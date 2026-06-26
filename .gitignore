@@ -21,3 +21,4 @@ dev-server*.log
 # Local Codex/agent state
 .agents/
 .codex/
+.local-tools/
