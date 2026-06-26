@@ -1,0 +1,23 @@
+# Local download/archive payloads
+archive/
+eater_downloads_batched/
+__pycache__/
+*.pyc
+
+# Build and dependency output
+node_modules/
+.pnpm-store/
+.svelte-kit/
+.vercel/
+dist/
+build/
+
+# Logs and local runtime files
+*.log
+dev-server*.log
+*.sqlite-shm
+*.sqlite-wal
+
+# Local Codex/agent state
+.agents/
+.codex/
