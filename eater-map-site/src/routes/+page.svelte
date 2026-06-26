@@ -9,6 +9,7 @@
   const SEARCH_LIMIT = 80;
   const MARKER_PADDING = 48;
   const MARKER_SPRITE_PADDING = 10;
+  const PINCH_ZOOM_THRESHOLD = 1.16;
 
   let mapEl;
   let markerCanvas;
@@ -23,9 +24,11 @@
   let selected = null;
   let query = '';
   let priceFilter = 'all';
+  let activePointers = new Map();
   let activePointer = null;
   let dragStart = null;
   let dragMoved = false;
+  let pinchStart = null;
   let resizeObserver;
   let markerHitState = { hits: [] };
   let markerSpriteCache = new Map();
@@ -33,6 +36,10 @@
   let markerDrawFrame = 0;
   let panFrame = 0;
   let pendingCenter = null;
+  let lastMarkerPick = null;
+  let userLocation = null;
+  let locationStatus = '';
+  let locationWatchId = null;
 
   const prices = ['all', '$', '$$', '$$$', '$$$$'];
   const roadmapItems = [
@@ -48,11 +55,19 @@
     'Deduplicate restaurants'
   ];
 
-  onMount(async () => {
+  onMount(() => {
     resizeObserver = new ResizeObserver(updateSize);
     if (mapEl) resizeObserver.observe(mapEl);
     updateSize();
+    loadRestaurants();
 
+    return () => {
+      resizeObserver?.disconnect();
+      stopLocationTracking();
+    };
+  });
+
+  async function loadRestaurants() {
     try {
       const response = await fetch('/data/restaurants.json');
       if (!response.ok) throw new Error(`Data request failed with ${response.status}`);
@@ -65,9 +80,7 @@
     } finally {
       loading = false;
     }
-
-    return () => resizeObserver?.disconnect();
-  });
+  }
 
   $: searchText = query.trim().toLowerCase();
   $: filteredRestaurants = restaurants.filter((restaurant) => {
@@ -83,7 +96,7 @@
   $: visibleTiles = getVisibleTiles(topLeft, width, height, zoom);
   $: searchResults = searchText ? filteredRestaurants.slice(0, SEARCH_LIMIT) : [];
   $: totalCount = stats?.entryCount || restaurants.length;
-  $: scheduleMarkerDraw(filteredRestaurants, topLeft, width, height, zoom, selected?.id);
+  $: scheduleMarkerDraw(filteredRestaurants, topLeft, width, height, zoom, selected?.id, userLocation);
 
   function annotateMarkers(items) {
     const duplicateCounts = new Map();
@@ -237,16 +250,16 @@
     return '#d43d2f';
   }
 
-  function scheduleMarkerDraw(items, origin, viewportWidth, viewportHeight, z, selectedId) {
+  function scheduleMarkerDraw(items, origin, viewportWidth, viewportHeight, z, selectedId, location) {
     if (!markerCanvas || !viewportWidth || !viewportHeight) return;
     if (markerDrawFrame) cancelAnimationFrame(markerDrawFrame);
     markerDrawFrame = requestAnimationFrame(() => {
       markerDrawFrame = 0;
-      drawMarkers(items, origin, viewportWidth, viewportHeight, z, selectedId);
+      drawMarkers(items, origin, viewportWidth, viewportHeight, z, selectedId, location);
     });
   }
 
-  function drawMarkers(items, origin, viewportWidth, viewportHeight, z, selectedId) {
+  function drawMarkers(items, origin, viewportWidth, viewportHeight, z, selectedId, location) {
     const canvas = markerCanvas;
     if (!canvas) return;
     const dpr = Math.max(1, window.devicePixelRatio || 1);
@@ -278,6 +291,7 @@
       drawMarker(ctx, marker, false);
     }
     if (selectedMarker) drawMarker(ctx, selectedMarker, true);
+    drawUserLocation(ctx, location, origin, viewportWidth, viewportHeight, z);
   }
 
   function drawMarker(ctx, marker, active) {
@@ -326,6 +340,46 @@
     return sprite;
   }
 
+  function drawUserLocation(ctx, location, origin, viewportWidth, viewportHeight, z) {
+    if (!location) return;
+    const point = project(location.lat, location.lon, z);
+    const x = point.x - origin.x;
+    const y = point.y - origin.y;
+    if (x < -100 || x > viewportWidth + 100 || y < -100 || y > viewportHeight + 100) return;
+
+    const accuracyRadius = location.accuracy
+      ? clamp(location.accuracy / metersPerPixel(location.lat, z), 10, 90)
+      : 0;
+
+    ctx.save();
+    if (accuracyRadius) {
+      ctx.beginPath();
+      ctx.arc(x, y, accuracyRadius, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(37, 99, 235, 0.16)';
+      ctx.fill();
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = 'rgba(37, 99, 235, 0.28)';
+      ctx.stroke();
+    }
+
+    ctx.shadowColor = 'rgba(27, 31, 28, 0.28)';
+    ctx.shadowBlur = 8;
+    ctx.shadowOffsetY = 3;
+    ctx.beginPath();
+    ctx.arc(x, y, 8, 0, Math.PI * 2);
+    ctx.fillStyle = '#2563eb';
+    ctx.fill();
+    ctx.shadowColor = 'transparent';
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = '#ffffff';
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function metersPerPixel(lat, z) {
+    return (156543.03392 * Math.cos((lat * Math.PI) / 180)) / 2 ** z;
+  }
+
   function isMapChrome(target) {
     return Boolean(target?.closest?.('.topbar, .zoom-controls, .price-controls, .results-panel, .attribution'));
   }
@@ -335,18 +389,30 @@
     const rect = mapEl.getBoundingClientRect();
     const x = clientX - rect.left;
     const y = clientY - rect.top;
-    let best = null;
-    let bestDistance = Infinity;
+    const candidates = [];
     for (const hit of markerHitState.hits) {
       const dx = x - hit.x;
       const dy = y - hit.y;
       const distance = Math.sqrt(dx * dx + dy * dy);
-      if (distance <= hit.radius + 5 && distance < bestDistance) {
-        best = hit.restaurant;
-        bestDistance = distance;
+      if (distance <= hit.radius + 10) {
+        candidates.push({ ...hit, distance });
       }
     }
-    return best;
+    if (!candidates.length) {
+      lastMarkerPick = null;
+      return null;
+    }
+
+    candidates.sort((a, b) => a.distance - b.distance || String(a.id).localeCompare(String(b.id)));
+    const key = candidates.map((candidate) => candidate.id).join('|');
+    const repeatedPick =
+      lastMarkerPick &&
+      lastMarkerPick.key === key &&
+      Math.abs(lastMarkerPick.x - clientX) <= 18 &&
+      Math.abs(lastMarkerPick.y - clientY) <= 18;
+    const index = repeatedPick ? (lastMarkerPick.index + 1) % candidates.length : 0;
+    lastMarkerPick = { key, index, x: clientX, y: clientY };
+    return candidates[index].restaurant;
   }
 
   function setCenterRaf(nextCenter) {
@@ -371,9 +437,72 @@
     pendingCenter = null;
   }
 
+  function eventPoint(event) {
+    return { x: event.clientX, y: event.clientY };
+  }
+
+  function pointerDistance(a, b) {
+    return Math.hypot(a.x - b.x, a.y - b.y);
+  }
+
+  function pointerMidpoint(a, b) {
+    return {
+      x: (a.x + b.x) / 2,
+      y: (a.y + b.y) / 2
+    };
+  }
+
+  function firstTwoPointers() {
+    return [...activePointers.values()].slice(0, 2);
+  }
+
+  function startPinch() {
+    const [first, second] = firstTwoPointers();
+    if (!first || !second) return;
+    const midpoint = pointerMidpoint(first, second);
+    pinchStart = {
+      distance: pointerDistance(first, second),
+      midpoint,
+      centerPx: project(center.lat, center.lon, zoom)
+    };
+    activePointer = null;
+    dragStart = null;
+    dragMoved = true;
+  }
+
+  function updatePinch() {
+    const [first, second] = firstTwoPointers();
+    if (!first || !second) return;
+    if (!pinchStart) startPinch();
+    if (!pinchStart) return;
+
+    const distance = pointerDistance(first, second);
+    const midpoint = pointerMidpoint(first, second);
+    const dx = midpoint.x - pinchStart.midpoint.x;
+    const dy = midpoint.y - pinchStart.midpoint.y;
+    setCenterRaf(unproject(pinchStart.centerPx.x - dx, pinchStart.centerPx.y - dy, zoom));
+
+    if (distance > pinchStart.distance * PINCH_ZOOM_THRESHOLD) {
+      flushPendingCenter();
+      zoomAt(midpoint.x, midpoint.y, 1);
+      startPinch();
+    } else if (distance < pinchStart.distance / PINCH_ZOOM_THRESHOLD) {
+      flushPendingCenter();
+      zoomAt(midpoint.x, midpoint.y, -1);
+      startPinch();
+    }
+  }
+
   function onPointerDown(event) {
     if (isMapChrome(event.target)) return;
     if (event.button !== undefined && event.button !== 0) return;
+    activePointers.set(event.pointerId, eventPoint(event));
+    mapEl?.setPointerCapture?.(event.pointerId);
+    if (activePointers.size >= 2) {
+      flushPendingCenter();
+      startPinch();
+      return;
+    }
     activePointer = event.pointerId;
     dragMoved = false;
     dragStart = {
@@ -381,10 +510,16 @@
       y: event.clientY,
       centerPx: project(center.lat, center.lon, zoom)
     };
-    mapEl?.setPointerCapture?.(event.pointerId);
   }
 
   function onPointerMove(event) {
+    if (activePointers.has(event.pointerId)) {
+      activePointers.set(event.pointerId, eventPoint(event));
+    }
+    if (activePointers.size >= 2) {
+      updatePinch();
+      return;
+    }
     if (activePointer !== event.pointerId || !dragStart) return;
     const dx = event.clientX - dragStart.x;
     const dy = event.clientY - dragStart.y;
@@ -393,6 +528,29 @@
   }
 
   function onPointerUp(event) {
+    const wasPinching = Boolean(pinchStart) || activePointers.size >= 2;
+    activePointers.delete(event.pointerId);
+    mapEl?.releasePointerCapture?.(event.pointerId);
+
+    if (wasPinching) {
+      flushPendingCenter();
+      pinchStart = null;
+      const remainingPointer = activePointers.entries().next().value;
+      if (remainingPointer) {
+        activePointer = remainingPointer[0];
+        dragStart = {
+          x: remainingPointer[1].x,
+          y: remainingPointer[1].y,
+          centerPx: project(center.lat, center.lon, zoom)
+        };
+        dragMoved = true;
+      } else {
+        activePointer = null;
+        dragStart = null;
+      }
+      return;
+    }
+
     if (activePointer !== event.pointerId) return;
     flushPendingCenter();
     if (!dragMoved && !isMapChrome(event.target)) {
@@ -401,7 +559,6 @@
     }
     activePointer = null;
     dragStart = null;
-    mapEl?.releasePointerCapture?.(event.pointerId);
   }
 
   function onWheel(event) {
@@ -434,8 +591,6 @@
 
   function selectRestaurant(restaurant) {
     selected = restaurant;
-    center = { lat: restaurant.lat, lon: restaurant.lon };
-    if (zoom < 15) zoom = 15;
   }
 
   function closeDetails() {
@@ -447,6 +602,50 @@
     selected = null;
     query = '';
     priceFilter = 'all';
+    lastMarkerPick = null;
+  }
+
+  function startLocationTracking() {
+    if (!navigator.geolocation) {
+      locationStatus = 'Location unavailable';
+      return;
+    }
+    if (userLocation) {
+      center = { lat: userLocation.lat, lon: userLocation.lon };
+      if (zoom < 15) zoom = 15;
+    }
+    if (locationWatchId !== null) return;
+
+    locationStatus = 'Locating';
+    locationWatchId = navigator.geolocation.watchPosition(
+      (position) => {
+        const firstLocation = !userLocation;
+        userLocation = {
+          lat: position.coords.latitude,
+          lon: position.coords.longitude,
+          accuracy: position.coords.accuracy
+        };
+        locationStatus = 'Live location on';
+        if (firstLocation) {
+          center = { lat: userLocation.lat, lon: userLocation.lon };
+          if (zoom < 15) zoom = 15;
+        }
+      },
+      (error) => {
+        locationStatus = error.message || 'Location unavailable';
+      },
+      {
+        enableHighAccuracy: true,
+        maximumAge: 10000,
+        timeout: 15000
+      }
+    );
+  }
+
+  function stopLocationTracking() {
+    if (locationWatchId === null || !navigator.geolocation) return;
+    navigator.geolocation.clearWatch(locationWatchId);
+    locationWatchId = null;
   }
 </script>
 
@@ -509,6 +708,16 @@
     <div class="zoom-controls" aria-label="Zoom controls">
       <button type="button" on:click={() => zoomButton(1)} aria-label="Zoom in">+</button>
       <button type="button" on:click={() => zoomButton(-1)} aria-label="Zoom out">-</button>
+      <button
+        class="location-button"
+        class:active={Boolean(userLocation)}
+        type="button"
+        on:click={startLocationTracking}
+        aria-label="Show current location"
+        title={locationStatus || 'Show current location'}
+      >
+        Loc
+      </button>
     </div>
 
     <div class="price-controls" aria-label="Price filter">
@@ -786,6 +995,16 @@
     font-weight: 800;
   }
 
+  .zoom-controls button.active {
+    color: #fff;
+    background: #2563eb;
+  }
+
+  .zoom-controls .location-button {
+    font-size: 12px;
+    letter-spacing: 0;
+  }
+
   .price-controls {
     position: absolute;
     left: 12px;
@@ -1060,7 +1279,7 @@
     }
 
     .zoom-controls {
-      top: 78px;
+      top: 98px;
     }
 
     .price-controls {
