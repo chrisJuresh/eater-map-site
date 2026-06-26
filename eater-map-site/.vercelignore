@@ -1,0 +1,7 @@
+node_modules
+.svelte-kit
+.vercel
+dev-server*.log
+*.log
+*.sqlite-shm
+*.sqlite-wal
