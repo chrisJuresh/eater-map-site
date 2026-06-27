@@ -43,6 +43,8 @@
 
   const prices = ['all', '$', '$$', '$$$', '$$$$'];
   const roadmapItems = [
+    'Smaller description popup on mobile',
+    'Location on by default',
     'Remove closed restaurants',
     'Add opening times',
     'Add rating information',
@@ -60,6 +62,7 @@
     if (mapEl) resizeObserver.observe(mapEl);
     updateSize();
     loadRestaurants();
+    startLocationTracking();
 
     return () => {
       resizeObserver?.disconnect();
@@ -653,7 +656,7 @@
   <title>Eater Restaurant Map</title>
   <meta
     name="description"
-    content="Mobile-friendly map of Eater restaurant entries with locations, descriptions, links, booking information, and source map URLs."
+    content="Full map of restaurants featured in Eater map guides."
   />
 </svelte:head>
 
@@ -1241,8 +1244,11 @@
       right: 0;
       bottom: 0;
       z-index: 30;
-      height: min(68dvh, 560px);
-      padding: 18px 16px 22px;
+      display: flex;
+      flex-direction: column;
+      height: auto;
+      max-height: min(56dvh, 470px);
+      padding: 14px 14px max(14px, env(safe-area-inset-bottom));
       border-top: 1px solid rgba(23, 32, 28, 0.16);
       border-left: 0;
       border-radius: 12px 12px 0 0;
@@ -1259,10 +1265,70 @@
       display: none;
     }
 
+    .details-panel h1 {
+      padding-right: 34px;
+      font-size: 22px;
+      line-height: 1.06;
+    }
+
+    .details-panel .eyebrow {
+      margin: 0 42px 6px 0;
+      font-size: 10px;
+    }
+
+    .details-panel .meta-row {
+      gap: 5px;
+      margin: 9px 0 8px;
+    }
+
+    .details-panel .meta-row span {
+      padding: 4px 7px;
+      font-size: 11px;
+    }
+
+    .details-panel .address {
+      margin-bottom: 9px;
+      font-size: 13px;
+    }
+
+    .details-panel .description {
+      order: 7;
+      max-height: calc(1.42em * 7);
+      margin: 0 0 10px;
+      padding-right: 3px;
+      overflow-y: auto;
+      line-height: 1.42;
+      font-size: 14px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .details-panel .facts {
+      order: 8;
+      gap: 8px;
+      font-size: 13px;
+    }
+
+    .details-panel .facts div {
+      padding-top: 8px;
+    }
+
     .actions {
-      margin: 18px -16px -22px;
-      padding-left: 16px;
-      padding-right: 16px;
+      position: static;
+      order: 6;
+      display: flex;
+      gap: 6px;
+      margin: 2px 0 10px;
+      padding: 0;
+      background: transparent;
+    }
+
+    .actions a {
+      flex: 1 1 0;
+      min-width: 0;
+      min-height: 38px;
+      padding: 0 6px;
+      font-size: 12px;
+      white-space: nowrap;
     }
 
     .topbar {

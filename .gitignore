@@ -1,6 +1,4 @@
-# Local download/archive payloads
-archive/
-eater_downloads_batched/
+# Local generated Python output
 __pycache__/
 *.pyc
 

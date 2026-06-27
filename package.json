@@ -7,7 +7,7 @@
     "dev": "vite --host 127.0.0.1",
     "build": "vite build",
     "preview": "vite preview --host 127.0.0.1",
-    "export:data": "python scripts/build-public-data.py"
+    "export:data": "python data-pipeline/scripts/build-public-data.py"
   },
   "devDependencies": {
     "@sveltejs/adapter-vercel": "^6.3.4",

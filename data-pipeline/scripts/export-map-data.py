@@ -9,8 +9,8 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[2]
-DB_PATH = ROOT / "eater_downloads_batched" / "01_maps" / "eater_maps.sqlite"
-OUTPUT_PATH = Path(__file__).resolve().parents[1] / "static" / "data" / "restaurants.json"
+DB_PATH = ROOT / "data-pipeline" / "raw-downloads" / "01_maps" / "eater_maps.sqlite"
+OUTPUT_PATH = ROOT / "static" / "data" / "restaurants.json"
 
 
 def json_list(value: str | None) -> list[str]:
