@@ -19,6 +19,7 @@
   const HOME_VIEW_PADDING = 32;
   const MARKER_SPRITE_PADDING = 10;
   const PINCH_ZOOM_THRESHOLD = 1.16;
+  const DESCRIPTION_VISIBLE_LINES = 6;
 
   let mapEl;
   let markerCanvas;
@@ -56,6 +57,7 @@
   let descriptionCanScrollDown = false;
   let descriptionScrollbar = { top: 0, height: 100 };
   let descriptionMeasureToken = 0;
+  let measuredDescriptionRestaurantId = '';
 
   const prices = ['all', '$', '$$', '$$$', '$$$$'];
   const roadmapItems = [
@@ -125,9 +127,15 @@
   $: scheduleMarkerDraw(filteredRestaurants, topLeft, width, height, zoom, selected?.id, userLocation);
 
   function scheduleDescriptionMeasure() {
+    const selectedRestaurantId = selected?.id || '';
     const token = ++descriptionMeasureToken;
     tick().then(() => {
-      if (token === descriptionMeasureToken) updateDescriptionScrollState();
+      if (token !== descriptionMeasureToken) return;
+      if (descriptionEl && selectedRestaurantId !== measuredDescriptionRestaurantId) {
+        descriptionEl.scrollTop = 0;
+        measuredDescriptionRestaurantId = selectedRestaurantId;
+      }
+      updateDescriptionScrollState();
     });
   }
 
@@ -136,6 +144,7 @@
       descriptionHasMore = false;
       descriptionCanScrollDown = false;
       descriptionScrollbar = { top: 0, height: 100 };
+      measuredDescriptionRestaurantId = '';
       return;
     }
 
@@ -845,6 +854,7 @@
           class:can-scroll-down={descriptionCanScrollDown}
           class:has-more={descriptionHasMore}
           class="description-shell"
+          style={`--description-visible-lines: ${DESCRIPTION_VISIBLE_LINES};`}
         >
           <p class="description" bind:this={descriptionEl} on:scroll={updateDescriptionScrollState}>
             {selected.description}
@@ -1410,7 +1420,7 @@
     }
 
     .details-panel .description {
-      max-height: calc(1.42em * 6);
+      max-height: calc(1.42em * var(--description-visible-lines, 6));
       margin: 0;
       padding-right: 12px;
       overflow-y: auto;
