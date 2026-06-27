@@ -683,7 +683,7 @@
     lastMarkerPick = null;
   }
 
-  function startLocationTracking() {
+  function startLocationTracking(options = {}) {
     if (!navigator.geolocation) {
       locationStatus = 'Location unavailable';
       return;
@@ -691,6 +691,9 @@
     if (userLocation) {
       center = { lat: userLocation.lat, lon: userLocation.lon };
       zoom = clamp(LOCATION_ZOOM, minZoom, MAX_ZOOM);
+    }
+    if (options.restart && locationWatchId !== null) {
+      stopLocationTracking();
     }
     if (locationWatchId !== null) return;
 
@@ -712,6 +715,7 @@
       },
       (error) => {
         locationStatus = error.message || 'Location unavailable';
+        stopLocationTracking();
         applyFallbackHomeView();
       },
       {
@@ -792,7 +796,7 @@
         class="location-button"
         class:active={Boolean(userLocation)}
         type="button"
-        on:click={startLocationTracking}
+        on:click={() => startLocationTracking({ restart: true })}
         aria-label="Show current location"
         title={locationStatus || 'Show current location'}
       >
@@ -1263,6 +1267,10 @@
     position: relative;
   }
 
+  .description-scrollbar {
+    display: none;
+  }
+
   .facts {
     display: grid;
     gap: 10px;
@@ -1406,28 +1414,20 @@
       margin: 0;
       padding-right: 12px;
       overflow-y: auto;
-      scrollbar-width: thin;
-      scrollbar-color: rgba(23, 32, 28, 0.45) rgba(23, 32, 28, 0.08);
+      scrollbar-width: none;
       line-height: 1.42;
       font-size: 14px;
       -webkit-overflow-scrolling: touch;
     }
 
     .details-panel .description::-webkit-scrollbar {
-      width: 4px;
-    }
-
-    .details-panel .description::-webkit-scrollbar-track {
-      border-radius: 999px;
-      background: rgba(23, 32, 28, 0.08);
-    }
-
-    .details-panel .description::-webkit-scrollbar-thumb {
-      border-radius: 999px;
-      background: rgba(23, 32, 28, 0.45);
+      display: none;
+      width: 0;
+      height: 0;
     }
 
     .description-scrollbar {
+      display: block;
       position: absolute;
       top: 2px;
       right: 1px;
