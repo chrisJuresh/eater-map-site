@@ -61,6 +61,7 @@
 
   const prices = ['all', '$', '$$', '$$$', '$$$$'];
   const roadmapItems = [
+    'Display num. of items in search',
     'Remove closed restaurants',
     'Add opening times',
     'Add rating information',
