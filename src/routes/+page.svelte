@@ -19,7 +19,7 @@
   const HOME_VIEW_PADDING = 32;
   const MARKER_SPRITE_PADDING = 10;
   const PINCH_ZOOM_THRESHOLD = 1.16;
-  const DESCRIPTION_VISIBLE_LINES = 6;
+  const DESCRIPTION_VISIBLE_LINES = 3;
 
   let mapEl;
   let markerCanvas;
