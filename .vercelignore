@@ -1,9 +1,13 @@
 node_modules
 .svelte-kit
 .vercel
+data
+data-pipeline
+.agents
+.codex
+.local-tools
+.pnpm-store
 dev-server*.log
 *.log
 *.sqlite-shm
 *.sqlite-wal
-
-.vercel

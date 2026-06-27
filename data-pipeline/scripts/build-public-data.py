@@ -17,11 +17,10 @@ from pathlib import Path
 from typing import Any
 
 
-SITE_ROOT = Path(__file__).resolve().parents[1]
-REPO_ROOT = SITE_ROOT.parent
-DEFAULT_SOURCE_DB = REPO_ROOT / "eater_downloads_batched" / "01_maps" / "eater_maps.sqlite"
-DEFAULT_PUBLIC_DB = SITE_ROOT / "data" / "eater-map-public.sqlite"
-DEFAULT_PUBLIC_JSON = SITE_ROOT / "static" / "data" / "restaurants.json"
+REPO_ROOT = Path(__file__).resolve().parents[2]
+DEFAULT_SOURCE_DB = REPO_ROOT / "data-pipeline" / "raw-downloads" / "01_maps" / "eater_maps.sqlite"
+DEFAULT_PUBLIC_DB = REPO_ROOT / "data" / "eater-map-public.sqlite"
+DEFAULT_PUBLIC_JSON = REPO_ROOT / "static" / "data" / "restaurants.json"
 
 
 SOURCE_QUERY = """
