@@ -2,12 +2,21 @@
   import { onMount } from 'svelte';
 
   const TILE_SIZE = 256;
-  const MIN_ZOOM = 5;
+  const MIN_ZOOM_FLOOR = 3;
   const MAX_ZOOM = 19;
+  const LOCATION_ZOOM = 14;
   const DEFAULT_CENTER = { lat: 51.5074, lon: -0.1278 };
-  const DEFAULT_ZOOM = 11;
+  const DEFAULT_ZOOM = 9;
+  const LONDON_FALLBACK_BOUNDS = {
+    minLat: 51.2868,
+    maxLat: 51.6919,
+    minLon: -0.5103,
+    maxLon: 0.334
+  };
   const SEARCH_LIMIT = 80;
   const MARKER_PADDING = 48;
+  const VIEW_FIT_PADDING = 48;
+  const HOME_VIEW_PADDING = 32;
   const MARKER_SPRITE_PADDING = 10;
   const PINCH_ZOOM_THRESHOLD = 1.16;
 
@@ -19,6 +28,7 @@
   let loadError = '';
   let width = 0;
   let height = 0;
+  let minZoom = 5;
   let center = DEFAULT_CENTER;
   let zoom = DEFAULT_ZOOM;
   let selected = null;
@@ -40,6 +50,7 @@
   let userLocation = null;
   let locationStatus = '';
   let locationWatchId = null;
+  let homeViewApplied = false;
 
   const prices = ['all', '$', '$$', '$$$', '$$$$'];
   const roadmapItems = [
@@ -77,7 +88,7 @@
       const payload = await response.json();
       restaurants = annotateMarkers(payload.restaurants || []);
       stats = payload.stats || null;
-      fitBounds(payload.bounds);
+      applyFallbackHomeView();
     } catch (error) {
       loadError = error instanceof Error ? error.message : String(error);
     } finally {
@@ -99,6 +110,8 @@
   $: visibleTiles = getVisibleTiles(topLeft, width, height, zoom);
   $: searchResults = searchText ? filteredRestaurants.slice(0, SEARCH_LIMIT) : [];
   $: totalCount = stats?.entryCount || restaurants.length;
+  $: minZoom = getMinimumZoom(stats?.bounds);
+  $: if (zoom < minZoom) zoom = minZoom;
   $: scheduleMarkerDraw(filteredRestaurants, topLeft, width, height, zoom, selected?.id, userLocation);
 
   function annotateMarkers(items) {
@@ -160,6 +173,7 @@
     const rect = mapEl.getBoundingClientRect();
     width = rect.width;
     height = rect.height;
+    applyFallbackHomeView();
   }
 
   function clamp(value, min, max) {
@@ -186,21 +200,43 @@
     };
   }
 
-  function fitBounds(bounds) {
+  function getFitZoom(bounds, padding = VIEW_FIT_PADDING, maxZoom = MAX_ZOOM, minZoomLimit = MIN_ZOOM_FLOOR) {
     if (!bounds || !width || !height) return;
+    const availableWidth = Math.max(1, width - padding * 2);
+    const availableHeight = Math.max(1, height - padding * 2);
+    for (let z = maxZoom; z >= minZoomLimit; z -= 1) {
+      const northwest = project(bounds.maxLat, bounds.minLon, z);
+      const southeast = project(bounds.minLat, bounds.maxLon, z);
+      if (
+        Math.abs(southeast.x - northwest.x) <= availableWidth &&
+        Math.abs(southeast.y - northwest.y) <= availableHeight
+      ) {
+        return z;
+      }
+    }
+    return minZoomLimit;
+  }
+
+  function getMinimumZoom(bounds) {
+    return getFitZoom(bounds, VIEW_FIT_PADDING, MAX_ZOOM, MIN_ZOOM_FLOOR) || 5;
+  }
+
+  function fitBounds(bounds, options = {}) {
+    if (!bounds || !width || !height) return false;
+    const padding = options.padding ?? VIEW_FIT_PADDING;
+    const maxZoom = options.maxZoom ?? MAX_ZOOM;
     const centerLat = (bounds.minLat + bounds.maxLat) / 2;
     const centerLon = (bounds.minLon + bounds.maxLon) / 2;
     center = { lat: centerLat, lon: centerLon };
+    zoom = clamp(getFitZoom(bounds, padding, maxZoom, minZoom), minZoom, maxZoom);
+    return true;
+  }
 
-    for (let z = MAX_ZOOM; z >= MIN_ZOOM; z -= 1) {
-      const northwest = project(bounds.maxLat, bounds.minLon, z);
-      const southeast = project(bounds.minLat, bounds.maxLon, z);
-      if (Math.abs(southeast.x - northwest.x) <= width * 0.72 && Math.abs(southeast.y - northwest.y) <= height * 0.72) {
-        zoom = z;
-        return;
-      }
+  function applyFallbackHomeView() {
+    if (homeViewApplied || userLocation) return;
+    if (fitBounds(LONDON_FALLBACK_BOUNDS, { padding: HOME_VIEW_PADDING, maxZoom: 11 })) {
+      homeViewApplied = true;
     }
-    zoom = 6;
   }
 
   function getVisibleTiles(origin, viewportWidth, viewportHeight, z) {
@@ -571,7 +607,7 @@
   }
 
   function zoomAt(clientX, clientY, delta) {
-    const nextZoom = clamp(zoom + delta, MIN_ZOOM, MAX_ZOOM);
+    const nextZoom = clamp(zoom + delta, minZoom, MAX_ZOOM);
     if (nextZoom === zoom || !mapEl) return;
     const rect = mapEl.getBoundingClientRect();
     const before = {
@@ -601,7 +637,13 @@
   }
 
   function resetMap() {
-    fitBounds(stats?.bounds);
+    if (userLocation) {
+      center = { lat: userLocation.lat, lon: userLocation.lon };
+      zoom = clamp(LOCATION_ZOOM, minZoom, MAX_ZOOM);
+    } else {
+      homeViewApplied = false;
+      applyFallbackHomeView();
+    }
     selected = null;
     query = '';
     priceFilter = 'all';
@@ -615,7 +657,7 @@
     }
     if (userLocation) {
       center = { lat: userLocation.lat, lon: userLocation.lon };
-      if (zoom < 15) zoom = 15;
+      zoom = clamp(LOCATION_ZOOM, minZoom, MAX_ZOOM);
     }
     if (locationWatchId !== null) return;
 
@@ -631,11 +673,13 @@
         locationStatus = 'Live location on';
         if (firstLocation) {
           center = { lat: userLocation.lat, lon: userLocation.lon };
-          if (zoom < 15) zoom = 15;
+          zoom = clamp(LOCATION_ZOOM, minZoom, MAX_ZOOM);
+          homeViewApplied = true;
         }
       },
       (error) => {
         locationStatus = error.message || 'Location unavailable';
+        applyFallbackHomeView();
       },
       {
         enableHighAccuracy: true,
