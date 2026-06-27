@@ -1,5 +1,5 @@
 <script>
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
 
   const TILE_SIZE = 256;
   const MIN_ZOOM_FLOOR = 3;
@@ -51,11 +51,14 @@
   let locationStatus = '';
   let locationWatchId = null;
   let homeViewApplied = false;
+  let descriptionEl;
+  let descriptionHasMore = false;
+  let descriptionCanScrollDown = false;
+  let descriptionScrollbar = { top: 0, height: 100 };
+  let descriptionMeasureToken = 0;
 
   const prices = ['all', '$', '$$', '$$$', '$$$$'];
   const roadmapItems = [
-    'Smaller description popup on mobile',
-    'Location on by default',
     'Remove closed restaurants',
     'Add opening times',
     'Add rating information',
@@ -112,7 +115,37 @@
   $: totalCount = stats?.entryCount || restaurants.length;
   $: minZoom = getMinimumZoom(stats?.bounds);
   $: if (zoom < minZoom) zoom = minZoom;
+  $: {
+    selected?.id;
+    selected?.description;
+    width;
+    height;
+    scheduleDescriptionMeasure();
+  }
   $: scheduleMarkerDraw(filteredRestaurants, topLeft, width, height, zoom, selected?.id, userLocation);
+
+  function scheduleDescriptionMeasure() {
+    const token = ++descriptionMeasureToken;
+    tick().then(() => {
+      if (token === descriptionMeasureToken) updateDescriptionScrollState();
+    });
+  }
+
+  function updateDescriptionScrollState() {
+    if (!descriptionEl) {
+      descriptionHasMore = false;
+      descriptionCanScrollDown = false;
+      descriptionScrollbar = { top: 0, height: 100 };
+      return;
+    }
+
+    const maxScroll = Math.max(0, descriptionEl.scrollHeight - descriptionEl.clientHeight);
+    descriptionHasMore = maxScroll > 1;
+    descriptionCanScrollDown = maxScroll - descriptionEl.scrollTop > 1;
+    const thumbHeight = descriptionHasMore ? clamp((descriptionEl.clientHeight / descriptionEl.scrollHeight) * 100, 18, 100) : 100;
+    const thumbTop = descriptionHasMore && maxScroll ? (descriptionEl.scrollTop / maxScroll) * (100 - thumbHeight) : 0;
+    descriptionScrollbar = { top: thumbTop, height: thumbHeight };
+  }
 
   function annotateMarkers(items) {
     const duplicateCounts = new Map();
@@ -804,7 +837,20 @@
       <p class="address">{selected.address}</p>
 
       {#if selected.description}
-        <p class="description">{selected.description}</p>
+        <div
+          class:can-scroll-down={descriptionCanScrollDown}
+          class:has-more={descriptionHasMore}
+          class="description-shell"
+        >
+          <p class="description" bind:this={descriptionEl} on:scroll={updateDescriptionScrollState}>
+            {selected.description}
+          </p>
+          {#if descriptionHasMore}
+            <span class="description-scrollbar" aria-hidden="true">
+              <span style={`top: ${descriptionScrollbar.top}%; height: ${descriptionScrollbar.height}%;`}></span>
+            </span>
+          {/if}
+        </div>
       {/if}
 
       <dl class="facts">
@@ -1213,6 +1259,10 @@
     line-height: 1.5;
   }
 
+  .description-shell {
+    position: relative;
+  }
+
   .facts {
     display: grid;
     gap: 10px;
@@ -1335,15 +1385,66 @@
       font-size: 13px;
     }
 
-    .details-panel .description {
+    .details-panel .description-shell {
       order: 7;
-      max-height: calc(1.42em * 6);
       margin: 0 0 8px;
-      padding-right: 3px;
+    }
+
+    .details-panel .description-shell.can-scroll-down::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 9px;
+      bottom: 0;
+      height: 1.7em;
+      pointer-events: none;
+      background: linear-gradient(180deg, rgba(255, 253, 247, 0), #fffdf7 82%);
+    }
+
+    .details-panel .description {
+      max-height: calc(1.42em * 6);
+      margin: 0;
+      padding-right: 12px;
       overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(23, 32, 28, 0.45) rgba(23, 32, 28, 0.08);
       line-height: 1.42;
       font-size: 14px;
       -webkit-overflow-scrolling: touch;
+    }
+
+    .details-panel .description::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .details-panel .description::-webkit-scrollbar-track {
+      border-radius: 999px;
+      background: rgba(23, 32, 28, 0.08);
+    }
+
+    .details-panel .description::-webkit-scrollbar-thumb {
+      border-radius: 999px;
+      background: rgba(23, 32, 28, 0.45);
+    }
+
+    .description-scrollbar {
+      position: absolute;
+      top: 2px;
+      right: 1px;
+      bottom: 2px;
+      width: 3px;
+      border-radius: 999px;
+      background: rgba(23, 32, 28, 0.08);
+      pointer-events: none;
+    }
+
+    .description-scrollbar span {
+      position: absolute;
+      left: 0;
+      right: 0;
+      min-height: 18%;
+      border-radius: 999px;
+      background: rgba(23, 32, 28, 0.46);
     }
 
     .details-panel .facts {
