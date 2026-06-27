@@ -1292,7 +1292,7 @@
       flex-direction: column;
       height: auto;
       max-height: min(56dvh, 470px);
-      padding: 14px 14px max(14px, env(safe-area-inset-bottom));
+      padding: 14px 14px max(8px, env(safe-area-inset-bottom));
       border-top: 1px solid rgba(23, 32, 28, 0.16);
       border-left: 0;
       border-radius: 12px 12px 0 0;
@@ -1337,8 +1337,8 @@
 
     .details-panel .description {
       order: 7;
-      max-height: calc(1.42em * 7);
-      margin: 0 0 10px;
+      max-height: calc(1.42em * 6);
+      margin: 0 0 8px;
       padding-right: 3px;
       overflow-y: auto;
       line-height: 1.42;
