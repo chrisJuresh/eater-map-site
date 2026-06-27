@@ -1,0 +1,42 @@
+{
+  "batch_folder": "03_www_eater_rest",
+  "batch_key": "www_eater_rest",
+  "batch_order": 3,
+  "canonical_url": "",
+  "content_length": 290926,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T23:17:16+00:00",
+  "final_url": "https://www.eater.com/2018/4/23/17270616/best-rooftops-patios-united-states-london",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "40729",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 23:17:18 GMT",
+    "ETag": "\"lagkv396ew68bq\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000143-IAD, cache-lhr-egwu1540056-LHR",
+    "X-Timer": "S1782515838.860520,VS0,VE233",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "25",
+    "x-middleware-rewrite": "/resource/content/post/ZXQyOnBvc3Q6NjIyNzcw"
+  },
+  "input_data": {
+    "url": "https://www.eater.com/2018/4/23/17270616/best-rooftops-patios-united-states-london"
+  },
+  "input_row_number": 4367,
+  "sha256": "8e924c3c92727881c13f54d4cf4603e857219d885bb86049309c5b17efd25204",
+  "status_code": 200,
+  "title": "",
+  "url": "https://www.eater.com/2018/4/23/17270616/best-rooftops-patios-united-states-london"
+}

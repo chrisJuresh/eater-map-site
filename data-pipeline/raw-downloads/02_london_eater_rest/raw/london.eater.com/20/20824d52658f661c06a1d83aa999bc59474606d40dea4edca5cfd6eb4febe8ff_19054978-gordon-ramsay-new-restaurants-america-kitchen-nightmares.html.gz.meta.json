@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 265258,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T21:10:03+00:00",
+  "final_url": "https://london.eater.com/2019/6/28/19054978/gordon-ramsay-new-restaurants-america-kitchen-nightmares",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "38976",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 21:10:05 GMT",
+    "ETag": "\"8f7ll9j6sj5ohm\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000160-IAD, cache-lcy-egml8630098-LCY",
+    "X-Timer": "S1782508205.922884,VS0,VE254",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "22",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIzMDE5"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2019/6/28/19054978/gordon-ramsay-new-restaurants-america-kitchen-nightmares"
+  },
+  "input_row_number": 2433,
+  "sha256": "be9d5ca375d3192153c13272d1beb17c17365ef1bcbba3b6a8adc3153201ac65",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2019/6/28/19054978/gordon-ramsay-new-restaurants-america-kitchen-nightmares"
+}

@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 263899,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T19:19:49+00:00",
+  "final_url": "https://london.eater.com/2020/10/22/21526337/conrad-london-hotel-sally-abe-harwood-arms-michelin-star",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "38594",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 19:19:50 GMT",
+    "ETag": "\"1lxg3prl995net\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000151-IAD, cache-lcy-egml8630065-LCY",
+    "X-Timer": "S1782501591.695706,VS0,VE263",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "23",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIwNjA1"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2020/10/22/21526337/conrad-london-hotel-sally-abe-harwood-arms-michelin-star"
+  },
+  "input_row_number": 750,
+  "sha256": "713cbf9aa6d1f2cf4ae4167051a623954b1f607b24a0d4045408c77622b204e4",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2020/10/22/21526337/conrad-london-hotel-sally-abe-harwood-arms-michelin-star"
+}

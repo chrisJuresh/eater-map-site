@@ -1,0 +1,43 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 452945,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T20:27:00+00:00",
+  "final_url": "https://london.eater.com/23170741/park-royal-london-food-restaurants-elizabeth-line-hs2",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "68935",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 20:27:02 GMT",
+    "ETag": "\"v9mstlwz029p9o\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000179-IAD, cache-lcy-egml8630085-LCY",
+    "X-Timer": "S1782505622.993849,VS0,VE251",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "27",
+    "vm-resource-primary-super-cat": "ZXQyOnN1cGVyQ2F0OjQ2NQ==",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIwMDc4"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/23170741/park-royal-london-food-restaurants-elizabeth-line-hs2"
+  },
+  "input_row_number": 1792,
+  "sha256": "bd18fa3fef63b55ace90e92dad557eac3dc1135c692ce8ba2ce795ce04371101",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/23170741/park-royal-london-food-restaurants-elizabeth-line-hs2"
+}

@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 695547,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T18:49:26+00:00",
+  "final_url": "https://london.eater.com/delivery",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "51729",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 18:49:27 GMT",
+    "ETag": "\"jjvvbi38noewd6\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000114-IAD, cache-lcy-eglc8600030-LCY",
+    "X-Timer": "S1782499767.232910,VS0,VE408",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-loop-nav-provider-query": "20",
+    "x-middleware-rewrite": "/resource/category/ZXQzMTpjYXRlZ29yeTo0OTE="
+  },
+  "input_data": {
+    "url": "https://london.eater.com/delivery"
+  },
+  "input_row_number": 306,
+  "sha256": "d187e91a0a1035aa730b0d831e2d86661042db46e8e627de5cd5222ea09873e5",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/delivery"
+}

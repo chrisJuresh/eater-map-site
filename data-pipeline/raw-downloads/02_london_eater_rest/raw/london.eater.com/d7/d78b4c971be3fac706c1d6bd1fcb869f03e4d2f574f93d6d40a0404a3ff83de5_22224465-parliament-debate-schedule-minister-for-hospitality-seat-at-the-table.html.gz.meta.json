@@ -1,0 +1,43 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 274045,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T23:00:27+00:00",
+  "final_url": "https://london.eater.com/22224465/parliament-debate-schedule-minister-for-hospitality-seat-at-the-table",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "40304",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 23:00:29 GMT",
+    "ETag": "\"m8wigeleef5vct\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000157-IAD, cache-lhr-egwu1540021-LHR",
+    "X-Timer": "S1782514829.756417,VS0,VE680",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "31",
+    "vm-resource-primary-super-cat": "ZXQyOnN1cGVyQ2F0OjExNzU=",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjE5NzM1"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/22224465/parliament-debate-schedule-minister-for-hospitality-seat-at-the-table"
+  },
+  "input_row_number": 4143,
+  "sha256": "014dc79996f8e9606dbe1c4c04f12729ad0932133736f12aebc2a36fbacb22bd",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/22224465/parliament-debate-schedule-minister-for-hospitality-seat-at-the-table"
+}

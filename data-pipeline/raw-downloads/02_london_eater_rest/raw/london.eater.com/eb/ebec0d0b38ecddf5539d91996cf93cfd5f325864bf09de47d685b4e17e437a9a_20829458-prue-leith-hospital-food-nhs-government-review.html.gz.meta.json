@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 268885,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T19:54:23+00:00",
+  "final_url": "https://london.eater.com/2019/8/23/20829458/prue-leith-hospital-food-nhs-government-review",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "40135",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 19:54:25 GMT",
+    "ETag": "\"5sbas8x0pa5rb6\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000108-IAD, cache-lhr-egwu1540064-LHR",
+    "X-Timer": "S1782503664.490488,VS0,VE788",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "29",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIzMTE1"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2019/8/23/20829458/prue-leith-hospital-food-nhs-government-review"
+  },
+  "input_row_number": 1270,
+  "sha256": "872aac827e8447a2c818d3d5b4396d29814049df461d3a09f819100d04e9d8d3",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2019/8/23/20829458/prue-leith-hospital-food-nhs-government-review"
+}

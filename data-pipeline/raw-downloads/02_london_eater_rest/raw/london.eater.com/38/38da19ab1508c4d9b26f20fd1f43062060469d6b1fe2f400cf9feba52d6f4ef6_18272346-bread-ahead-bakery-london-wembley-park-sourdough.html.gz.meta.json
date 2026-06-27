@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 288240,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T21:15:37+00:00",
+  "final_url": "https://london.eater.com/2019/3/19/18272346/bread-ahead-bakery-london-wembley-park-sourdough",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "38544",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 21:15:39 GMT",
+    "ETag": "\"186uigj336t66b8\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000103-IAD, cache-lcy-egml8630036-LCY",
+    "X-Timer": "S1782508539.924780,VS0,VE323",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "25",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIzNzU1"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2019/3/19/18272346/bread-ahead-bakery-london-wembley-park-sourdough"
+  },
+  "input_row_number": 2522,
+  "sha256": "f04f80f1f13c9cf3f264dab9c128b2d2584a57ff0a5f36e43d47c2b62db24db6",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2019/3/19/18272346/bread-ahead-bakery-london-wembley-park-sourdough"
+}

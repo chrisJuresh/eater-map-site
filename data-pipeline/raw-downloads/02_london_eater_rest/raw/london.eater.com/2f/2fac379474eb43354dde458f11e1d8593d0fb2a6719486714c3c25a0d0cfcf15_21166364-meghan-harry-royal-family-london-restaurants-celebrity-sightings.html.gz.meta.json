@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 284521,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T20:54:36+00:00",
+  "final_url": "https://london.eater.com/2020/3/6/21166364/meghan-harry-royal-family-london-restaurants-celebrity-sightings",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "41746",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 20:54:38 GMT",
+    "ETag": "\"eo3i1mm4cd63ej\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200150-IAD, cache-lcy-egml8630035-LCY",
+    "X-Timer": "S1782507278.798922,VS0,VE280",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "26",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIxNjQy"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2020/3/6/21166364/meghan-harry-royal-family-london-restaurants-celebrity-sightings"
+  },
+  "input_row_number": 2209,
+  "sha256": "2b64fde6c036ad8f7b7cbcaf48812ac47e9920762383fdd9d7f1a03c7450afa5",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2020/3/6/21166364/meghan-harry-royal-family-london-restaurants-celebrity-sightings"
+}

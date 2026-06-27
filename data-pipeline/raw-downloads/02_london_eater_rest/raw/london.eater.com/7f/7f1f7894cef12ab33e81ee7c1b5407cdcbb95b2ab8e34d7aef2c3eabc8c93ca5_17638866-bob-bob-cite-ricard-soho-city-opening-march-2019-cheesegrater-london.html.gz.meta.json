@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 263836,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T21:28:44+00:00",
+  "final_url": "https://london.eater.com/2018/8/1/17638866/bob-bob-cite-ricard-soho-city-opening-march-2019-cheesegrater-london",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "38888",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 21:28:46 GMT",
+    "ETag": "\"olsh9ob0vv5ngo\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200037-IAD, cache-lon4269-LON",
+    "X-Timer": "S1782509326.418760,VS0,VE294",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "36",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI0OTY0"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2018/8/1/17638866/bob-bob-cite-ricard-soho-city-opening-march-2019-cheesegrater-london"
+  },
+  "input_row_number": 2735,
+  "sha256": "375493dc9405495aaf80a181d278ee39afec55aa6017fb89890cdc1c72b09705",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2018/8/1/17638866/bob-bob-cite-ricard-soho-city-opening-march-2019-cheesegrater-london"
+}

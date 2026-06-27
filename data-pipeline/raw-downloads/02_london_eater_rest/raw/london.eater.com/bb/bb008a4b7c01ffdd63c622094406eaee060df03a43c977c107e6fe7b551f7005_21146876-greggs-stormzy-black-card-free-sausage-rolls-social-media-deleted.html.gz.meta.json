@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 264658,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T22:22:32+00:00",
+  "final_url": "https://london.eater.com/2020/2/21/21146876/greggs-stormzy-black-card-free-sausage-rolls-social-media-deleted",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "37837",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 22:22:34 GMT",
+    "ETag": "\"rmqqsc24fz5o1e\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200102-IAD, cache-lon4267-LON",
+    "X-Timer": "S1782512554.092551,VS0,VE763",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "28",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIwOTEz"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2020/2/21/21146876/greggs-stormzy-black-card-free-sausage-rolls-social-media-deleted"
+  },
+  "input_row_number": 3541,
+  "sha256": "7df6068285dcd3f77bab92fcd0b4ac4536ee129a7d3e86a3a46f8f401c1c9ae3",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2020/2/21/21146876/greggs-stormzy-black-card-free-sausage-rolls-social-media-deleted"
+}

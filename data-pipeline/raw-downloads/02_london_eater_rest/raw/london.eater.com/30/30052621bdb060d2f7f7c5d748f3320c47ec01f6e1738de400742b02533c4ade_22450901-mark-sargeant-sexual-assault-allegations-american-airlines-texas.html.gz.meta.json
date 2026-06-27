@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 300089,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T23:02:17+00:00",
+  "final_url": "https://london.eater.com/22450901/mark-sargeant-sexual-assault-allegations-american-airlines-texas",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "45318",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 23:02:19 GMT",
+    "ETag": "\"axgmwbxgna6ffh\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000119-IAD, cache-lcy-egml8630028-LCY",
+    "X-Timer": "S1782514939.936528,VS0,VE311",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "20",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjE4OTIy"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/22450901/mark-sargeant-sexual-assault-allegations-american-airlines-texas"
+  },
+  "input_row_number": 4172,
+  "sha256": "be0b9ebb94197d5802e1171ef55c86827f3e42935e987bd8d6fc9f77d89cba95",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/22450901/mark-sargeant-sexual-assault-allegations-american-airlines-texas"
+}

@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 286225,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T21:31:31+00:00",
+  "final_url": "https://london.eater.com/2018/7/2/17524916/hai-di-lao-china-new-london-restaurant-hot-pot",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "37660",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 21:31:32 GMT",
+    "ETag": "\"acuwaa0dgi64rp\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000114-IAD, cache-lcy-egml8630020-LCY",
+    "X-Timer": "S1782509492.202635,VS0,VE630",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "62",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI1NTEw"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2018/7/2/17524916/hai-di-lao-china-new-london-restaurant-hot-pot"
+  },
+  "input_row_number": 2779,
+  "sha256": "25e2fcb9fcf2b3631a29696b1f945ef26dfb868b5ef6cb583c11ecd6c32531f2",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2018/7/2/17524916/hai-di-lao-china-new-london-restaurant-hot-pot"
+}

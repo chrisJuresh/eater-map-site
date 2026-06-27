@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 268650,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T21:16:01+00:00",
+  "final_url": "https://london.eater.com/2019/3/12/18261487/department-coffee-social-affairs-london-small-batch-brighton",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "37766",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 21:16:03 GMT",
+    "ETag": "\"yucz47per45r5q\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000094-IAD, cache-lcy-eglc8600071-LCY",
+    "X-Timer": "S1782508563.498930,VS0,VE240",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "26",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIzNDcw"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2019/3/12/18261487/department-coffee-social-affairs-london-small-batch-brighton"
+  },
+  "input_row_number": 2529,
+  "sha256": "51c92aae8044aa3a4b372619d0d88cce87a9469656db3e60547295ebd57dbbd7",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2019/3/12/18261487/department-coffee-social-affairs-london-small-batch-brighton"
+}

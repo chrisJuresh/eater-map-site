@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 282574,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T20:12:08+00:00",
+  "final_url": "https://london.eater.com/2018/2/15/17011350/karma-app-food-waste-london-restaurants",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "41395",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 20:12:10 GMT",
+    "ETag": "\"ibed56vuuz61ws\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200082-IAD, cache-lhr-egwu1540057-LHR",
+    "X-Timer": "S1782504730.912810,VS0,VE210",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "15",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI3ODkw"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2018/2/15/17011350/karma-app-food-waste-london-restaurants"
+  },
+  "input_row_number": 1552,
+  "sha256": "7fc49d085f1b5c7298dc1488106aa55343172ca8e1d92ed7f58b4d7facb112ec",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2018/2/15/17011350/karma-app-food-waste-london-restaurants"
+}

@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 343336,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T19:39:47+00:00",
+  "final_url": "https://london.eater.com/2021/12/21/22847934/best-christmas-hamper-guide-uk-london-2021",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "47531",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 19:39:49 GMT",
+    "ETag": "\"15xn11t1bu87ctb\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100175-IAD, cache-lcy-egml8630083-LCY",
+    "X-Timer": "S1782502789.914223,VS0,VE252",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "23",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjE5NTcx"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2021/12/21/22847934/best-christmas-hamper-guide-uk-london-2021"
+  },
+  "input_row_number": 1035,
+  "sha256": "a2ace24c80aefc66b99941a7316a1997f7c1fe7ee6ad498da3000f9c828f150c",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2021/12/21/22847934/best-christmas-hamper-guide-uk-london-2021"
+}

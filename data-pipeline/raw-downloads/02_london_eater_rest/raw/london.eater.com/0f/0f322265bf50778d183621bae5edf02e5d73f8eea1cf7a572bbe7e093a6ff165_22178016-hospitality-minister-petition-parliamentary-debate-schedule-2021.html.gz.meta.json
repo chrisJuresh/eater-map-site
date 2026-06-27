@@ -1,0 +1,43 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 262926,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T22:17:37+00:00",
+  "final_url": "https://london.eater.com/2020/12/16/22178016/hospitality-minister-petition-parliamentary-debate-schedule-2021",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "38354",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 22:17:39 GMT",
+    "ETag": "\"149mj3ydguh5mqg\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200107-IAD, cache-lhr-egwu1540023-LHR",
+    "X-Timer": "S1782512259.977797,VS0,VE410",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "19",
+    "vm-resource-primary-super-cat": "ZXQyOnN1cGVyQ2F0OjExNzU=",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjE5NjEz"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2020/12/16/22178016/hospitality-minister-petition-parliamentary-debate-schedule-2021"
+  },
+  "input_row_number": 3462,
+  "sha256": "6a0c5fc79df06c44941baf1925cd00aa0b237844392c546082eaa0335d550b0f",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2020/12/16/22178016/hospitality-minister-petition-parliamentary-debate-schedule-2021"
+}

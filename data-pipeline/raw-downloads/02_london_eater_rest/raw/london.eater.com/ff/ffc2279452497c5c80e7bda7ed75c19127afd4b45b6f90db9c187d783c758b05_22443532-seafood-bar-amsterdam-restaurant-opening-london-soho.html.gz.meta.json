@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 297891,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T19:19:27+00:00",
+  "final_url": "https://london.eater.com/2021/5/19/22443532/seafood-bar-amsterdam-restaurant-opening-london-soho",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "39835",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 19:19:29 GMT",
+    "ETag": "\"11l7v4liwyj6drh\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000060-IAD, cache-lcy-egml8630054-LCY",
+    "X-Timer": "S1782501569.925481,VS0,VE350",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "22",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIwNDUz"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2021/5/19/22443532/seafood-bar-amsterdam-restaurant-opening-london-soho"
+  },
+  "input_row_number": 744,
+  "sha256": "5c04c5bbfd690a248fdd219b57bdf90ffab710dd62b9bc5ca0498eb30b27ab6d",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2021/5/19/22443532/seafood-bar-amsterdam-restaurant-opening-london-soho"
+}

@@ -1,0 +1,42 @@
+{
+  "batch_folder": "03_www_eater_rest",
+  "batch_key": "www_eater_rest",
+  "batch_order": 3,
+  "canonical_url": "",
+  "content_length": 249897,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T23:25:02+00:00",
+  "final_url": "https://www.eater.com/2016/10/25/13402046/jean-georges-vongerichten-london-connaught-hotel",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "37410",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 23:25:04 GMT",
+    "ETag": "\"9n2u5m9ded5co7\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000070-IAD, cache-lon4256-LON",
+    "X-Timer": "S1782516304.497443,VS0,VE218",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "22",
+    "x-middleware-rewrite": "/resource/content/post/ZXQyOnBvc3Q6NjQwMTQ5"
+  },
+  "input_data": {
+    "url": "https://www.eater.com/2016/10/25/13402046/jean-georges-vongerichten-london-connaught-hotel"
+  },
+  "input_row_number": 4493,
+  "sha256": "0b87ee4f72389cd5416488e66308a909c5f2567e159b70fc220947312479943f",
+  "status_code": 200,
+  "title": "",
+  "url": "https://www.eater.com/2016/10/25/13402046/jean-georges-vongerichten-london-connaught-hotel"
+}

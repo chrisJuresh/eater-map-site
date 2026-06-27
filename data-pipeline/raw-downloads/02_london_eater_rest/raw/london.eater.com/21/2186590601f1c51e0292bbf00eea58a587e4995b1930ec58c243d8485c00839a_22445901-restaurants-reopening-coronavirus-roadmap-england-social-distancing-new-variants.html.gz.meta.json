@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 217296,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T22:06:50+00:00",
+  "final_url": "https://london.eater.com/22445901/restaurants-reopening-coronavirus-roadmap-england-social-distancing-new-variants",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "29288",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 22:06:51 GMT",
+    "ETag": "\"bo5d97860e4nhd\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000088-IAD, cache-lon420095-LON",
+    "X-Timer": "S1782511612.745454,VS0,VE195",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-resource-primary-super-cat": "ZXQyOnN1cGVyQ2F0OjExMDM=",
+    "x-middleware-rewrite": "/resource/content/package/ZXQzMTpwYWNrYWdlOjE3NzQ5"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/22445901/restaurants-reopening-coronavirus-roadmap-england-social-distancing-new-variants"
+  },
+  "input_row_number": 3305,
+  "sha256": "e6974900abefd9c38650622fe00d20689a53c1a96b1c7ab88d686af442f6da50",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/22445901/restaurants-reopening-coronavirus-roadmap-england-social-distancing-new-variants"
+}

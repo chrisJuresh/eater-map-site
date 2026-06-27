@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 268303,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T21:10:53+00:00",
+  "final_url": "https://london.eater.com/2019/6/11/18660095/starbucks-coffee-reusable-cups-gatwick-airport-london",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "39193",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 21:10:54 GMT",
+    "ETag": "\"1iw4ha2vje5qth\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200121-IAD, cache-lhr-egwu1540051-LHR",
+    "X-Timer": "S1782508255.558162,VS0,VE256",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "22",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIzMDc0"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2019/6/11/18660095/starbucks-coffee-reusable-cups-gatwick-airport-london"
+  },
+  "input_row_number": 2446,
+  "sha256": "257077334c14097f9343cd8cc4692269fe269e11dcd361e38854f067876e77a4",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2019/6/11/18660095/starbucks-coffee-reusable-cups-gatwick-airport-london"
+}

@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 264558,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T22:14:30+00:00",
+  "final_url": "https://london.eater.com/2022/9/13/23350512/great-british-bake-off-2022-challenges-queen-elizabeth-ii",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "37360",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 22:14:32 GMT",
+    "ETag": "\"108avntyc3o5nvc\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200111-IAD, cache-lon420119-LON",
+    "X-Timer": "S1782512072.891096,VS0,VE249",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "27",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjE4Mzgw"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2022/9/13/23350512/great-british-bake-off-2022-challenges-queen-elizabeth-ii"
+  },
+  "input_row_number": 3413,
+  "sha256": "e4a26ce023e2b6099d03c639fbb49b222cc58e3d8d904fae05d985b338fc9bf7",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2022/9/13/23350512/great-british-bake-off-2022-challenges-queen-elizabeth-ii"
+}

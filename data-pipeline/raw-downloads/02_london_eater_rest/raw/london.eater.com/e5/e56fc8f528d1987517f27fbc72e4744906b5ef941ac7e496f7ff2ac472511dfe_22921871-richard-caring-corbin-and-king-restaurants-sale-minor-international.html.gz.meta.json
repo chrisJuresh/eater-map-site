@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 282446,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T20:35:00+00:00",
+  "final_url": "https://london.eater.com/2022/2/8/22921871/richard-caring-corbin-and-king-restaurants-sale-minor-international",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "39714",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 20:35:02 GMT",
+    "ETag": "\"15fo3a1p1xk61sy\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200112-IAD, cache-lcy-eglc8600040-LCY",
+    "X-Timer": "S1782506102.080757,VS0,VE386",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "24",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjE3ODU3"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2022/2/8/22921871/richard-caring-corbin-and-king-restaurants-sale-minor-international"
+  },
+  "input_row_number": 1920,
+  "sha256": "72793874e040dbb10478c222b20d5ba424b51275876108c9e4aeea0b58387787",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2022/2/8/22921871/richard-caring-corbin-and-king-restaurants-sale-minor-international"
+}

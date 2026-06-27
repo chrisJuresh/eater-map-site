@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 255195,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T19:14:18+00:00",
+  "final_url": "https://london.eater.com/2017/10/11/16458180/deliveroo-workers-rights-extra-cost-to-consumer-food-delivery-london",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "35835",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 19:14:19 GMT",
+    "ETag": "\"gjaq3rspeg5gtj\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000139-IAD, cache-lhr-egwu1540020-LHR",
+    "X-Timer": "S1782501259.181096,VS0,VE801",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "24",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI3ODYz"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2017/10/11/16458180/deliveroo-workers-rights-extra-cost-to-consumer-food-delivery-london"
+  },
+  "input_row_number": 674,
+  "sha256": "d7bb7bcbe77b9fe633f4692196f4253198f831a31007debdc126a0379a5f25ca",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2017/10/11/16458180/deliveroo-workers-rights-extra-cost-to-consumer-food-delivery-london"
+}

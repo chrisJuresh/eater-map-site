@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 275382,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T20:39:09+00:00",
+  "final_url": "https://london.eater.com/2021/6/9/22525776/summer-by-the-river-festival-london-bridge-food-drink-restaurantsbars",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "39925",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 20:39:10 GMT",
+    "ETag": "\"7xp6406u915wd6\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100091-IAD, cache-lhr-egwu1540064-LHR",
+    "X-Timer": "S1782506351.526664,VS0,VE236",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "16",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjE4NDMy"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2021/6/9/22525776/summer-by-the-river-festival-london-bridge-food-drink-restaurantsbars"
+  },
+  "input_row_number": 1985,
+  "sha256": "e491d349cc7117b625a849e8154f3e0dbda056e883a64ab291112e20c4e8f453",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2021/6/9/22525776/summer-by-the-river-festival-london-bridge-food-drink-restaurantsbars"
+}

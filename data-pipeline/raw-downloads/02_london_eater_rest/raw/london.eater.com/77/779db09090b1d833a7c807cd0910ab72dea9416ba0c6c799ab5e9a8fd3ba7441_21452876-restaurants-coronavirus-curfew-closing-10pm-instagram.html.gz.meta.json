@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 393472,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T20:20:55+00:00",
+  "final_url": "https://london.eater.com/21452876/restaurants-coronavirus-curfew-closing-10pm-instagram",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "44439",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 20:20:56 GMT",
+    "ETag": "\"kggjj83f1e8fhe\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100064-IAD, cache-lon4265-LON",
+    "X-Timer": "S1782505256.644493,VS0,VE1029",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "27",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjE5Mzg2"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/21452876/restaurants-coronavirus-curfew-closing-10pm-instagram"
+  },
+  "input_row_number": 1693,
+  "sha256": "2b1d030fe78857f17a2d15ecf6f0f127e07816d92fdc0555a08a7bb3edc08ffe",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/21452876/restaurants-coronavirus-curfew-closing-10pm-instagram"
+}

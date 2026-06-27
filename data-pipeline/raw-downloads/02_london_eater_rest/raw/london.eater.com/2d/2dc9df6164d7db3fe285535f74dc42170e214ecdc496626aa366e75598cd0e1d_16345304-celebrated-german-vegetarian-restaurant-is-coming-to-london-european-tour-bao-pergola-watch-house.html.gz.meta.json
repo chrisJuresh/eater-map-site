@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 286948,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T21:52:31+00:00",
+  "final_url": "https://london.eater.com/2017/9/21/16345304/celebrated-german-vegetarian-restaurant-is-coming-to-london-european-tour-bao-pergola-watch-house",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "40825",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 21:52:33 GMT",
+    "ETag": "\"14gcbqt10an658y\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100176-IAD, cache-lcy-eglc8600022-LCY",
+    "X-Timer": "S1782510753.927566,VS0,VE417",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "31",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI3NzM0"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2017/9/21/16345304/celebrated-german-vegetarian-restaurant-is-coming-to-london-european-tour-bao-pergola-watch-house"
+  },
+  "input_row_number": 3121,
+  "sha256": "61e434060ea838d3a8086229440f4c4d8330c0e9d80cb8cf2868072cf9183103",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2017/9/21/16345304/celebrated-german-vegetarian-restaurant-is-coming-to-london-european-tour-bao-pergola-watch-house"
+}

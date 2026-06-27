@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 264233,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T21:33:17+00:00",
+  "final_url": "https://london.eater.com/2018/6/4/17424164/gordon-ramsay-stuart-gillies-alfa-zero-limited-restaurant",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "36885",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 21:33:19 GMT",
+    "ETag": "\"6rzi7sbd8k5npn\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100175-IAD, cache-lcy-eglc8600090-LCY",
+    "X-Timer": "S1782509599.274923,VS0,VE288",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "30",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI2OTA0"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2018/6/4/17424164/gordon-ramsay-stuart-gillies-alfa-zero-limited-restaurant"
+  },
+  "input_row_number": 2808,
+  "sha256": "fa4aaba1deeb542ff26814d11b492cabcde72faea012c4b580e1a76246bfffa9",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2018/6/4/17424164/gordon-ramsay-stuart-gillies-alfa-zero-limited-restaurant"
+}

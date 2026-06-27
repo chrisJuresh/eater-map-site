@@ -1,0 +1,42 @@
+{
+  "batch_folder": "03_www_eater_rest",
+  "batch_key": "www_eater_rest",
+  "batch_order": 3,
+  "canonical_url": "",
+  "content_length": 260363,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T23:27:43+00:00",
+  "final_url": "https://www.eater.com/2013/11/15/6328541/london-wire",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "36833",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 23:27:45 GMT",
+    "ETag": "\"7w1lr4407k5ksb\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100091-IAD, cache-lon420093-LON",
+    "X-Timer": "S1782516465.850969,VS0,VE791",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "19",
+    "x-middleware-rewrite": "/resource/content/post/ZXQyOnBvc3Q6NzAxMzUw"
+  },
+  "input_data": {
+    "url": "https://www.eater.com/2013/11/15/6328541/london-wire"
+  },
+  "input_row_number": 4536,
+  "sha256": "70381f85aed11c2648b30f33ea0cbe6e5f0f9800965328b07536768d7c74d1d5",
+  "status_code": 200,
+  "title": "",
+  "url": "https://www.eater.com/2013/11/15/6328541/london-wire"
+}

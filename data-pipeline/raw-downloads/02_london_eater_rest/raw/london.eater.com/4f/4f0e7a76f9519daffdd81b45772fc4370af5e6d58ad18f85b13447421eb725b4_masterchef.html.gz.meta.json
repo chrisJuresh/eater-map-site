@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 266671,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T23:13:16+00:00",
+  "final_url": "https://london.eater.com/masterchef",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "28980",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 23:13:18 GMT",
+    "ETag": "\"6kvdajdkkw5piy\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000158-IAD, cache-lcy-eglc8600098-LCY",
+    "X-Timer": "S1782515598.861057,VS0,VE1130",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-loop-nav-provider-query": "201",
+    "x-middleware-rewrite": "/resource/category/ZXQzMTpjYXRlZ29yeTo2MDU="
+  },
+  "input_data": {
+    "url": "https://london.eater.com/masterchef"
+  },
+  "input_row_number": 4318,
+  "sha256": "1e87885703bee39d9a56713335e18b3532e0a06614cd6d9104f50ce7a0599990",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/masterchef"
+}

@@ -1,0 +1,42 @@
+{
+  "batch_folder": "03_www_eater_rest",
+  "batch_key": "www_eater_rest",
+  "batch_order": 3,
+  "canonical_url": "",
+  "content_length": 281757,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T23:23:15+00:00",
+  "final_url": "https://www.eater.com/2012/8/10/6556503/young-turks-isaac-mchale-announces-his-upcoming-london-restaurant-the",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "46342",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 23:23:17 GMT",
+    "ETag": "\"8t7endhrvr60xt\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100163-IAD, cache-lcy-egml8630084-LCY",
+    "X-Timer": "S1782516197.126295,VS0,VE189",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "21",
+    "x-middleware-rewrite": "/resource/content/post/ZXQyOnBvc3Q6NzM0MjM3"
+  },
+  "input_data": {
+    "url": "https://www.eater.com/2012/8/10/6556503/young-turks-isaac-mchale-announces-his-upcoming-london-restaurant-the"
+  },
+  "input_row_number": 4463,
+  "sha256": "e81ec01c4cdd0c542dde55d00fdb19949f2fc8940e2c0b5da9b16d518f9b9351",
+  "status_code": 200,
+  "title": "",
+  "url": "https://www.eater.com/2012/8/10/6556503/young-turks-isaac-mchale-announces-his-upcoming-london-restaurant-the"
+}

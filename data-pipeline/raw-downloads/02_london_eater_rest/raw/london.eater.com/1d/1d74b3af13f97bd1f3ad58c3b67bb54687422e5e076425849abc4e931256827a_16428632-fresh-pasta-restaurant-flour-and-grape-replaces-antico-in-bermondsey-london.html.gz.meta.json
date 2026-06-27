@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 297104,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T21:51:23+00:00",
+  "final_url": "https://london.eater.com/2017/10/5/16428632/fresh-pasta-restaurant-flour-and-grape-replaces-antico-in-bermondsey-london",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "39070",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 21:51:25 GMT",
+    "ETag": "\"89npge6qyv6d5o\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200086-IAD, cache-lhr-egwu1540037-LHR",
+    "X-Timer": "S1782510685.113495,VS0,VE716",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "319",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI4ODI2"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2017/10/5/16428632/fresh-pasta-restaurant-flour-and-grape-replaces-antico-in-bermondsey-london"
+  },
+  "input_row_number": 3102,
+  "sha256": "7274997c40fa2861e53e69bb047e084e8b2bab983e34d85150ea592f7038a911",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2017/10/5/16428632/fresh-pasta-restaurant-flour-and-grape-replaces-antico-in-bermondsey-london"
+}

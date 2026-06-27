@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 283236,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T19:20:04+00:00",
+  "final_url": "https://london.eater.com/2020/9/18/21444993/pantechnicon-restaurant-opening-belgravia-cafe-kitsune-paris-london",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "37341",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 19:20:06 GMT",
+    "ETag": "\"szgjz1mfto62fz\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100090-IAD, cache-lcy-egml8630020-LCY",
+    "X-Timer": "S1782501606.155879,VS0,VE230",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "33",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjE5NzY5"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2020/9/18/21444993/pantechnicon-restaurant-opening-belgravia-cafe-kitsune-paris-london"
+  },
+  "input_row_number": 754,
+  "sha256": "27403b74167c575427bfd81adff8ca68fe1af14b5a80d8b034780f6ebe0fb306",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2020/9/18/21444993/pantechnicon-restaurant-opening-belgravia-cafe-kitsune-paris-london"
+}

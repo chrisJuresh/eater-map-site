@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 272762,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T20:42:41+00:00",
+  "final_url": "https://london.eater.com/2020/10/26/21534144/free-school-meals-england-marcus-rashford-twitter-campaign",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "41409",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 20:42:42 GMT",
+    "ETag": "\"oej5a3wpuv5uas\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000088-IAD, cache-lhr-egwu1540045-LHR",
+    "X-Timer": "S1782506563.522681,VS0,VE235",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "26",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIxMzkz"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2020/10/26/21534144/free-school-meals-england-marcus-rashford-twitter-campaign"
+  },
+  "input_row_number": 2043,
+  "sha256": "28f7d3f2d97d57c9bc0fd321284413e8ce5a704bfbff1ec7e385cc02acb98eec",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2020/10/26/21534144/free-school-meals-england-marcus-rashford-twitter-campaign"
+}

@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 265964,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T20:37:31+00:00",
+  "final_url": "https://london.eater.com/2021/8/27/22642753/brexit-supermarket-food-shortages-england",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "39393",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 20:37:33 GMT",
+    "ETag": "\"v8z1l93sxv5p14\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200158-IAD, cache-lhr-egwu1540078-LHR",
+    "X-Timer": "S1782506253.142315,VS0,VE301",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "40",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjE4MDc0"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2021/8/27/22642753/brexit-supermarket-food-shortages-england"
+  },
+  "input_row_number": 1959,
+  "sha256": "4261e332d1d83c44606d1d00127d77966fdbc34c0fb8af2d861a1e7e1eba709a",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2021/8/27/22642753/brexit-supermarket-food-shortages-england"
+}

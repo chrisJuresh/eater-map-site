@@ -1,0 +1,43 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 330192,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T23:06:38+00:00",
+  "final_url": "https://london.eater.com/23198034/boris-johnson-resigns-conservative-leader-prime-minister",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "40922",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 23:06:40 GMT",
+    "ETag": "\"uypd0zq2nn72lf\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100124-IAD, cache-lon420103-LON",
+    "X-Timer": "S1782515200.327365,VS0,VE209",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "22",
+    "vm-resource-primary-super-cat": "ZXQyOnN1cGVyQ2F0OjExNzU=",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjE2NjA1"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/23198034/boris-johnson-resigns-conservative-leader-prime-minister"
+  },
+  "input_row_number": 4227,
+  "sha256": "f0f23a3235b7db42df71abe147827a1819d5c433ce3914a4bcd6ffe46b948cf8",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/23198034/boris-johnson-resigns-conservative-leader-prime-minister"
+}

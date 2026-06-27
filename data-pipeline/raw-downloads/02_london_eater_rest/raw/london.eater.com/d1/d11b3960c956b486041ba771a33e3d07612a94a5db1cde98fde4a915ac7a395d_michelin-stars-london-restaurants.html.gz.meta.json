@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 676153,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T18:49:11+00:00",
+  "final_url": "https://london.eater.com/michelin-stars-london-restaurants",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "51297",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 18:49:13 GMT",
+    "ETag": "\"ztbnwzpi3yehc6\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000047-IAD, cache-lcy-egml8630041-LCY",
+    "X-Timer": "S1782499753.596604,VS0,VE586",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-loop-nav-provider-query": "175",
+    "x-middleware-rewrite": "/resource/category/ZXQzMTpjYXRlZ29yeTozNjc="
+  },
+  "input_data": {
+    "url": "https://london.eater.com/michelin-stars-london-restaurants"
+  },
+  "input_row_number": 302,
+  "sha256": "c678d4cf78263147f6d2cb3aec0bd2f5ee87878d9bd5a6a37ce5312775885eb8",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/michelin-stars-london-restaurants"
+}

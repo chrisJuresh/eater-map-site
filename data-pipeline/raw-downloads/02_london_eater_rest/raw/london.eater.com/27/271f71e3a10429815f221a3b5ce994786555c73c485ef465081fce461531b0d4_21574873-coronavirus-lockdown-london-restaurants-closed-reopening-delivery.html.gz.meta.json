@@ -1,0 +1,43 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 401587,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T19:15:48+00:00",
+  "final_url": "https://london.eater.com/21574873/coronavirus-lockdown-london-restaurants-closed-reopening-delivery",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "60924",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 19:15:50 GMT",
+    "ETag": "\"n7nowwe81d8llo\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000163-IAD, cache-lcy-egml8630095-LCY",
+    "X-Timer": "S1782501350.145549,VS0,VE255",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "22",
+    "vm-resource-primary-super-cat": "ZXQyOnN1cGVyQ2F0OjExMDM=",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIwNzA4"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/21574873/coronavirus-lockdown-london-restaurants-closed-reopening-delivery"
+  },
+  "input_row_number": 700,
+  "sha256": "6761f46c05d5849e22a03bbe58136e59798aa06118fb29c928019de3c0514358",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/21574873/coronavirus-lockdown-london-restaurants-closed-reopening-delivery"
+}

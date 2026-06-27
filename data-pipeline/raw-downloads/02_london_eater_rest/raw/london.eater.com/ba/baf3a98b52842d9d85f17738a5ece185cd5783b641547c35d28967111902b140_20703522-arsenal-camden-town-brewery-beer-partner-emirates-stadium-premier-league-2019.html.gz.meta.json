@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 267596,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T22:29:35+00:00",
+  "final_url": "https://london.eater.com/2019/7/22/20703522/arsenal-camden-town-brewery-beer-partner-emirates-stadium-premier-league-2019",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "38322",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 22:29:37 GMT",
+    "ETag": "\"j38e8cmwtk5qau\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000103-IAD, cache-lhr-egwu1540033-LHR",
+    "X-Timer": "S1782512977.938481,VS0,VE359",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "25",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIyMjc5"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2019/7/22/20703522/arsenal-camden-town-brewery-beer-partner-emirates-stadium-premier-league-2019"
+  },
+  "input_row_number": 3653,
+  "sha256": "3702e910f79b580dd961bbad7e400a400832b6aa8008b8f4a24aad364fd923ec",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2019/7/22/20703522/arsenal-camden-town-brewery-beer-partner-emirates-stadium-premier-league-2019"
+}

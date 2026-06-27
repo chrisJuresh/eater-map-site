@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 295216,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T21:14:57+00:00",
+  "final_url": "https://london.eater.com/2019/3/27/18283898/london-mughlai-restaurant-lucknow-49-dum-mayfair",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "41753",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 21:14:59 GMT",
+    "ETag": "\"a6aze6nazt6blk\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200141-IAD, cache-lcy-eglc8600081-LCY",
+    "X-Timer": "S1782508499.963301,VS0,VE249",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "30",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI0NDMy"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2019/3/27/18283898/london-mughlai-restaurant-lucknow-49-dum-mayfair"
+  },
+  "input_row_number": 2511,
+  "sha256": "8663066be71bbe0ee5bd6135c7940c6c33a9b2a0fb2dc3331c7f90a4c7f66eb0",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2019/3/27/18283898/london-mughlai-restaurant-lucknow-49-dum-mayfair"
+}

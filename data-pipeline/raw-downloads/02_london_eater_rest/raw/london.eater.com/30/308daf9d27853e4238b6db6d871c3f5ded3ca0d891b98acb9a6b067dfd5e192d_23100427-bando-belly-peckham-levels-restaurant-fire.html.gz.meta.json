@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 258584,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T20:32:38+00:00",
+  "final_url": "https://london.eater.com/2022/5/18/23100427/bando-belly-peckham-levels-restaurant-fire",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "35038",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 20:32:40 GMT",
+    "ETag": "\"8jqvb01j0a5jek\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100126-IAD, cache-lon4245-LON",
+    "X-Timer": "S1782505960.100927,VS0,VE233",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "23",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjE2NDY3"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2022/5/18/23100427/bando-belly-peckham-levels-restaurant-fire"
+  },
+  "input_row_number": 1881,
+  "sha256": "25d6785e240acb878da53a9472e6fbc5f34f70799d62a28bc4f4a88270a05082",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2022/5/18/23100427/bando-belly-peckham-levels-restaurant-fire"
+}

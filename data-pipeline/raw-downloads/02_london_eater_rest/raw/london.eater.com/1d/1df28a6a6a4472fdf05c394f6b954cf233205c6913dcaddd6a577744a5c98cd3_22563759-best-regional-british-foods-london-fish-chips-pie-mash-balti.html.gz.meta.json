@@ -1,0 +1,43 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 416400,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T22:07:26+00:00",
+  "final_url": "https://london.eater.com/22563759/best-regional-british-foods-london-fish-chips-pie-mash-balti",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "68933",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 22:07:28 GMT",
+    "ETag": "\"kvgsq2e23a8x6g\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100169-IAD, cache-lcy-egml8630089-LCY",
+    "X-Timer": "S1782511648.084729,VS0,VE341",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "32",
+    "vm-resource-primary-super-cat": "ZXQyOnN1cGVyQ2F0OjQ2NQ==",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIxMzk2"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/22563759/best-regional-british-foods-london-fish-chips-pie-mash-balti"
+  },
+  "input_row_number": 3315,
+  "sha256": "8e24e0af41e50cbc4f96de5db9385b176eae78efb64e9e5d8b94eadfa2c383f2",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/22563759/best-regional-british-foods-london-fish-chips-pie-mash-balti"
+}

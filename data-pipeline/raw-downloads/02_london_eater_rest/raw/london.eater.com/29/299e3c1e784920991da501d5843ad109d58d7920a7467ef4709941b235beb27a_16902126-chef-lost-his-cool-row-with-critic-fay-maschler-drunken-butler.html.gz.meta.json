@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 275757,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T21:43:13+00:00",
+  "final_url": "https://london.eater.com/2018/1/17/16902126/chef-lost-his-cool-row-with-critic-fay-maschler-drunken-butler",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "40952",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 21:43:15 GMT",
+    "ETag": "\"6dxphhi4gt5wlb\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100095-IAD, cache-lon420143-LON",
+    "X-Timer": "S1782510195.374607,VS0,VE212",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "20",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI4MTg4"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2018/1/17/16902126/chef-lost-his-cool-row-with-critic-fay-maschler-drunken-butler"
+  },
+  "input_row_number": 2970,
+  "sha256": "c79c3786dd49f16709c8f443a23059826a8ea09eccb23564e15d888966568991",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2018/1/17/16902126/chef-lost-his-cool-row-with-critic-fay-maschler-drunken-butler"
+}

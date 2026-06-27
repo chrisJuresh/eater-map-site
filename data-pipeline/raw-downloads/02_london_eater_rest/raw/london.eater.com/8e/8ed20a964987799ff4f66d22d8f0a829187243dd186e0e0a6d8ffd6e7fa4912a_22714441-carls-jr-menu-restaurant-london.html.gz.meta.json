@@ -1,0 +1,43 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 257858,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T20:36:49+00:00",
+  "final_url": "https://london.eater.com/2021/10/7/22714441/carls-jr-menu-restaurant-london",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "37063",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 20:36:50 GMT",
+    "ETag": "\"f74a9h00a35itu\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200091-IAD, cache-lhr-egwu1540058-LHR",
+    "X-Timer": "S1782506211.530667,VS0,VE183",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "20",
+    "vm-resource-primary-super-cat": "ZXQyOnN1cGVyQ2F0OjEzNTQ=",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjE3ODIw"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2021/10/7/22714441/carls-jr-menu-restaurant-london"
+  },
+  "input_row_number": 1948,
+  "sha256": "bb84a23e5e66057668e74f87652bac8b40af091b6e20409ac1c0ebce1dcab9f4",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2021/10/7/22714441/carls-jr-menu-restaurant-london"
+}

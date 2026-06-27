@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 251298,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T22:42:21+00:00",
+  "final_url": "https://london.eater.com/2018/6/18/17474278/pide-oven-turkish-pizza-fitzrovia-hammersmith",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "35515",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 22:42:23 GMT",
+    "ETag": "\"q76w0qpghy5dry\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100138-IAD, cache-lcy-egml8630063-LCY",
+    "X-Timer": "S1782513743.289127,VS0,VE410",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "30",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI2NjU1"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2018/6/18/17474278/pide-oven-turkish-pizza-fitzrovia-hammersmith"
+  },
+  "input_row_number": 3858,
+  "sha256": "fbc632f10b653b8e6881aaa6e09191f09ddee44433a0da3fd85bf9f7b64a573d",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2018/6/18/17474278/pide-oven-turkish-pizza-fitzrovia-hammersmith"
+}

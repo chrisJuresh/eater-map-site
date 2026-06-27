@@ -1,0 +1,41 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 353307,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T23:03:12+00:00",
+  "final_url": "https://london.eater.com/22685802/great-british-bake-off-episode-recaps-2021",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "45147",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 23:03:14 GMT",
+    "ETag": "\"o92w02ya3i7k6u\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200053-IAD, cache-lcy-eglc8600020-LCY",
+    "X-Timer": "S1782514994.912462,VS0,VE228",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "x-middleware-rewrite": "/resource/content/stream/ZXQzMTpzdHJlYW06MTcwNDY="
+  },
+  "input_data": {
+    "url": "https://london.eater.com/22685802/great-british-bake-off-episode-recaps-2021"
+  },
+  "input_row_number": 4187,
+  "sha256": "4e2fb9b6bffb399805e57be6a69f9eb8422406aa306c03cbf0ae633bdb92177c",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/22685802/great-british-bake-off-episode-recaps-2021"
+}

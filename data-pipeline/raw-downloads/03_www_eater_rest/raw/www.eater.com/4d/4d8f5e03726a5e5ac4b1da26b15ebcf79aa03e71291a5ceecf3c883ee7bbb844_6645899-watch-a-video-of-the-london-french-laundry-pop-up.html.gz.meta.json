@@ -1,0 +1,42 @@
+{
+  "batch_folder": "03_www_eater_rest",
+  "batch_key": "www_eater_rest",
+  "batch_order": 3,
+  "canonical_url": "",
+  "content_length": 261091,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T23:32:15+00:00",
+  "final_url": "https://www.eater.com/2011/10/6/6645899/watch-a-video-of-the-london-french-laundry-pop-up",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "36986",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 23:32:17 GMT",
+    "ETag": "\"z5sb46cawr5lbf\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100120-IAD, cache-lhr-egwu1540066-LHR",
+    "X-Timer": "S1782516737.204172,VS0,VE182",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "13",
+    "x-middleware-rewrite": "/resource/content/post/ZXQyOnBvc3Q6NzQwMDAw"
+  },
+  "input_data": {
+    "url": "https://www.eater.com/2011/10/6/6645899/watch-a-video-of-the-london-french-laundry-pop-up"
+  },
+  "input_row_number": 4594,
+  "sha256": "64c20aa24391c57908172e45c9d06a1b2c881358929c1d615310a04c928f419f",
+  "status_code": 200,
+  "title": "",
+  "url": "https://www.eater.com/2011/10/6/6645899/watch-a-video-of-the-london-french-laundry-pop-up"
+}

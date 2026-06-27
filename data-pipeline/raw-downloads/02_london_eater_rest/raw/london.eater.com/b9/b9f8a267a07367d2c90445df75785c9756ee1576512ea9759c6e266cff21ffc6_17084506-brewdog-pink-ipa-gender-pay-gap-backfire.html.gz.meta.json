@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 288883,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T22:48:45+00:00",
+  "final_url": "https://london.eater.com/2018/3/6/17084506/brewdog-pink-ipa-gender-pay-gap-backfire",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "44762",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 22:48:47 GMT",
+    "ETag": "\"ft0bm8zqzz66oj\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000158-IAD, cache-lhr-egwu1540022-LHR",
+    "X-Timer": "S1782514127.814003,VS0,VE270",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "25",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI2NjU0"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2018/3/6/17084506/brewdog-pink-ipa-gender-pay-gap-backfire"
+  },
+  "input_row_number": 3959,
+  "sha256": "89b40a91e3688291838bd46efa7c38f82425343eac6359e89a3bc78ff5fd066c",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2018/3/6/17084506/brewdog-pink-ipa-gender-pay-gap-backfire"
+}

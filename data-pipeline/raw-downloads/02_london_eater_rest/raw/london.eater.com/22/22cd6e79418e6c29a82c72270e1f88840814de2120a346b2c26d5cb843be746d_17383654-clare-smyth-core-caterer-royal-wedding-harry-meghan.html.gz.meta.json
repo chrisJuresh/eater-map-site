@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 282314,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T22:43:57+00:00",
+  "final_url": "https://london.eater.com/2018/5/23/17383654/clare-smyth-core-caterer-royal-wedding-harry-meghan",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "40091",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 22:43:59 GMT",
+    "ETag": "\"9bpbcxsezf61n8\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200125-IAD, cache-lhr-egwu1540072-LHR",
+    "X-Timer": "S1782513840.591842,VS0,VE267",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "28",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI4MjQ5"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2018/5/23/17383654/clare-smyth-core-caterer-royal-wedding-harry-meghan"
+  },
+  "input_row_number": 3883,
+  "sha256": "9462810283920f04be29cce57d7a62ab394274b375977399c1436b7d631dcb19",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2018/5/23/17383654/clare-smyth-core-caterer-royal-wedding-harry-meghan"
+}

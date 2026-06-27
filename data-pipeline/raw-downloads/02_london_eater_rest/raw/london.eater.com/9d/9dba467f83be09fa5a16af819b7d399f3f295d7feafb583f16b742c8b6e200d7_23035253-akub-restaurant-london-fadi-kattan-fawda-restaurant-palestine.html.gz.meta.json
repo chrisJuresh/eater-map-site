@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 291436,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T20:33:29+00:00",
+  "final_url": "https://london.eater.com/2022/4/22/23035253/akub-restaurant-london-fadi-kattan-fawda-restaurant-palestine",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "39901",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 20:33:31 GMT",
+    "ETag": "\"mkhry1kvco68sf\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100081-IAD, cache-lhr-egwu1540033-LHR",
+    "X-Timer": "S1782506011.728212,VS0,VE409",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "131",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjE2NTE3"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2022/4/22/23035253/akub-restaurant-london-fadi-kattan-fawda-restaurant-palestine"
+  },
+  "input_row_number": 1895,
+  "sha256": "633dd7834f2ce54543e635cf30349b4145b8deb4b368a3613e1c699a2fe96119",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2022/4/22/23035253/akub-restaurant-london-fadi-kattan-fawda-restaurant-palestine"
+}

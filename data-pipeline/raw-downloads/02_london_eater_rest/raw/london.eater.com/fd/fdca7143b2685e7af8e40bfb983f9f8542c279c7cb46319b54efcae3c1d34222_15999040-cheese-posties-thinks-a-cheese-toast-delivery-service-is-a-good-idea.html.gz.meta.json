@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 267876,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T19:33:15+00:00",
+  "final_url": "https://london.eater.com/2017/7/19/15999040/cheese-posties-thinks-a-cheese-toast-delivery-service-is-a-good-idea",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "40356",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 19:33:17 GMT",
+    "ETag": "\"qfay7k51x95qm9\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000062-IAD, cache-lhr-egwu1540028-LHR",
+    "X-Timer": "S1782502397.629901,VS0,VE402",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "24",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI4MDgx"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2017/7/19/15999040/cheese-posties-thinks-a-cheese-toast-delivery-service-is-a-good-idea"
+  },
+  "input_row_number": 945,
+  "sha256": "6bbb78c79f4a45c73b58baf554222aca114defc1ca1634b4be824c88490387f1",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2017/7/19/15999040/cheese-posties-thinks-a-cheese-toast-delivery-service-is-a-good-idea"
+}

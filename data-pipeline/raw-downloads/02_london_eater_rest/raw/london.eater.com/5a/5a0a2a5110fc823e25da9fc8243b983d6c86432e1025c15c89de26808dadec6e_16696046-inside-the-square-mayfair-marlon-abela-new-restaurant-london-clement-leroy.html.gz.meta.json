@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 352890,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T21:47:37+00:00",
+  "final_url": "https://london.eater.com/2017/11/24/16696046/inside-the-square-mayfair-marlon-abela-new-restaurant-london-clement-leroy",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "46148",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 21:47:38 GMT",
+    "ETag": "\"wui2tq00ya7k5z\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000148-IAD, cache-lcy-eglc8600058-LCY",
+    "X-Timer": "S1782510459.636971,VS0,VE286",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "17",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI3NjE1"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2017/11/24/16696046/inside-the-square-mayfair-marlon-abela-new-restaurant-london-clement-leroy"
+  },
+  "input_row_number": 3041,
+  "sha256": "9f56e28749491e464463ac78649ca42bd088359e4b35bc50572a9560bb178992",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2017/11/24/16696046/inside-the-square-mayfair-marlon-abela-new-restaurant-london-clement-leroy"
+}

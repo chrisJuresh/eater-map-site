@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 321304,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T21:57:17+00:00",
+  "final_url": "https://london.eater.com/2017/7/25/16024448/a-first-look-at-jean-georges-at-the-connaught-restaurant",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "45057",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 21:57:19 GMT",
+    "ETag": "\"124jo3b1phc6vro\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000050-IAD, cache-lcy-eglc8600022-LCY",
+    "X-Timer": "S1782511039.930678,VS0,VE696",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "31",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI4NDU2"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2017/7/25/16024448/a-first-look-at-jean-georges-at-the-connaught-restaurant"
+  },
+  "input_row_number": 3180,
+  "sha256": "41ddfd34d52f5e4ca94d31d7e354a625b34ee20caf2b751c1ed0547befbdf38d",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2017/7/25/16024448/a-first-look-at-jean-georges-at-the-connaught-restaurant"
+}

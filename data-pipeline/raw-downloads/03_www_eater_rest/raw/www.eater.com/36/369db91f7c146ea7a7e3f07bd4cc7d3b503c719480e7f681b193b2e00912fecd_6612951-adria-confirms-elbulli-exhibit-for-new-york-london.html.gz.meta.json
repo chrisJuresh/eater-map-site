@@ -1,0 +1,42 @@
+{
+  "batch_folder": "03_www_eater_rest",
+  "batch_key": "www_eater_rest",
+  "batch_order": 3,
+  "canonical_url": "",
+  "content_length": 263687,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T23:31:44+00:00",
+  "final_url": "https://www.eater.com/2012/2/16/6612951/adria-confirms-elbulli-exhibit-for-new-york-london",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "36673",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 23:31:46 GMT",
+    "ETag": "\"uyzjp1ig2y5nc1\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000087-IAD, cache-lhr-egwu1540069-LHR",
+    "X-Timer": "S1782516705.398416,VS0,VE659",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "21",
+    "x-middleware-rewrite": "/resource/content/post/ZXQyOnBvc3Q6NzMxMDE4"
+  },
+  "input_data": {
+    "url": "https://www.eater.com/2012/2/16/6612951/adria-confirms-elbulli-exhibit-for-new-york-london"
+  },
+  "input_row_number": 4586,
+  "sha256": "779388ad36b8c77174581f27a78fe33fa7ebe91f9644ed2a6d207a6cbb014234",
+  "status_code": 200,
+  "title": "",
+  "url": "https://www.eater.com/2012/2/16/6612951/adria-confirms-elbulli-exhibit-for-new-york-london"
+}

@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 292461,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T20:40:19+00:00",
+  "final_url": "https://london.eater.com/2021/3/30/22356452/toklas-restaurant-frieze-london-180-strand",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "37857",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 20:40:21 GMT",
+    "ETag": "\"15y1m3ifpaq69it\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000062-IAD, cache-lhr-egwu1540061-LHR",
+    "X-Timer": "S1782506421.023785,VS0,VE203",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "19",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjE4MjQ2"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2021/3/30/22356452/toklas-restaurant-frieze-london-180-strand"
+  },
+  "input_row_number": 2004,
+  "sha256": "8d628a5fd784fd4ec406e1228958bee1a41dfb0fcf6e25fc5b5c8dc2fd024393",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2021/3/30/22356452/toklas-restaurant-frieze-london-180-strand"
+}

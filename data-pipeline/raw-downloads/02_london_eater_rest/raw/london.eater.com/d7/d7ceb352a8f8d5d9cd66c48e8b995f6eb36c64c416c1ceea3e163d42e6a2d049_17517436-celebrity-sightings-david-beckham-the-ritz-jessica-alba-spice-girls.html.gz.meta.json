@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 305653,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T22:41:43+00:00",
+  "final_url": "https://london.eater.com/2018/6/29/17517436/celebrity-sightings-david-beckham-the-ritz-jessica-alba-spice-girls",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "44727",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 22:41:45 GMT",
+    "ETag": "\"ob2eqdz8un6jq1\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100161-IAD, cache-lhr-egwu1540048-LHR",
+    "X-Timer": "S1782513705.036084,VS0,VE283",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "32",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI1NzQ5"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2018/6/29/17517436/celebrity-sightings-david-beckham-the-ritz-jessica-alba-spice-girls"
+  },
+  "input_row_number": 3848,
+  "sha256": "a03604b5371a4a680a3f4fd0f16487516eea1fa9c7c6e2130c125dbea12698c7",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2018/6/29/17517436/celebrity-sightings-david-beckham-the-ritz-jessica-alba-spice-girls"
+}

@@ -1,0 +1,42 @@
+{
+  "batch_folder": "03_www_eater_rest",
+  "batch_key": "www_eater_rest",
+  "batch_order": 3,
+  "canonical_url": "",
+  "content_length": 303009,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T23:29:13+00:00",
+  "final_url": "https://www.eater.com/2013/2/19/6478979/a-first-look-inside-keith-mcnallys-balthazar-london-now-open-in",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "42271",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 23:29:15 GMT",
+    "ETag": "\"9ys52nxb3g6hlj\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000178-IAD, cache-lon420116-LON",
+    "X-Timer": "S1782516556.522684,VS0,VE430",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "32",
+    "x-middleware-rewrite": "/resource/content/post/ZXQyOnBvc3Q6NzE2OTcy"
+  },
+  "input_data": {
+    "url": "https://www.eater.com/2013/2/19/6478979/a-first-look-inside-keith-mcnallys-balthazar-london-now-open-in"
+  },
+  "input_row_number": 4560,
+  "sha256": "38561a1ac1ac79c0ee6e6ff0ad818fa0b82f7853886daf41957e107e4ab83b2c",
+  "status_code": 200,
+  "title": "",
+  "url": "https://www.eater.com/2013/2/19/6478979/a-first-look-inside-keith-mcnallys-balthazar-london-now-open-in"
+}

@@ -1,0 +1,42 @@
+{
+  "batch_folder": "03_www_eater_rest",
+  "batch_key": "www_eater_rest",
+  "batch_order": 3,
+  "canonical_url": "",
+  "content_length": 258042,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T23:31:08+00:00",
+  "final_url": "https://www.eater.com/2012/8/1/6559583/london-olympics-wire",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "36104",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 23:31:10 GMT",
+    "ETag": "\"8ojb4hanfa5izu\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100144-IAD, cache-lcy-egml8630097-LCY",
+    "X-Timer": "S1782516670.916589,VS0,VE212",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "24",
+    "x-middleware-rewrite": "/resource/content/post/ZXQyOnBvc3Q6NzI1NjI1"
+  },
+  "input_data": {
+    "url": "https://www.eater.com/2012/8/1/6559583/london-olympics-wire"
+  },
+  "input_row_number": 4576,
+  "sha256": "fc747b6bd137f1d098930740c2345504db252c0b0b97f3e428a624fd821441e9",
+  "status_code": 200,
+  "title": "",
+  "url": "https://www.eater.com/2012/8/1/6559583/london-olympics-wire"
+}

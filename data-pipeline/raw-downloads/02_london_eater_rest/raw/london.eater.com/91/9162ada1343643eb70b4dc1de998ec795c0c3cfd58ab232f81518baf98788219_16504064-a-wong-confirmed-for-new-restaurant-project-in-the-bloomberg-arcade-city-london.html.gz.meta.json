@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 296479,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T21:50:43+00:00",
+  "final_url": "https://london.eater.com/2017/10/19/16504064/a-wong-confirmed-for-new-restaurant-project-in-the-bloomberg-arcade-city-london",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "38451",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 21:50:45 GMT",
+    "ETag": "\"5iozsfxwl66cor\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200080-IAD, cache-lhr-egwu1540034-LHR",
+    "X-Timer": "S1782510645.977929,VS0,VE401",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "35",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI3ODI4"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2017/10/19/16504064/a-wong-confirmed-for-new-restaurant-project-in-the-bloomberg-arcade-city-london"
+  },
+  "input_row_number": 3091,
+  "sha256": "d3087918e892a67a39a2b0497a5477f1b5fdaf1c85766909f01ffbf85a03aaed",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2017/10/19/16504064/a-wong-confirmed-for-new-restaurant-project-in-the-bloomberg-arcade-city-london"
+}

@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 272856,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T21:11:31+00:00",
+  "final_url": "https://london.eater.com/2019/5/28/18642474/gordon-ramsay-restaurants-london-profit-success",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "38779",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 21:11:33 GMT",
+    "ETag": "\"15dgl8benxg5ucv\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000067-IAD, cache-lcy-egml8630048-LCY",
+    "X-Timer": "S1782508293.034997,VS0,VE414",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "32",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIzODA1"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2019/5/28/18642474/gordon-ramsay-restaurants-london-profit-success"
+  },
+  "input_row_number": 2456,
+  "sha256": "1b0657d1dd3dd323e764c9148654a63cfcbeab67d69b38d2ea027d100640a21c",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2019/5/28/18642474/gordon-ramsay-restaurants-london-profit-success"
+}

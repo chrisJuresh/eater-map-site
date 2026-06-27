@@ -1,0 +1,42 @@
+{
+  "batch_folder": "03_www_eater_rest",
+  "batch_key": "www_eater_rest",
+  "batch_order": 3,
+  "canonical_url": "",
+  "content_length": 299010,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T23:23:24+00:00",
+  "final_url": "https://www.eater.com/2012/6/22/6571581/london-restaurant-installs-damien-hirsts-formaldehyde-preserved-cock",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "1255",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "39615",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 23:23:26 GMT",
+    "ETag": "\"ldx4xsef3q6ehe\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "HIT, MISS",
+    "X-Cache-Hits": "1, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100048-IAD, cache-lcy-egml8630020-LCY",
+    "X-Timer": "S1782516207.856324,VS0,VE94",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "32",
+    "x-middleware-rewrite": "/resource/content/post/ZXQyOnBvc3Q6NzI5Mzgy"
+  },
+  "input_data": {
+    "url": "https://www.eater.com/2012/6/22/6571581/london-restaurant-installs-damien-hirsts-formaldehyde-preserved-cock"
+  },
+  "input_row_number": 4466,
+  "sha256": "1c4b4742eb4837d6f3a4681eac26c90422fd130c52b7882499e46a143d7f907a",
+  "status_code": 200,
+  "title": "",
+  "url": "https://www.eater.com/2012/6/22/6571581/london-restaurant-installs-damien-hirsts-formaldehyde-preserved-cock"
+}

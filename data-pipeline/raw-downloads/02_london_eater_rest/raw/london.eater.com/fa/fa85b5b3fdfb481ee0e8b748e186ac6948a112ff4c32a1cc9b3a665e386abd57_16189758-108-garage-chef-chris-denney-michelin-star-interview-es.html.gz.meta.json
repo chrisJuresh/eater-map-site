@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 261288,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T19:15:12+00:00",
+  "final_url": "https://london.eater.com/2017/8/23/16189758/108-garage-chef-chris-denney-michelin-star-interview-es",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "37308",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 19:15:13 GMT",
+    "ETag": "\"13ef38vgkuq5l98\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100166-IAD, cache-lhr-egwu1540065-LHR",
+    "X-Timer": "S1782501314.739114,VS0,VE233",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "25",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI4ODM3"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2017/8/23/16189758/108-garage-chef-chris-denney-michelin-star-interview-es"
+  },
+  "input_row_number": 690,
+  "sha256": "9bbda457730abad4305566e0c1b9722e48581dd893fc63afc2098320d605f834",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2017/8/23/16189758/108-garage-chef-chris-denney-michelin-star-interview-es"
+}

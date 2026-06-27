@@ -1,0 +1,42 @@
+{
+  "batch_folder": "03_www_eater_rest",
+  "batch_key": "www_eater_rest",
+  "batch_order": 3,
+  "canonical_url": "",
+  "content_length": 253731,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T23:25:32+00:00",
+  "final_url": "https://www.eater.com/2016/6/21/11988312/kelis-lebun-burger-pop-up-london",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "38931",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 23:25:34 GMT",
+    "ETag": "\"zk0zsvq4i15fll\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200091-IAD, cache-lon420086-LON",
+    "X-Timer": "S1782516335.826864,VS0,VE159",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "12",
+    "x-middleware-rewrite": "/resource/content/post/ZXQyOnBvc3Q6NjQ3NDg3"
+  },
+  "input_data": {
+    "url": "https://www.eater.com/2016/6/21/11988312/kelis-lebun-burger-pop-up-london"
+  },
+  "input_row_number": 4501,
+  "sha256": "73cc169bc41bcb2f7b468c66e499d1f11b8e6942627c0f24f0583c6ae95bdf46",
+  "status_code": 200,
+  "title": "",
+  "url": "https://www.eater.com/2016/6/21/11988312/kelis-lebun-burger-pop-up-london"
+}

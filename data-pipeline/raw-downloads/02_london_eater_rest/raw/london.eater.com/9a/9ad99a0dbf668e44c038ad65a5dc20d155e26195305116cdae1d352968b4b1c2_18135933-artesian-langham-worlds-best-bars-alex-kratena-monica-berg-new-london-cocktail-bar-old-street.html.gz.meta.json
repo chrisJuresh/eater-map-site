@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 288665,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T19:27:07+00:00",
+  "final_url": "https://london.eater.com/2018/12/12/18135933/artesian-langham-worlds-best-bars-alex-kratena-monica-berg-new-london-cocktail-bar-old-street",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "43032",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 19:27:09 GMT",
+    "ETag": "\"pjeh8v9tda66j9\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200170-IAD, cache-lon420124-LON",
+    "X-Timer": "S1782502029.921066,VS0,VE281",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "30",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI1MjQx"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2018/12/12/18135933/artesian-langham-worlds-best-bars-alex-kratena-monica-berg-new-london-cocktail-bar-old-street"
+  },
+  "input_row_number": 846,
+  "sha256": "46e34e7a00a86c8bce0324868439f5084a1a1f3f9e2081c58c8d3e693a6672aa",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2018/12/12/18135933/artesian-langham-worlds-best-bars-alex-kratena-monica-berg-new-london-cocktail-bar-old-street"
+}

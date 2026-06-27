@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 336568,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T21:33:56+00:00",
+  "final_url": "https://london.eater.com/2018/5/23/17380736/instagram-stories-london-restaurants-news",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "44442",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 21:33:58 GMT",
+    "ETag": "\"176pq2f6vd177kh\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100123-IAD, cache-lon420087-LON",
+    "X-Timer": "S1782509638.884687,VS0,VE434",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "26",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI4Mjc4"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2018/5/23/17380736/instagram-stories-london-restaurants-news"
+  },
+  "input_row_number": 2818,
+  "sha256": "6645a9c8baba3f6a56098b28003115a19c2515f2026e17fb12d8612eafc9d81f",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2018/5/23/17380736/instagram-stories-london-restaurants-news"
+}

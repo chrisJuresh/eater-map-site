@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 264160,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T20:12:59+00:00",
+  "final_url": "https://london.eater.com/2018/1/15/16892314/chef-angela-hartnett-british-food-culture-all-about-money-bbc-desert-island-discs-interview",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "37956",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 20:13:01 GMT",
+    "ETag": "\"oyee4828uf5nn8\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000049-IAD, cache-lon4253-LON",
+    "X-Timer": "S1782504780.520945,VS0,VE1955",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "37",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI3Mjky"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2018/1/15/16892314/chef-angela-hartnett-british-food-culture-all-about-money-bbc-desert-island-discs-interview"
+  },
+  "input_row_number": 1565,
+  "sha256": "1594ba308ef6d876a078b2da03047d8a31159995ff41b473c14d6c7129883526",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2018/1/15/16892314/chef-angela-hartnett-british-food-culture-all-about-money-bbc-desert-island-discs-interview"
+}

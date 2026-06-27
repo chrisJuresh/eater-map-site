@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 293729,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T19:09:15+00:00",
+  "final_url": "https://london.eater.com/2019/2/7/18215201/jolt-coffee-saudi-arabia-london-coffee-shops-cafes",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "42192",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 19:09:16 GMT",
+    "ETag": "\"d9yh5yf7o26alb\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000051-IAD, cache-lcy-egml8630031-LCY",
+    "X-Timer": "S1782500956.048809,VS0,VE866",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "32",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIzOTc0"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2019/2/7/18215201/jolt-coffee-saudi-arabia-london-coffee-shops-cafes"
+  },
+  "input_row_number": 593,
+  "sha256": "9e7525012e5ed18f83bc99fa64ee0422537ad1750c392210ef7733c1f24abe59",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2019/2/7/18215201/jolt-coffee-saudi-arabia-london-coffee-shops-cafes"
+}

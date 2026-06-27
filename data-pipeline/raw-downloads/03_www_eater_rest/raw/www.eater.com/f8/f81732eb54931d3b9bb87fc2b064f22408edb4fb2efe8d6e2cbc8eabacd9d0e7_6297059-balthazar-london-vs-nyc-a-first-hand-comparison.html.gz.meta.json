@@ -1,0 +1,42 @@
+{
+  "batch_folder": "03_www_eater_rest",
+  "batch_key": "www_eater_rest",
+  "batch_order": 3,
+  "canonical_url": "",
+  "content_length": 294869,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T23:27:34+00:00",
+  "final_url": "https://www.eater.com/2014/1/31/6297059/balthazar-london-vs-nyc-a-first-hand-comparison",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "47305",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 23:27:36 GMT",
+    "ETag": "\"oyapcgt9gl6b6j\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100178-IAD, cache-lhr-egwu1540028-LHR",
+    "X-Timer": "S1782516457.710366,VS0,VE223",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "23",
+    "x-middleware-rewrite": "/resource/content/post/ZXQyOnBvc3Q6Njk5MDYy"
+  },
+  "input_data": {
+    "url": "https://www.eater.com/2014/1/31/6297059/balthazar-london-vs-nyc-a-first-hand-comparison"
+  },
+  "input_row_number": 4534,
+  "sha256": "d3c0d972d23596089ec0a2d25f383ab2d4ad78e37ffb003c8a69defb9cac9f9f",
+  "status_code": 200,
+  "title": "",
+  "url": "https://www.eater.com/2014/1/31/6297059/balthazar-london-vs-nyc-a-first-hand-comparison"
+}

@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 264809,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T22:37:25+00:00",
+  "final_url": "https://london.eater.com/2018/11/5/18064398/diana-henry-interview-richard-corrigan-irish-times-brexit-boris-johnson-new-nordic",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "38329",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 22:37:27 GMT",
+    "ETag": "\"11izhyzry4w5nyv\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100049-IAD, cache-lhr-egwu1540032-LHR",
+    "X-Timer": "S1782513447.156119,VS0,VE241",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "23",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI0MzEw"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2018/11/5/18064398/diana-henry-interview-richard-corrigan-irish-times-brexit-boris-johnson-new-nordic"
+  },
+  "input_row_number": 3780,
+  "sha256": "2006d1450164f3f6f522ff8d095658e290663378afeb4dbc5bd57d143ba9a428",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2018/11/5/18064398/diana-henry-interview-richard-corrigan-irish-times-brexit-boris-johnson-new-nordic"
+}

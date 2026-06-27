@@ -1,0 +1,43 @@
+{
+  "batch_folder": "03_www_eater_rest",
+  "batch_key": "www_eater_rest",
+  "batch_order": 3,
+  "canonical_url": "",
+  "content_length": 411129,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T23:15:24+00:00",
+  "final_url": "https://www.eater.com/2017/2/9/14493112/best-classic-british-food-restaurants-london-fish-and-chips-sticky-toffee-pudding",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "1073",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "68815",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 23:15:26 GMT",
+    "ETag": "\"ju81ejvrkk8szb\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "HIT, MISS",
+    "X-Cache-Hits": "1, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200168-IAD, cache-lhr-egwu1540023-LHR",
+    "X-Timer": "S1782515726.082117,VS0,VE78",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "29",
+    "vm-resource-primary-super-cat": "ZXQyOnN1cGVyQ2F0OjQ2Mw==",
+    "x-middleware-rewrite": "/resource/content/post/ZXQyOnBvc3Q6NjM4NzMz"
+  },
+  "input_data": {
+    "url": "https://www.eater.com/2017/2/9/14493112/best-classic-british-food-restaurants-london-fish-and-chips-sticky-toffee-pudding"
+  },
+  "input_row_number": 4337,
+  "sha256": "af26e8201f4008d3ab2627fef0e8e89f59000eb73c040f2b5c296de3c9b16e2b",
+  "status_code": 200,
+  "title": "",
+  "url": "https://www.eater.com/2017/2/9/14493112/best-classic-british-food-restaurants-london-fish-and-chips-sticky-toffee-pudding"
+}

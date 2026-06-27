@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 239879,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T20:43:08+00:00",
+  "final_url": "https://london.eater.com/2020/10/1/21497065/black-book-zoe-adjonyoh-food-events-black-history-month",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "36308",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 20:43:10 GMT",
+    "ETag": "\"uvzigyii3c54yl\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100071-IAD, cache-lhr-egwu1540022-LHR",
+    "X-Timer": "S1782506590.281877,VS0,VE223",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "21",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjE5NzA3"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2020/10/1/21497065/black-book-zoe-adjonyoh-food-events-black-history-month"
+  },
+  "input_row_number": 2050,
+  "sha256": "4069758ca5fe8ba9028d6ba1f91795e53ce75465f8a01d96935ebea8dc1b527f",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2020/10/1/21497065/black-book-zoe-adjonyoh-food-events-black-history-month"
+}

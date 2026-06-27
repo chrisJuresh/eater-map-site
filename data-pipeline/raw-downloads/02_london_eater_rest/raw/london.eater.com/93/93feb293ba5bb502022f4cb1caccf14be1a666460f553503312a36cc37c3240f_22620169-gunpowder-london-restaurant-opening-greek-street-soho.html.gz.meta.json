@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 286748,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T19:40:57+00:00",
+  "final_url": "https://london.eater.com/2021/8/12/22620169/gunpowder-london-restaurant-opening-greek-street-soho",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "38048",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 19:40:59 GMT",
+    "ETag": "\"f868n4o8n7655z\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200094-IAD, cache-lcy-egml8630089-LCY",
+    "X-Timer": "S1782502859.219749,VS0,VE284",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "43",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjE4NTYz"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2021/8/12/22620169/gunpowder-london-restaurant-opening-greek-street-soho"
+  },
+  "input_row_number": 1054,
+  "sha256": "f7cce7a816397e307976859c0ac34b61a9021d37431c90a2fc781466e2e1c150",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2021/8/12/22620169/gunpowder-london-restaurant-opening-greek-street-soho"
+}

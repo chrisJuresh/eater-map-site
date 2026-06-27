@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 303013,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T20:15:05+00:00",
+  "final_url": "https://london.eater.com/2017/11/7/16618772/old-street-white-collar-factory-ex-chiltern-firehouse-chefs-first-restaurant-niall-davidson-nuala",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "41471",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 20:15:07 GMT",
+    "ETag": "\"iolimzyb7e6hox\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100079-IAD, cache-lon420097-LON",
+    "X-Timer": "S1782504907.040825,VS0,VE215",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "20",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI3NDUz"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2017/11/7/16618772/old-street-white-collar-factory-ex-chiltern-firehouse-chefs-first-restaurant-niall-davidson-nuala"
+  },
+  "input_row_number": 1599,
+  "sha256": "fa2b0a06c4db246db30e75215541a5bb55a1d3090fad0debfc9d6def08dddf23",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2017/11/7/16618772/old-street-white-collar-factory-ex-chiltern-firehouse-chefs-first-restaurant-niall-davidson-nuala"
+}

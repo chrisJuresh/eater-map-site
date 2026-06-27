@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 270248,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T22:57:08+00:00",
+  "final_url": "https://london.eater.com/2017/8/10/16117852/brindisa-london-dinner-spanish-iberico-pork-florence-knight-hawksmoor",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "37782",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 22:57:10 GMT",
+    "ETag": "\"ly1y3ejjwi5sdx\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200160-IAD, cache-lon4279-LON",
+    "X-Timer": "S1782514630.431315,VS0,VE275",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "27",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI4NzMw"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2017/8/10/16117852/brindisa-london-dinner-spanish-iberico-pork-florence-knight-hawksmoor"
+  },
+  "input_row_number": 4093,
+  "sha256": "b95f6538a86cd246d2bffebbed0fb06531eab71710dfa663fdd02bf55089c139",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2017/8/10/16117852/brindisa-london-dinner-spanish-iberico-pork-florence-knight-hawksmoor"
+}

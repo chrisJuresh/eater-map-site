@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 245766,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T19:35:23+00:00",
+  "final_url": "https://london.eater.com/23538795/helene-darroze-three-michelin-star-london-video",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "34413",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 19:35:24 GMT",
+    "ETag": "\"grvqg2vtxh59i1\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200094-IAD, cache-lon4228-LON",
+    "X-Timer": "S1782502525.597716,VS0,VE299",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "40",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjE3NTMy"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/23538795/helene-darroze-three-michelin-star-london-video"
+  },
+  "input_row_number": 979,
+  "sha256": "0f6ee18c2c489e850c5a3f88418b7a7f73f4b477c80b824d309adaa2227117b2",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/23538795/helene-darroze-three-michelin-star-london-video"
+}

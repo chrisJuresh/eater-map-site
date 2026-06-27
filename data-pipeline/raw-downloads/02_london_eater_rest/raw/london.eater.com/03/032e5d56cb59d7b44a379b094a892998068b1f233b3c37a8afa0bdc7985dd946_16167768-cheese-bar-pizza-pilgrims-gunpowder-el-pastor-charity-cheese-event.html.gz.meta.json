@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 269981,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T21:55:26+00:00",
+  "final_url": "https://london.eater.com/2017/8/18/16167768/cheese-bar-pizza-pilgrims-gunpowder-el-pastor-charity-cheese-event",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "37805",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 21:55:27 GMT",
+    "ETag": "\"evq3qz8pmp5s75\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200089-IAD, cache-lcy-egml8630026-LCY",
+    "X-Timer": "S1782510928.619283,VS0,VE323",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "31",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI4ODgx"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2017/8/18/16167768/cheese-bar-pizza-pilgrims-gunpowder-el-pastor-charity-cheese-event"
+  },
+  "input_row_number": 3152,
+  "sha256": "181f0c250420acaaae6515307d0cbddb9d7d95b2bfc4cef542025d6199f5048d",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2017/8/18/16167768/cheese-bar-pizza-pilgrims-gunpowder-el-pastor-charity-cheese-event"
+}

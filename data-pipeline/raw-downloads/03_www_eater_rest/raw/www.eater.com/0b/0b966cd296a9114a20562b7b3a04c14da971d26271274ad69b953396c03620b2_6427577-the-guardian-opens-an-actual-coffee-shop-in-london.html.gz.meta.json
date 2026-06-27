@@ -1,0 +1,42 @@
+{
+  "batch_folder": "03_www_eater_rest",
+  "batch_key": "www_eater_rest",
+  "batch_order": 3,
+  "canonical_url": "",
+  "content_length": 277166,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T23:22:37+00:00",
+  "final_url": "https://www.eater.com/2013/5/30/6427577/the-guardian-opens-an-actual-coffee-shop-in-london",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "42545",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 23:22:39 GMT",
+    "ETag": "\"xwh8vm9kwr5xm2\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000067-IAD, cache-lhr-egwu1540023-LHR",
+    "X-Timer": "S1782516159.491155,VS0,VE425",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "40",
+    "x-middleware-rewrite": "/resource/content/post/ZXQyOnBvc3Q6NzEyNzU0"
+  },
+  "input_data": {
+    "url": "https://www.eater.com/2013/5/30/6427577/the-guardian-opens-an-actual-coffee-shop-in-london"
+  },
+  "input_row_number": 4453,
+  "sha256": "5ad20dd5c401f208e7d7f8224cd6f59ea3b57d7b3bb4c018016e87063df8e117",
+  "status_code": 200,
+  "title": "",
+  "url": "https://www.eater.com/2013/5/30/6427577/the-guardian-opens-an-actual-coffee-shop-in-london"
+}

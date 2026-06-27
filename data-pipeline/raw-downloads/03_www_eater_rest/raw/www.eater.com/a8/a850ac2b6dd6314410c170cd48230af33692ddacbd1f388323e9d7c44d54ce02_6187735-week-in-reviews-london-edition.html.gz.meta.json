@@ -1,0 +1,42 @@
+{
+  "batch_folder": "03_www_eater_rest",
+  "batch_key": "www_eater_rest",
+  "batch_order": 3,
+  "canonical_url": "",
+  "content_length": 258875,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T23:20:54+00:00",
+  "final_url": "https://www.eater.com/2014/7/14/6187735/week-in-reviews-london-edition",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "36381",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 23:20:56 GMT",
+    "ETag": "\"8dc8w4xk2g5jmz\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100119-IAD, cache-lon4223-LON",
+    "X-Timer": "S1782516056.043059,VS0,VE759",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "27",
+    "x-middleware-rewrite": "/resource/content/post/ZXQyOnBvc3Q6Njg2MjE5"
+  },
+  "input_data": {
+    "url": "https://www.eater.com/2014/7/14/6187735/week-in-reviews-london-edition"
+  },
+  "input_row_number": 4425,
+  "sha256": "b8a98d748cda4cb23ce3d3041b77ea9996cba59e3510890c7515c9c8f16da805",
+  "status_code": 200,
+  "title": "",
+  "url": "https://www.eater.com/2014/7/14/6187735/week-in-reviews-london-edition"
+}

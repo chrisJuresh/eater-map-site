@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 256352,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T21:49:15+00:00",
+  "final_url": "https://london.eater.com/2017/11/2/16597242/yotam-ottolenghi-new-restaurant-fitzrovia-london",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "37825",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 21:49:17 GMT",
+    "ETag": "\"b8ua2xzigb5hqc\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000053-IAD, cache-lhr-egwu1540026-LHR",
+    "X-Timer": "S1782510557.779257,VS0,VE298",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "22",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI4ODc3"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2017/11/2/16597242/yotam-ottolenghi-new-restaurant-fitzrovia-london"
+  },
+  "input_row_number": 3068,
+  "sha256": "45a2035fdb7db43fac5e275d263f70a8353a3bc4e9569a83e19a4634bc644752",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2017/11/2/16597242/yotam-ottolenghi-new-restaurant-fitzrovia-london"
+}

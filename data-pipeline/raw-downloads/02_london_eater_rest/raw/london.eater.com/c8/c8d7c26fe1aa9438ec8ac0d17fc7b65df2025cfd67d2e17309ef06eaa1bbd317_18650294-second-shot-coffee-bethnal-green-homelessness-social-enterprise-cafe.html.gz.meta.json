@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 278458,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T19:57:26+00:00",
+  "final_url": "https://london.eater.com/2019/6/3/18650294/second-shot-coffee-bethnal-green-homelessness-social-enterprise-cafe",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "35535",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 19:57:28 GMT",
+    "ETag": "\"18qvp088co5yrz\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200052-IAD, cache-lcy-egml8630048-LCY",
+    "X-Timer": "S1782503847.210379,VS0,VE978",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "29",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIzMDI4"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2019/6/3/18650294/second-shot-coffee-bethnal-green-homelessness-social-enterprise-cafe"
+  },
+  "input_row_number": 1320,
+  "sha256": "ad22441f17bc364baaab2c4c73319e7634a462ec0a1aa2d34013e9f1261b91b9",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2019/6/3/18650294/second-shot-coffee-bethnal-green-homelessness-social-enterprise-cafe"
+}

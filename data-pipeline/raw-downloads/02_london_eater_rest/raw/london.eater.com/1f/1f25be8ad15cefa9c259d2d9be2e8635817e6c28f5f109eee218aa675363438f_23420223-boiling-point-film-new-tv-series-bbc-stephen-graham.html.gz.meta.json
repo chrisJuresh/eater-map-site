@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 255485,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T22:13:48+00:00",
+  "final_url": "https://london.eater.com/2022/10/24/23420223/boiling-point-film-new-tv-series-bbc-stephen-graham",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "35038",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 22:13:50 GMT",
+    "ETag": "\"146ffh0ag05guf\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200111-IAD, cache-lon420112-LON",
+    "X-Timer": "S1782512030.226182,VS0,VE385",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "27",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjE3NDc2"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2022/10/24/23420223/boiling-point-film-new-tv-series-bbc-stephen-graham"
+  },
+  "input_row_number": 3402,
+  "sha256": "334595ca62c72e82fe8b1798bc6619241890706edcd661c0c5e2777b43d98c33",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2022/10/24/23420223/boiling-point-film-new-tv-series-bbc-stephen-graham"
+}

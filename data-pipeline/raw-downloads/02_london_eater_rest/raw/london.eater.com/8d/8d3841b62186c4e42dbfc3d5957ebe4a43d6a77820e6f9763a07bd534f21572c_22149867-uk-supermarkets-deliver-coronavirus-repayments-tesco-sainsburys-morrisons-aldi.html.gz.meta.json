@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 274352,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T23:00:02+00:00",
+  "final_url": "https://london.eater.com/22149867/uk-supermarkets-deliver-coronavirus-repayments-tesco-sainsburys-morrisons-aldi",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "42444",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 23:00:04 GMT",
+    "ETag": "\"u4fz8un99w5vhg\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000148-IAD, cache-lhr-egwu1540042-LHR",
+    "X-Timer": "S1782514804.076355,VS0,VE300",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "31",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIwNjQ3"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/22149867/uk-supermarkets-deliver-coronavirus-repayments-tesco-sainsburys-morrisons-aldi"
+  },
+  "input_row_number": 4137,
+  "sha256": "a794f70ce3014ed213eb6752f0a3421c48e81a5abcecf0889948d3e587bcd663",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/22149867/uk-supermarkets-deliver-coronavirus-repayments-tesco-sainsburys-morrisons-aldi"
+}

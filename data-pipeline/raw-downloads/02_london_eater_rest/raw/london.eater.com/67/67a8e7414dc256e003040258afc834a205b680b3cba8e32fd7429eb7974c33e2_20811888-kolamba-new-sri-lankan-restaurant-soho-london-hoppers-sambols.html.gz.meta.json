@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 258166,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T21:07:22+00:00",
+  "final_url": "https://london.eater.com/2019/8/19/20811888/kolamba-new-sri-lankan-restaurant-soho-london-hoppers-sambols",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "37067",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 21:07:23 GMT",
+    "ETag": "\"rrgfnuw1kz5j1x\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100115-IAD, cache-lhr-egwu1540064-LHR",
+    "X-Timer": "S1782508044.585054,VS0,VE216",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "26",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIzNDY2"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2019/8/19/20811888/kolamba-new-sri-lankan-restaurant-soho-london-hoppers-sambols"
+  },
+  "input_row_number": 2389,
+  "sha256": "d0297551b8b05cfe6e986d4f5876089c01c19d096c1f409c75b7335201c95023",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2019/8/19/20811888/kolamba-new-sri-lankan-restaurant-soho-london-hoppers-sambols"
+}

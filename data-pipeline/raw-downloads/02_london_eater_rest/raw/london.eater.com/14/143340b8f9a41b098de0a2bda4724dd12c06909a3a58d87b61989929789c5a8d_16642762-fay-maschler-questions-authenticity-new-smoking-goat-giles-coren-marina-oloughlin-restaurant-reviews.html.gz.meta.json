@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 320766,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T20:14:50+00:00",
+  "final_url": "https://london.eater.com/2017/11/13/16642762/fay-maschler-questions-authenticity-new-smoking-goat-giles-coren-marina-oloughlin-restaurant-reviews",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "53279",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 20:14:52 GMT",
+    "ETag": "\"gc2bo1gzep6v8z\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000080-IAD, cache-lon420089-LON",
+    "X-Timer": "S1782504892.791443,VS0,VE338",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "40",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI3NzA0"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2017/11/13/16642762/fay-maschler-questions-authenticity-new-smoking-goat-giles-coren-marina-oloughlin-restaurant-reviews"
+  },
+  "input_row_number": 1595,
+  "sha256": "c3facb7b10a324e3eb0ed292a22243e01896dce91249fbc539a6c142fdcb1ee8",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2017/11/13/16642762/fay-maschler-questions-authenticity-new-smoking-goat-giles-coren-marina-oloughlin-restaurant-reviews"
+}

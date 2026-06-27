@@ -1,0 +1,42 @@
+{
+  "batch_folder": "03_www_eater_rest",
+  "batch_key": "www_eater_rest",
+  "batch_order": 3,
+  "canonical_url": "",
+  "content_length": 254715,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T23:20:15+00:00",
+  "final_url": "https://www.eater.com/2015/2/25/8110529/londons-journalists-need-to-drink-more-to-keep-this-iconic-restaurant",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "37725",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 23:20:17 GMT",
+    "ETag": "\"3jsdt3ydy55gc0\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200052-IAD, cache-lon420117-LON",
+    "X-Timer": "S1782516018.658860,VS0,VE213",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "20",
+    "x-middleware-rewrite": "/resource/content/post/ZXQyOnBvc3Q6NjcyOTE0"
+  },
+  "input_data": {
+    "url": "https://www.eater.com/2015/2/25/8110529/londons-journalists-need-to-drink-more-to-keep-this-iconic-restaurant"
+  },
+  "input_row_number": 4415,
+  "sha256": "b3a3f1fbd99198ec451cd343e529ea2598560d75169e9ab3cdf4a073781ba449",
+  "status_code": 200,
+  "title": "",
+  "url": "https://www.eater.com/2015/2/25/8110529/londons-journalists-need-to-drink-more-to-keep-this-iconic-restaurant"
+}

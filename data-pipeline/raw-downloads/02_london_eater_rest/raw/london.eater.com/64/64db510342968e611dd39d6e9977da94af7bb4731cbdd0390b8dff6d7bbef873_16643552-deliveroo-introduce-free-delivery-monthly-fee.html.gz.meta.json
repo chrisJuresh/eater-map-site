@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 267553,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T19:31:40+00:00",
+  "final_url": "https://london.eater.com/2017/11/13/16643552/deliveroo-introduce-free-delivery-monthly-fee",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "36637",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 19:31:42 GMT",
+    "ETag": "\"nk336du2kb5qbb\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000052-IAD, cache-lcy-eglc8600042-LCY",
+    "X-Timer": "S1782502301.445217,VS0,VE678",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "24",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI3Njc4"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2017/11/13/16643552/deliveroo-introduce-free-delivery-monthly-fee"
+  },
+  "input_row_number": 920,
+  "sha256": "330540db428ecc1450bfe6f09a4ae561e069f7ca58ce587e6dc8b9f0074cf6c1",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2017/11/13/16643552/deliveroo-introduce-free-delivery-monthly-fee"
+}

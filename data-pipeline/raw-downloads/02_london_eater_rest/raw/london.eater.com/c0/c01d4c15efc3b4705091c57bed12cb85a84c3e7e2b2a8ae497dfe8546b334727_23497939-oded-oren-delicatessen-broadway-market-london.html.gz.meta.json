@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 253647,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T22:13:28+00:00",
+  "final_url": "https://london.eater.com/2022/12/7/23497939/oded-oren-delicatessen-broadway-market-london",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "36256",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 22:13:30 GMT",
+    "ETag": "\"l8awjltx4n5fmp\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000126-IAD, cache-lon420087-LON",
+    "X-Timer": "S1782512010.895736,VS0,VE346",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "42",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjE2Mzg5"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2022/12/7/23497939/oded-oren-delicatessen-broadway-market-london"
+  },
+  "input_row_number": 3397,
+  "sha256": "f58ceec8a6f8752bea8ea02586ff2bfc703906b0504ec94798c7d8f3627948dc",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2022/12/7/23497939/oded-oren-delicatessen-broadway-market-london"
+}

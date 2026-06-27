@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 290510,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T19:14:06+00:00",
+  "final_url": "https://london.eater.com/2017/10/17/16482330/brindisa-breakfast-cheese-pop-ups-poke-white-truffle-nordic-food-more-news-london-restaurants",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "43603",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 19:14:08 GMT",
+    "ETag": "\"7d8hj7juzw6800\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100170-IAD, cache-lhr-egwu1540055-LHR",
+    "X-Timer": "S1782501248.085273,VS0,VE262",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "29",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI4NzQ3"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2017/10/17/16482330/brindisa-breakfast-cheese-pop-ups-poke-white-truffle-nordic-food-more-news-london-restaurants"
+  },
+  "input_row_number": 671,
+  "sha256": "e50b7a86dcd343811495ab53fb89fd2eff16c3618226ad1567ce7efb24d52832",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2017/10/17/16482330/brindisa-breakfast-cheese-pop-ups-poke-white-truffle-nordic-food-more-news-london-restaurants"
+}

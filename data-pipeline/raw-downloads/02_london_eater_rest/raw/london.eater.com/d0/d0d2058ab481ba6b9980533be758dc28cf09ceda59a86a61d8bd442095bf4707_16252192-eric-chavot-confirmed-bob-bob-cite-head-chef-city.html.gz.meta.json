@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 261677,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T21:53:33+00:00",
+  "final_url": "https://london.eater.com/2017/9/4/16252192/eric-chavot-confirmed-bob-bob-cite-head-chef-city",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "38090",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 21:53:35 GMT",
+    "ETag": "\"b7hpi33b45lpq\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000094-IAD, cache-lcy-egml8630061-LCY",
+    "X-Timer": "S1782510814.371403,VS0,VE995",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "44",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI4MTYw"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2017/9/4/16252192/eric-chavot-confirmed-bob-bob-cite-head-chef-city"
+  },
+  "input_row_number": 3137,
+  "sha256": "779e8e009f6f90f343ce596391ac28d6dbf10e123db32dac1493fa6a6ea782cd",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2017/9/4/16252192/eric-chavot-confirmed-bob-bob-cite-head-chef-city"
+}

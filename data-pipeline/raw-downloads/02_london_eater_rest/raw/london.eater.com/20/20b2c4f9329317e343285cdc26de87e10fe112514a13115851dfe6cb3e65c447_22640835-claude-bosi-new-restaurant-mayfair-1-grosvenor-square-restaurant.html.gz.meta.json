@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 275724,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T20:37:35+00:00",
+  "final_url": "https://london.eater.com/2021/8/25/22640835/claude-bosi-new-restaurant-mayfair-1-grosvenor-square-restaurant",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "39643",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 20:37:37 GMT",
+    "ETag": "\"dmzam63fax5wky\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100150-IAD, cache-lhr-egwu1540026-LHR",
+    "X-Timer": "S1782506257.668948,VS0,VE454",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "44",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjE5MjYz"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2021/8/25/22640835/claude-bosi-new-restaurant-mayfair-1-grosvenor-square-restaurant"
+  },
+  "input_row_number": 1960,
+  "sha256": "bf38b5633fef034cddb8877e1c1b01f7adaff846e771c004139eb4a8524a87ae",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2021/8/25/22640835/claude-bosi-new-restaurant-mayfair-1-grosvenor-square-restaurant"
+}

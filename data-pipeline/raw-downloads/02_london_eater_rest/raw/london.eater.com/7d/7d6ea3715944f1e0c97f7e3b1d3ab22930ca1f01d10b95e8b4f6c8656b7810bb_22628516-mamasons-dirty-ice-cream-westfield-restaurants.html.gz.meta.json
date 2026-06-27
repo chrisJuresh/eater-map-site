@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 283112,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T20:37:45+00:00",
+  "final_url": "https://london.eater.com/2021/8/17/22628516/mamasons-dirty-ice-cream-westfield-restaurants",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "41349",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 20:37:46 GMT",
+    "ETag": "\"6fhk0xxtk629i\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100165-IAD, cache-lcy-eglc8600026-LCY",
+    "X-Timer": "S1782506267.586932,VS0,VE280",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "33",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjE5NTY5"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2021/8/17/22628516/mamasons-dirty-ice-cream-westfield-restaurants"
+  },
+  "input_row_number": 1963,
+  "sha256": "f164a8ca7b04d88dd557c73708fd8ad2526a7b9f73911304023dd9b6579a2b69",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2021/8/17/22628516/mamasons-dirty-ice-cream-westfield-restaurants"
+}

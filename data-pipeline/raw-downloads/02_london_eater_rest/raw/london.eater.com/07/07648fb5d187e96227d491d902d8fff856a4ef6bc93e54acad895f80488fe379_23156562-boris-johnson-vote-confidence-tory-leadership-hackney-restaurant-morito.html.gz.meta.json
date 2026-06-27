@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 154389,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T20:32:24+00:00",
+  "final_url": "https://london.eater.com/2022/6/7/23156562/boris-johnson-vote-confidence-tory-leadership-hackney-restaurant-morito",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "31918",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 20:32:26 GMT",
+    "ETag": "\"3xro5swnot3b1d\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200108-IAD, cache-lon4260-LON",
+    "X-Timer": "S1782505946.631799,VS0,VE556",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "63",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjE3NTIw"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2022/6/7/23156562/boris-johnson-vote-confidence-tory-leadership-hackney-restaurant-morito"
+  },
+  "input_row_number": 1877,
+  "sha256": "eedbcfa99bf8575dca323e7154f90381a7e48cee3fb6a615bc41a2ce6f970022",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2022/6/7/23156562/boris-johnson-vote-confidence-tory-leadership-hackney-restaurant-morito"
+}

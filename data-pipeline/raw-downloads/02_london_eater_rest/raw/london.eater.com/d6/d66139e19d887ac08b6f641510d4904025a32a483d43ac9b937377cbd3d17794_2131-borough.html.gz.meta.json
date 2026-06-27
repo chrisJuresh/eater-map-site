@@ -1,0 +1,41 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 620202,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T23:10:39+00:00",
+  "final_url": "https://london.eater.com/neighborhood/2131/borough",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "50828",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 23:10:41 GMT",
+    "ETag": "\"ujlkzgg7qkda8v\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000039-IAD, cache-lon4224-LON",
+    "X-Timer": "S1782515441.419001,VS0,VE527",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "x-middleware-rewrite": "/resource/content/neighborhood/ZXQzMTpuZWlnaGJvcmhvb2Q6NDY="
+  },
+  "input_data": {
+    "url": "https://london.eater.com/neighborhood/2131/borough"
+  },
+  "input_row_number": 4276,
+  "sha256": "7ba3d23c6bcb183717a9adc2ba2398dec3378a1bd55411e5fa19a191a48f3409",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/neighborhood/2131/borough"
+}

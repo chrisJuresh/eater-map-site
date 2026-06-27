@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 356900,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T20:02:27+00:00",
+  "final_url": "https://london.eater.com/2018/12/20/18126992/coal-drops-yard-london-restaurants-kings-cross-ritas-dining-missy-flynn",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "48756",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 20:02:29 GMT",
+    "ETag": "\"cagc5ry6fm7n0z\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000048-IAD, cache-lon4228-LON",
+    "X-Timer": "S1782504149.094024,VS0,VE240",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "20",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI0MTYy"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2018/12/20/18126992/coal-drops-yard-london-restaurants-kings-cross-ritas-dining-missy-flynn"
+  },
+  "input_row_number": 1400,
+  "sha256": "4f29526e919c168afcf149a0a080da83807325e1c0d4e07fc0366ea4d0db4c19",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2018/12/20/18126992/coal-drops-yard-london-restaurants-kings-cross-ritas-dining-missy-flynn"
+}

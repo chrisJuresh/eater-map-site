@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 299805,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T18:51:33+00:00",
+  "final_url": "https://london.eater.com/2017/10/11/16453548/angela-hartnett-schmaltz-michelin-cooking-london-street-food-london-restaurant-openings",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "39532",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 18:51:34 GMT",
+    "ETag": "\"17qklvzhp0r6f8m\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100129-IAD, cache-lcy-eglc8600099-LCY",
+    "X-Timer": "S1782499895.622913,VS0,VE250",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "27",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI3OTE1"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2017/10/11/16453548/angela-hartnett-schmaltz-michelin-cooking-london-street-food-london-restaurant-openings"
+  },
+  "input_row_number": 324,
+  "sha256": "76e3609acbf093ff306b4c5b41e2f32e0d1b48d7ee86c4d03f2362763de84014",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2017/10/11/16453548/angela-hartnett-schmaltz-michelin-cooking-london-street-food-london-restaurant-openings"
+}

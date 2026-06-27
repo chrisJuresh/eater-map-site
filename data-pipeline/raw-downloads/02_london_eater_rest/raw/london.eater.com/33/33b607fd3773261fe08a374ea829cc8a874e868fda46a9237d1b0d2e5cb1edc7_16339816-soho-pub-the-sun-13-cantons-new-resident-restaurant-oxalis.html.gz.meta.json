@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 273809,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T20:17:25+00:00",
+  "final_url": "https://london.eater.com/2017/9/20/16339816/soho-pub-the-sun-13-cantons-new-resident-restaurant-oxalis",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "39023",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 20:17:27 GMT",
+    "ETag": "\"b3kcen21yv5v4i\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000101-IAD, cache-lcy-eglc8600086-LCY",
+    "X-Timer": "S1782505047.164520,VS0,VE226",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "21",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI3ODQ0"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2017/9/20/16339816/soho-pub-the-sun-13-cantons-new-resident-restaurant-oxalis"
+  },
+  "input_row_number": 1636,
+  "sha256": "09b988c0fcf7e958150ece0b44ab66e74ebd2ff3a739e80ea605fdbe94cdfb95",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2017/9/20/16339816/soho-pub-the-sun-13-cantons-new-resident-restaurant-oxalis"
+}

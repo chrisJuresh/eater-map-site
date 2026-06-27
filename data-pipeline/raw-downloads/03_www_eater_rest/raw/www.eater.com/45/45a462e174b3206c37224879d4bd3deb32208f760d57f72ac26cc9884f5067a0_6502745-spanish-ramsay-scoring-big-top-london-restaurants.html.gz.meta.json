@@ -1,0 +1,42 @@
+{
+  "batch_folder": "03_www_eater_rest",
+  "batch_key": "www_eater_rest",
+  "batch_order": 3,
+  "canonical_url": "",
+  "content_length": 261583,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T23:22:52+00:00",
+  "final_url": "https://www.eater.com/2012/12/27/6502745/spanish-ramsay-scoring-big-top-london-restaurants",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "37205",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 23:22:54 GMT",
+    "ETag": "\"11f3vcl80pr5lpb\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000050-IAD, cache-lhr-egwu1540048-LHR",
+    "X-Timer": "S1782516174.135477,VS0,VE197",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "22",
+    "x-middleware-rewrite": "/resource/content/post/ZXQyOnBvc3Q6NzE4NDgw"
+  },
+  "input_data": {
+    "url": "https://www.eater.com/2012/12/27/6502745/spanish-ramsay-scoring-big-top-london-restaurants"
+  },
+  "input_row_number": 4457,
+  "sha256": "4f97f822088465ae3fa2a86f98f21cd47f281a0ee367f2d7321f7bf8d7407529",
+  "status_code": 200,
+  "title": "",
+  "url": "https://www.eater.com/2012/12/27/6502745/spanish-ramsay-scoring-big-top-london-restaurants"
+}

@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 275632,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T22:15:40+00:00",
+  "final_url": "https://london.eater.com/2022/2/14/22932777/two-more-years-hackney-wick-collapse-13-injured",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "38477",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 22:15:42 GMT",
+    "ETag": "\"11h9ap52pnt5wj0\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200055-IAD, cache-lcy-egml8630061-LCY",
+    "X-Timer": "S1782512141.051655,VS0,VE1247",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "22",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjE2NDk2"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2022/2/14/22932777/two-more-years-hackney-wick-collapse-13-injured"
+  },
+  "input_row_number": 3431,
+  "sha256": "e42131adf291931e26a4f19ecc52d9094a4c75379d749df08d50307fa70bd81c",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2022/2/14/22932777/two-more-years-hackney-wick-collapse-13-injured"
+}

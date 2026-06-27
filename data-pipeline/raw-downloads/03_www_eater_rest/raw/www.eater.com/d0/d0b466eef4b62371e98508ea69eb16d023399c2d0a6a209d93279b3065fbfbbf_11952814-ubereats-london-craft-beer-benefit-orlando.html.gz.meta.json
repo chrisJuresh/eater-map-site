@@ -1,0 +1,42 @@
+{
+  "batch_folder": "03_www_eater_rest",
+  "batch_key": "www_eater_rest",
+  "batch_order": 3,
+  "canonical_url": "",
+  "content_length": 257483,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T23:25:36+00:00",
+  "final_url": "https://www.eater.com/2016/6/16/11952814/ubereats-london-craft-beer-benefit-orlando",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "39006",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 23:25:38 GMT",
+    "ETag": "\"jdr0lnf59f5ihz\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100086-IAD, cache-lon420131-LON",
+    "X-Timer": "S1782516338.128289,VS0,VE234",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "21",
+    "x-middleware-rewrite": "/resource/content/post/ZXQyOnBvc3Q6NjQ2ODE2"
+  },
+  "input_data": {
+    "url": "https://www.eater.com/2016/6/16/11952814/ubereats-london-craft-beer-benefit-orlando"
+  },
+  "input_row_number": 4502,
+  "sha256": "94eeccd2848e87a771a5c1bf702b19367d1bf9861099c0721553dd4f6b926e26",
+  "status_code": 200,
+  "title": "",
+  "url": "https://www.eater.com/2016/6/16/11952814/ubereats-london-craft-beer-benefit-orlando"
+}

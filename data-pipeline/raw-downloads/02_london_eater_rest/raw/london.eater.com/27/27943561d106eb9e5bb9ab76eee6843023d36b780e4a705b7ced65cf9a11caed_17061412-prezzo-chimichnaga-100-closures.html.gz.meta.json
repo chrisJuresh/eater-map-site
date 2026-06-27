@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 258986,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T22:49:03+00:00",
+  "final_url": "https://london.eater.com/2018/2/28/17061412/prezzo-chimichnaga-100-closures",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "37147",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 22:49:05 GMT",
+    "ETag": "\"10k0480cfr25jri\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000150-IAD, cache-lhr-egwu1540052-LHR",
+    "X-Timer": "S1782514146.556161,VS0,VE202",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "23",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI3MDIy"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2018/2/28/17061412/prezzo-chimichnaga-100-closures"
+  },
+  "input_row_number": 3964,
+  "sha256": "17736cd780afd15a477a319afeac79d3980e0e12802bf545e6b58b8461a22226",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2018/2/28/17061412/prezzo-chimichnaga-100-closures"
+}

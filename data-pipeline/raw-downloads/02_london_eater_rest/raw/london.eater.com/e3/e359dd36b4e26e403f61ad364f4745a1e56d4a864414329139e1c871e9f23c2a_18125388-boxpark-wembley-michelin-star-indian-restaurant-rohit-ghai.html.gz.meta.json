@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 277261,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T19:10:15+00:00",
+  "final_url": "https://london.eater.com/2018/12/4/18125388/boxpark-wembley-michelin-star-indian-restaurant-rohit-ghai",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "39955",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 19:10:17 GMT",
+    "ETag": "\"82a5zqip2h5xtp\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200145-IAD, cache-lcy-egml8630047-LCY",
+    "X-Timer": "S1782501017.912070,VS0,VE413",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "34",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI0MTQ5"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2018/12/4/18125388/boxpark-wembley-michelin-star-indian-restaurant-rohit-ghai"
+  },
+  "input_row_number": 609,
+  "sha256": "e53ab649ea8a2ef30a6bd10180f228403fac65ebc9f7603af6cda56a3cdf0e11",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2018/12/4/18125388/boxpark-wembley-michelin-star-indian-restaurant-rohit-ghai"
+}

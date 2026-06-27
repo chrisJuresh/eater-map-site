@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 289484,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T19:39:04+00:00",
+  "final_url": "https://london.eater.com/2022/2/18/22940570/saltie-girl-boston-menu-restaurant-opening-mayfair",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "38468",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 19:39:06 GMT",
+    "ETag": "\"pll7dkzknz679v\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000176-IAD, cache-lcy-egml8630084-LCY",
+    "X-Timer": "S1782502746.192438,VS0,VE246",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "23",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjE3MzM4"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2022/2/18/22940570/saltie-girl-boston-menu-restaurant-opening-mayfair"
+  },
+  "input_row_number": 1024,
+  "sha256": "d0c6c4f49234b46b0bc843ab822337bf54113484e9fcb3458fbe904bdd0bbbbf",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2022/2/18/22940570/saltie-girl-boston-menu-restaurant-opening-mayfair"
+}

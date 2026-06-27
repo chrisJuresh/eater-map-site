@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 272933,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T22:54:52+00:00",
+  "final_url": "https://london.eater.com/2017/10/13/16469234/closure-threatened-da-maria-notting-hill-safe-for-now",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "39647",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 22:54:54 GMT",
+    "ETag": "\"cchwjokln35ufx\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100079-IAD, cache-lon420096-LON",
+    "X-Timer": "S1782514494.953391,VS0,VE561",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "40",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI3NTc5"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2017/10/13/16469234/closure-threatened-da-maria-notting-hill-safe-for-now"
+  },
+  "input_row_number": 4057,
+  "sha256": "53d8e213135fe7d7bdaa861ca5c81d1393e74ae4cc6715ce717d8d53e501b9ca",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2017/10/13/16469234/closure-threatened-da-maria-notting-hill-safe-for-now"
+}

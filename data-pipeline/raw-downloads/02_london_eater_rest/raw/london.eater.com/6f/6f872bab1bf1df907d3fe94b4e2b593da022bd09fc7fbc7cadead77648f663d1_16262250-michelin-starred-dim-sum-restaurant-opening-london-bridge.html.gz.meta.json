@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 308463,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T19:01:06+00:00",
+  "final_url": "https://london.eater.com/2017/9/6/16262250/michelin-starred-dim-sum-restaurant-opening-london-bridge",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "40870",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 19:01:08 GMT",
+    "ETag": "\"askr795xic6luo\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000103-IAD, cache-lhr-egwu1540047-LHR",
+    "X-Timer": "S1782500468.736705,VS0,VE287",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "33",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI3OTg1"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2017/9/6/16262250/michelin-starred-dim-sum-restaurant-opening-london-bridge"
+  },
+  "input_row_number": 462,
+  "sha256": "0ad489c63bea036032d5f0182d4b13f8e6cc3b7e91849aa2f9ef16bc0e58433f",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2017/9/6/16262250/michelin-starred-dim-sum-restaurant-opening-london-bridge"
+}

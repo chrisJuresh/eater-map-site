@@ -1,0 +1,42 @@
+{
+  "batch_folder": "03_www_eater_rest",
+  "batch_key": "www_eater_rest",
+  "batch_order": 3,
+  "canonical_url": "",
+  "content_length": 238748,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T23:15:09+00:00",
+  "final_url": "https://www.eater.com/23601598/michelin-starred-dim-sum-restaurant-london-signature-shanghai-dumpling",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "36559",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 23:15:11 GMT",
+    "ETag": "\"14nhc56gl5r543i\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200162-IAD, cache-lhr-egwu1540071-LHR",
+    "X-Timer": "S1782515711.016470,VS0,VE258",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "27",
+    "x-middleware-rewrite": "/resource/content/post/ZXQyOnBvc3Q6NTg0MTc0"
+  },
+  "input_data": {
+    "url": "https://www.eater.com/23601598/michelin-starred-dim-sum-restaurant-london-signature-shanghai-dumpling"
+  },
+  "input_row_number": 4333,
+  "sha256": "dd94c2d1cd07002ee2e4f06c1bbbb6f2238807be713a5e52f1914f0240de2359",
+  "status_code": 200,
+  "title": "",
+  "url": "https://www.eater.com/23601598/michelin-starred-dim-sum-restaurant-london-signature-shanghai-dumpling"
+}

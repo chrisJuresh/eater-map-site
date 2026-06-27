@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 260671,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T19:29:01+00:00",
+  "final_url": "https://london.eater.com/2018/9/5/17822478/leon-restaurant-chain-washington-dc-opening",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "38643",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 19:29:02 GMT",
+    "ETag": "\"8uoepjtc0v5l0z\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000149-IAD, cache-lcy-eglc8600098-LCY",
+    "X-Timer": "S1782502143.687043,VS0,VE262",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "32",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI0OTU1"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2018/9/5/17822478/leon-restaurant-chain-washington-dc-opening"
+  },
+  "input_row_number": 877,
+  "sha256": "7cdf5a2bff0fa7ccad864415d80171433f8a6b55da71030e4bf2a76848d14012",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2018/9/5/17822478/leon-restaurant-chain-washington-dc-opening"
+}

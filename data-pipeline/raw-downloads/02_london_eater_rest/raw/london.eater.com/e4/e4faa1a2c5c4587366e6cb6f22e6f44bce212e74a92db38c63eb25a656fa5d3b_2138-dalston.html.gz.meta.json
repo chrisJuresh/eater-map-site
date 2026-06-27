@@ -1,0 +1,41 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 624730,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T23:11:04+00:00",
+  "final_url": "https://london.eater.com/neighborhood/2138/dalston",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "49183",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 23:11:06 GMT",
+    "ETag": "\"izvddibm0nddqc\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000042-IAD, cache-lon4252-LON",
+    "X-Timer": "S1782515466.137818,VS0,VE272",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "x-middleware-rewrite": "/resource/content/neighborhood/ZXQzMTpuZWlnaGJvcmhvb2Q6NDc="
+  },
+  "input_data": {
+    "url": "https://london.eater.com/neighborhood/2138/dalston"
+  },
+  "input_row_number": 4283,
+  "sha256": "03a4435680d2095b8ea91383084cf8214833c483280aba0d49800f0cad34a252",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/neighborhood/2138/dalston"
+}

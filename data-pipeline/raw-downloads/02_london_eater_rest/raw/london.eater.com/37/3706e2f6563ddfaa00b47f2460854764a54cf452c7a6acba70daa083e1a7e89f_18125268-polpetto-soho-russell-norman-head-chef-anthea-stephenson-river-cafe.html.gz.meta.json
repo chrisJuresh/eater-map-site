@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 277214,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T20:03:12+00:00",
+  "final_url": "https://london.eater.com/2018/12/4/18125268/polpetto-soho-russell-norman-head-chef-anthea-stephenson-river-cafe",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "39203",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 20:03:14 GMT",
+    "ETag": "\"xribbfjcg15xrg\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100145-IAD, cache-lcy-eglc8600023-LCY",
+    "X-Timer": "S1782504194.627411,VS0,VE389",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "26",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI0MTI4"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2018/12/4/18125268/polpetto-soho-russell-norman-head-chef-anthea-stephenson-river-cafe"
+  },
+  "input_row_number": 1412,
+  "sha256": "57cca53dc1ccd63c42fbd89b5105b1b2c99d8baa0abd2e71e004bf3779f6e59d",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2018/12/4/18125268/polpetto-soho-russell-norman-head-chef-anthea-stephenson-river-cafe"
+}

@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 273062,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T20:38:51+00:00",
+  "final_url": "https://london.eater.com/2021/7/1/22558795/best-wine-london-lockdown-shop-top-cuvee-bethnal-green",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "39534",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 20:38:53 GMT",
+    "ETag": "\"11bwzt509t65uj5\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200106-IAD, cache-lhr-egwu1540069-LHR",
+    "X-Timer": "S1782506333.427095,VS0,VE229",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "19",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjE4NzE5"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2021/7/1/22558795/best-wine-london-lockdown-shop-top-cuvee-bethnal-green"
+  },
+  "input_row_number": 1980,
+  "sha256": "999d2e6f629188f42819b5347a04f01c2cc9d2e2e79cde774103b5f908c6ca3b",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2021/7/1/22558795/best-wine-london-lockdown-shop-top-cuvee-bethnal-green"
+}

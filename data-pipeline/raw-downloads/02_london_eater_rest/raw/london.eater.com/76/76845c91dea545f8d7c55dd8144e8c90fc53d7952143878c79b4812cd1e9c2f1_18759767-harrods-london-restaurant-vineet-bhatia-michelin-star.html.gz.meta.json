@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 292920,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T19:07:56+00:00",
+  "final_url": "https://london.eater.com/2019/6/27/18759767/harrods-london-restaurant-vineet-bhatia-michelin-star",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "39700",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 19:07:57 GMT",
+    "ETag": "\"mz3hgsm61a69x3\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200122-IAD, cache-lon420115-LON",
+    "X-Timer": "S1782500878.624368,VS0,VE355",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "22",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIzMTMw"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2019/6/27/18759767/harrods-london-restaurant-vineet-bhatia-michelin-star"
+  },
+  "input_row_number": 572,
+  "sha256": "cd4d80c8a8f8305265e764261c76dd65e1e4a981b38cd6bb654278a4b38fcb42",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2019/6/27/18759767/harrods-london-restaurant-vineet-bhatia-michelin-star"
+}

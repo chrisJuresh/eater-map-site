@@ -1,0 +1,43 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 269747,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T20:28:57+00:00",
+  "final_url": "https://london.eater.com/2022/11/22/23438560/eater-talks-one-hundred-shoreditch-london-food-events",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "38065",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 20:28:58 GMT",
+    "ETag": "\"stplofn8bc5ry3\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100141-IAD, cache-lcy-eglc8600049-LCY",
+    "X-Timer": "S1782505738.460032,VS0,VE286",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "41",
+    "vm-resource-primary-super-cat": "ZXQyOnN1cGVyQ2F0OjI1MTU=",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjE4NzYy"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2022/11/22/23438560/eater-talks-one-hundred-shoreditch-london-food-events"
+  },
+  "input_row_number": 1823,
+  "sha256": "efdf2af1f3bb078105ef204e924f0da82a50f081c899d7a37fa98f8cb4194ebc",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2022/11/22/23438560/eater-talks-one-hundred-shoreditch-london-food-events"
+}

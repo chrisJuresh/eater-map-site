@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 273177,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T21:05:06+00:00",
+  "final_url": "https://london.eater.com/2019/9/10/20857209/black-food-festival-london-charcoal-lattes-squid-ink",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "40314",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 21:05:08 GMT",
+    "ETag": "\"tl69xncj785un5\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100048-IAD, cache-lcy-eglc8600032-LCY",
+    "X-Timer": "S1782507908.036812,VS0,VE246",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "27",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIyOTY1"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2019/9/10/20857209/black-food-festival-london-charcoal-lattes-squid-ink"
+  },
+  "input_row_number": 2359,
+  "sha256": "49d066330a616961d905a7e36a2451ed1112f8f541f6de66a5068cb540b6250e",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2019/9/10/20857209/black-food-festival-london-charcoal-lattes-squid-ink"
+}

@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 288395,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T21:32:21+00:00",
+  "final_url": "https://london.eater.com/2018/6/19/17478070/wild-serai-malaysian-supper-club-sun-and-13-cantons-pub-soho",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "43573",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 21:32:23 GMT",
+    "ETag": "\"4izz3agbk866dp\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200082-IAD, cache-lcy-egml8630093-LCY",
+    "X-Timer": "S1782509543.924638,VS0,VE216",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "22",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI2NTEy"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2018/6/19/17478070/wild-serai-malaysian-supper-club-sun-and-13-cantons-pub-soho"
+  },
+  "input_row_number": 2793,
+  "sha256": "568b494c854484fa0236fe40029ced07e567f239a75f178485665ef5e4cf1b71",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2018/6/19/17478070/wild-serai-malaysian-supper-club-sun-and-13-cantons-pub-soho"
+}

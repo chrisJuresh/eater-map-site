@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 297408,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T22:47:38+00:00",
+  "final_url": "https://london.eater.com/2018/3/19/17138292/bacone-louis-korovilas-giorgio-locatelli-pasta",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "39226",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 22:47:40 GMT",
+    "ETag": "\"r9bvmb4n5g6ddq\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000111-IAD, cache-lhr-egwu1540045-LHR",
+    "X-Timer": "S1782514060.264168,VS0,VE272",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "30",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI3MDA4"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2018/3/19/17138292/bacone-louis-korovilas-giorgio-locatelli-pasta"
+  },
+  "input_row_number": 3941,
+  "sha256": "610e840750cfafee78092b54c33b7edcc7862c44a24eced4f9c9877bd794ff4f",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2018/3/19/17138292/bacone-louis-korovilas-giorgio-locatelli-pasta"
+}

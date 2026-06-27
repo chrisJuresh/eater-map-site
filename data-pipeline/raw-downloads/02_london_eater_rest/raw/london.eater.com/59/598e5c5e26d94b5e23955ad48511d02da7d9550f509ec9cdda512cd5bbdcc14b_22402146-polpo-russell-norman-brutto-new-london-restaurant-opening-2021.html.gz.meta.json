@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 303426,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T19:42:13+00:00",
+  "final_url": "https://london.eater.com/2021/4/26/22402146/polpo-russell-norman-brutto-new-london-restaurant-opening-2021",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "43249",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 19:42:15 GMT",
+    "ETag": "\"11mpy2c0n0p6i17\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200084-IAD, cache-lcy-eglc8600034-LCY",
+    "X-Timer": "S1782502935.139478,VS0,VE277",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "35",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjE4NzI2"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2021/4/26/22402146/polpo-russell-norman-brutto-new-london-restaurant-opening-2021"
+  },
+  "input_row_number": 1075,
+  "sha256": "c9da421e25056c342b09c00b8c52ae0450f8d9aedc1ad862ebe1c835f4e9d1d7",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2021/4/26/22402146/polpo-russell-norman-brutto-new-london-restaurant-opening-2021"
+}

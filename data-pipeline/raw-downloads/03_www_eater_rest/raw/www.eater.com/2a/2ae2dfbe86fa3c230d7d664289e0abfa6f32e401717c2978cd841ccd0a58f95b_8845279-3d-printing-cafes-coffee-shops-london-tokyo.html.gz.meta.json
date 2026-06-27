@@ -1,0 +1,42 @@
+{
+  "batch_folder": "03_www_eater_rest",
+  "batch_key": "www_eater_rest",
+  "batch_order": 3,
+  "canonical_url": "",
+  "content_length": 266495,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T23:14:46+00:00",
+  "final_url": "https://www.eater.com/2015/6/25/8845279/3d-printing-cafes-coffee-shops-london-tokyo",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "38688",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 23:14:48 GMT",
+    "ETag": "\"139l7jl3f0f5pfz\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000159-IAD, cache-lhr-egwu1540052-LHR",
+    "X-Timer": "S1782515688.920222,VS0,VE222",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "27",
+    "x-middleware-rewrite": "/resource/content/post/ZXQyOnBvc3Q6NjY2MTA3"
+  },
+  "input_data": {
+    "url": "https://www.eater.com/2015/6/25/8845279/3d-printing-cafes-coffee-shops-london-tokyo"
+  },
+  "input_row_number": 4327,
+  "sha256": "bea03bc3088582f2c6fb45ad29bcd5b734e9234dc9ca1266e7d194c046119a1a",
+  "status_code": 200,
+  "title": "",
+  "url": "https://www.eater.com/2015/6/25/8845279/3d-printing-cafes-coffee-shops-london-tokyo"
+}

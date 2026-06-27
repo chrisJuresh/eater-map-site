@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 308847,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T19:24:33+00:00",
+  "final_url": "https://london.eater.com/2019/5/13/18616879/guy-ritchie-pub-lore-of-the-land-london-restaurant-review",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "48396",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 19:24:34 GMT",
+    "ETag": "\"1380mm4v67e6m1l\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200169-IAD, cache-lhr-egwu1540070-LHR",
+    "X-Timer": "S1782501875.653773,VS0,VE238",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "28",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIzNjI0"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2019/5/13/18616879/guy-ritchie-pub-lore-of-the-land-london-restaurant-review"
+  },
+  "input_row_number": 820,
+  "sha256": "6f64ecc40a65110e4e5435a8507de11700e61a9f24f9c3aca1406da2c68495c7",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2019/5/13/18616879/guy-ritchie-pub-lore-of-the-land-london-restaurant-review"
+}

@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 268866,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T21:36:16+00:00",
+  "final_url": "https://london.eater.com/2018/4/16/17243212/jamie-oliver-restaurant-business-whats-next-aramark",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "38601",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 21:36:18 GMT",
+    "ETag": "\"4uxbt378zg5ray\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200056-IAD, cache-lhr-egwu1540070-LHR",
+    "X-Timer": "S1782509778.387706,VS0,VE273",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "32",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI2NjQy"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2018/4/16/17243212/jamie-oliver-restaurant-business-whats-next-aramark"
+  },
+  "input_row_number": 2856,
+  "sha256": "8e797c23912c3a5d7b901fe7d9db5ef04ec9c1d149f5793bedb05bdc7681a628",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2018/4/16/17243212/jamie-oliver-restaurant-business-whats-next-aramark"
+}

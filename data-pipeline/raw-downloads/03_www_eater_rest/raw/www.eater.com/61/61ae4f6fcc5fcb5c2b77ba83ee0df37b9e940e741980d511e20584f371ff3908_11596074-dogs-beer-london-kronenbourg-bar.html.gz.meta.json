@@ -1,0 +1,42 @@
+{
+  "batch_folder": "03_www_eater_rest",
+  "batch_key": "www_eater_rest",
+  "batch_order": 3,
+  "canonical_url": "",
+  "content_length": 249047,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T23:18:22+00:00",
+  "final_url": "https://www.eater.com/2016/5/5/11596074/dogs-beer-london-kronenbourg-bar",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "38245",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 23:18:24 GMT",
+    "ETag": "\"iosdle29ed5c07\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000093-IAD, cache-lcy-egml8630042-LCY",
+    "X-Timer": "S1782515904.400587,VS0,VE263",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "28",
+    "x-middleware-rewrite": "/resource/content/post/ZXQyOnBvc3Q6NjQ4NjI4"
+  },
+  "input_data": {
+    "url": "https://www.eater.com/2016/5/5/11596074/dogs-beer-london-kronenbourg-bar"
+  },
+  "input_row_number": 4384,
+  "sha256": "d7bf6e78a3519806f4aa0044fa2dd55b233dcfa2d7bd89ab93fd7b1aa84c466e",
+  "status_code": 200,
+  "title": "",
+  "url": "https://www.eater.com/2016/5/5/11596074/dogs-beer-london-kronenbourg-bar"
+}

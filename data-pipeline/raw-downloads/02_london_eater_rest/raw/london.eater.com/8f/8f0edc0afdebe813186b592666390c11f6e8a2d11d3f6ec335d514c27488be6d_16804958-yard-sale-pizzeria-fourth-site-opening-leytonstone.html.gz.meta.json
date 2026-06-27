@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 275625,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T21:45:18+00:00",
+  "final_url": "https://london.eater.com/2017/12/21/16804958/yard-sale-pizzeria-fourth-site-opening-leytonstone",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "40632",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 21:45:20 GMT",
+    "ETag": "\"fi8skzffs65wlp\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100100-IAD, cache-lon420139-LON",
+    "X-Timer": "S1782510319.479643,VS0,VE667",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "208",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI3MDAx"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2017/12/21/16804958/yard-sale-pizzeria-fourth-site-opening-leytonstone"
+  },
+  "input_row_number": 3004,
+  "sha256": "d0f61d519c6ba3c5d4eec2cdeaa52921ba7f5c7701d6967c832aab832a312814",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2017/12/21/16804958/yard-sale-pizzeria-fourth-site-opening-leytonstone"
+}

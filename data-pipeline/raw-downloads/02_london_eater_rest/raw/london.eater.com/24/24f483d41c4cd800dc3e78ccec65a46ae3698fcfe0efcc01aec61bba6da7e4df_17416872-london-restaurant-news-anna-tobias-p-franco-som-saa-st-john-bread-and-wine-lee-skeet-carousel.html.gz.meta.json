@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 298387,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T19:29:30+00:00",
+  "final_url": "https://london.eater.com/2018/6/1/17416872/london-restaurant-news-anna-tobias-p-franco-som-saa-st-john-bread-and-wine-lee-skeet-carousel",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "45719",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 19:29:31 GMT",
+    "ETag": "\"11uy49gnhq46e1s\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100063-IAD, cache-lcy-eglc8600086-LCY",
+    "X-Timer": "S1782502172.506570,VS0,VE324",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "29",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI3OTU5"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2018/6/1/17416872/london-restaurant-news-anna-tobias-p-franco-som-saa-st-john-bread-and-wine-lee-skeet-carousel"
+  },
+  "input_row_number": 885,
+  "sha256": "f5c71a750d5d64ae3f01e78c606b0a9b6fd075b6f9ac833a494df6fdd92f72b0",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2018/6/1/17416872/london-restaurant-news-anna-tobias-p-franco-som-saa-st-john-bread-and-wine-lee-skeet-carousel"
+}

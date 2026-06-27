@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 261701,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T21:35:35+00:00",
+  "final_url": "https://london.eater.com/2018/4/27/17290158/jamie-oliver-steak-restaurant-barbecoa-uncertain-future",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "37028",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 21:35:37 GMT",
+    "ETag": "\"156339stu9k5lsl\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000066-IAD, cache-lcy-eglc8600079-LCY",
+    "X-Timer": "S1782509737.640932,VS0,VE381",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "33",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI2MTg3"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2018/4/27/17290158/jamie-oliver-steak-restaurant-barbecoa-uncertain-future"
+  },
+  "input_row_number": 2845,
+  "sha256": "0d529a80ce3925e09e652c9fea4a32b103892f53b4abde7d3807fde49d53e91d",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2018/4/27/17290158/jamie-oliver-steak-restaurant-barbecoa-uncertain-future"
+}

@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 438568,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T20:21:43+00:00",
+  "final_url": "https://london.eater.com/21574844/best-pies-london-restaurants-winter-2020",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "43656",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 20:21:45 GMT",
+    "ETag": "\"tphm484rly9e7x\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000141-IAD, cache-lcy-eglc8600063-LCY",
+    "X-Timer": "S1782505304.265522,VS0,VE812",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "23",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIyMTg1"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/21574844/best-pies-london-restaurants-winter-2020"
+  },
+  "input_row_number": 1706,
+  "sha256": "4133962a43bd12226e3ceb1454bab2b510ad0f3f878b01e34778d1cb7f884fd0",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/21574844/best-pies-london-restaurants-winter-2020"
+}

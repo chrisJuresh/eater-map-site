@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 267737,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T22:33:03+00:00",
+  "final_url": "https://london.eater.com/2019/5/2/18526497/pride-month-2019-lgbtq-sandwich-marks-and-spencer-ireland",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "39260",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 22:33:05 GMT",
+    "ETag": "\"11dab8uzcf35qed\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000067-IAD, cache-lon4247-LON",
+    "X-Timer": "S1782513185.772214,VS0,VE273",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "26",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI0MjQ5"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2019/5/2/18526497/pride-month-2019-lgbtq-sandwich-marks-and-spencer-ireland"
+  },
+  "input_row_number": 3709,
+  "sha256": "32672396d9b8ef39b8dff9ea7d3c58dc27288ee7ac7532650a4c931e9ce3cba1",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2019/5/2/18526497/pride-month-2019-lgbtq-sandwich-marks-and-spencer-ireland"
+}

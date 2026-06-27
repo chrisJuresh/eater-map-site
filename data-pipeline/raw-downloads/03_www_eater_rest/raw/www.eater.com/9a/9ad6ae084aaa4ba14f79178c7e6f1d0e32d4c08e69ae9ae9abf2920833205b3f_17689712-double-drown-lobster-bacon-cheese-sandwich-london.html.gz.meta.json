@@ -1,0 +1,43 @@
+{
+  "batch_folder": "03_www_eater_rest",
+  "batch_key": "www_eater_rest",
+  "batch_order": 3,
+  "canonical_url": "",
+  "content_length": 266344,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T23:24:27+00:00",
+  "final_url": "https://www.eater.com/2018/8/14/17689712/double-drown-lobster-bacon-cheese-sandwich-london",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "39283",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 23:24:29 GMT",
+    "ETag": "\"blpza46epk5pcs\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200093-IAD, cache-lcy-egml8630041-LCY",
+    "X-Timer": "S1782516269.666198,VS0,VE739",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "17",
+    "vm-resource-primary-super-cat": "ZXQyOnN1cGVyQ2F0OjEyMDk=",
+    "x-middleware-rewrite": "/resource/content/post/ZXQyOnBvc3Q6NjE3MTg1"
+  },
+  "input_data": {
+    "url": "https://www.eater.com/2018/8/14/17689712/double-drown-lobster-bacon-cheese-sandwich-london"
+  },
+  "input_row_number": 4483,
+  "sha256": "4832b53f6922d7de3f6319cc970010c98ad50d7ff377153811b04342f7ef4d76",
+  "status_code": 200,
+  "title": "",
+  "url": "https://www.eater.com/2018/8/14/17689712/double-drown-lobster-bacon-cheese-sandwich-london"
+}

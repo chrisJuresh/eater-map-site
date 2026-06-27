@@ -1,0 +1,42 @@
+{
+  "batch_folder": "03_www_eater_rest",
+  "batch_key": "www_eater_rest",
+  "batch_order": 3,
+  "canonical_url": "",
+  "content_length": 255791,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T23:17:34+00:00",
+  "final_url": "https://www.eater.com/2017/1/12/14256476/wasted-pop-up-london-dan-barber-food-waste",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "40131",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 23:17:36 GMT",
+    "ETag": "\"ozmbhhbx7y5h7z\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100176-IAD, cache-lcy-egml8630037-LCY",
+    "X-Timer": "S1782515856.492739,VS0,VE341",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "37",
+    "x-middleware-rewrite": "/resource/content/post/ZXQyOnBvc3Q6NjM3MDM3"
+  },
+  "input_data": {
+    "url": "https://www.eater.com/2017/1/12/14256476/wasted-pop-up-london-dan-barber-food-waste"
+  },
+  "input_row_number": 4372,
+  "sha256": "f4c46f79c5338941bfa9e009fd25db128c083376354d90ec55a2e8232e5f1679",
+  "status_code": 200,
+  "title": "",
+  "url": "https://www.eater.com/2017/1/12/14256476/wasted-pop-up-london-dan-barber-food-waste"
+}

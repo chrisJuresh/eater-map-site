@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 275175,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T21:38:55+00:00",
+  "final_url": "https://london.eater.com/2018/3/2/17070606/w-london-hotel-dining-series-collaboration-ravinder-bhogal",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "39882",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 21:38:57 GMT",
+    "ETag": "\"kjtx6l0kno5w76\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200062-IAD, cache-lon420144-LON",
+    "X-Timer": "S1782509938.507312,VS0,VE228",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "22",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI2ODg2"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2018/3/2/17070606/w-london-hotel-dining-series-collaboration-ravinder-bhogal"
+  },
+  "input_row_number": 2899,
+  "sha256": "fce18082628ed8ae0b9e05d38e28b840abed4516b3e99a060a16700c70b938b7",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2018/3/2/17070606/w-london-hotel-dining-series-collaboration-ravinder-bhogal"
+}

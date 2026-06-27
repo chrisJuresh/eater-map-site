@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 267667,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T22:31:20+00:00",
+  "final_url": "https://london.eater.com/2019/6/6/18653919/milkshake-political-protest-donald-trump-uk-visit",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "39443",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 22:31:22 GMT",
+    "ETag": "\"14mikeo8fx85qb9\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000148-IAD, cache-lcy-egml8630082-LCY",
+    "X-Timer": "S1782513082.430916,VS0,VE226",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "18",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIzNjg1"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2019/6/6/18653919/milkshake-political-protest-donald-trump-uk-visit"
+  },
+  "input_row_number": 3681,
+  "sha256": "b55c8982f636feb7f5f511861b222812d9ba18a71af49951539a206b3b1c5cc3",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2019/6/6/18653919/milkshake-political-protest-donald-trump-uk-visit"
+}

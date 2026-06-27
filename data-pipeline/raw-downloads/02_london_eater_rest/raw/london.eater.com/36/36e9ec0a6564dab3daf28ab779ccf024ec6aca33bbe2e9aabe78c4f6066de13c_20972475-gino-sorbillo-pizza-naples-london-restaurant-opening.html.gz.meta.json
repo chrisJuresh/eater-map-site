@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 284287,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T19:51:45+00:00",
+  "final_url": "https://london.eater.com/2019/11/19/20972475/gino-sorbillo-pizza-naples-london-restaurant-opening",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "36912",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 19:51:47 GMT",
+    "ETag": "\"9qvc9y9z08639y\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000093-IAD, cache-lcy-eglc8600025-LCY",
+    "X-Timer": "S1782503507.144693,VS0,VE208",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "24",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIxODc1"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2019/11/19/20972475/gino-sorbillo-pizza-naples-london-restaurant-opening"
+  },
+  "input_row_number": 1227,
+  "sha256": "1f91f84ff2971b82f1de460dcb3b54e1b8c973a3aa53857a01ee1d168be37f7e",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2019/11/19/20972475/gino-sorbillo-pizza-naples-london-restaurant-opening"
+}

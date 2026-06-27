@@ -1,0 +1,43 @@
+{
+  "batch_folder": "03_www_eater_rest",
+  "batch_key": "www_eater_rest",
+  "batch_order": 3,
+  "canonical_url": "",
+  "content_length": 313984,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T23:33:56+00:00",
+  "final_url": "https://www.eater.com/23844360/anya-hindmarch-ice-cream-project-pop-up-london",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "48254",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 23:33:58 GMT",
+    "ETag": "\"f0b2vrvv2c6q4o\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100161-IAD, cache-lcy-egml8630074-LCY",
+    "X-Timer": "S1782516838.053904,VS0,VE318",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "33",
+    "vm-resource-primary-super-cat": "ZXQyOnN1cGVyQ2F0OjQ2Mw==",
+    "x-middleware-rewrite": "/resource/content/post/ZXQyOnBvc3Q6NTc5MTQw"
+  },
+  "input_data": {
+    "url": "https://www.eater.com/23844360/anya-hindmarch-ice-cream-project-pop-up-london"
+  },
+  "input_row_number": 4621,
+  "sha256": "e547a3f9168b0ee8a3c968f7b76794852ccd4e3a3027f9bfb9a387462881ff36",
+  "status_code": 200,
+  "title": "",
+  "url": "https://www.eater.com/23844360/anya-hindmarch-ice-cream-project-pop-up-london"
+}

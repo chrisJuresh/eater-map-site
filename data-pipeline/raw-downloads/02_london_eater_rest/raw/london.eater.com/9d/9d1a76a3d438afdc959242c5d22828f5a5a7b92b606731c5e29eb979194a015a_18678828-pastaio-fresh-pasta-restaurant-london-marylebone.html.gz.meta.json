@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 299143,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T21:10:41+00:00",
+  "final_url": "https://london.eater.com/2019/6/14/18678828/pastaio-fresh-pasta-restaurant-london-marylebone",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "39646",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 21:10:43 GMT",
+    "ETag": "\"5t88wmtwed6eq7\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100140-IAD, cache-lhr-egwu1540073-LHR",
+    "X-Timer": "S1782508243.219410,VS0,VE258",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "28",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIzMjY4"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2019/6/14/18678828/pastaio-fresh-pasta-restaurant-london-marylebone"
+  },
+  "input_row_number": 2443,
+  "sha256": "720ecffca1cd93dcb2e137442433a4e137e42fe4e09e3c02dcb5f2c984446f96",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2019/6/14/18678828/pastaio-fresh-pasta-restaurant-london-marylebone"
+}

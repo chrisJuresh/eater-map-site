@@ -1,0 +1,43 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 416868,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T22:00:58+00:00",
+  "final_url": "https://london.eater.com/21754891/coronavirus-uk-restaurants-reopen-london-tier-2-uncertainty",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "64696",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 22:00:59 GMT",
+    "ETag": "\"lmkxo5e8b88xby\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000041-IAD, cache-lcy-egml8630095-LCY",
+    "X-Timer": "S1782511260.542904,VS0,VE433",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "43",
+    "vm-resource-primary-super-cat": "ZXQyOnN1cGVyQ2F0OjExMDM=",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjE5MzM2"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/21754891/coronavirus-uk-restaurants-reopen-london-tier-2-uncertainty"
+  },
+  "input_row_number": 3240,
+  "sha256": "700b63b87a1aa5740cb86e2405cfb7e4a51b8e1f9366a155fcfea5dfb6071064",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/21754891/coronavirus-uk-restaurants-reopen-london-tier-2-uncertainty"
+}

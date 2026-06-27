@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 259486,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T23:04:09+00:00",
+  "final_url": "https://london.eater.com/22876338/queen-platinum-pudding-recipe-jubilee-menu-mary-berry",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "37604",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 23:04:11 GMT",
+    "ETag": "\"wy3lyzx8155k3k\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000052-IAD, cache-lon420124-LON",
+    "X-Timer": "S1782515051.099005,VS0,VE247",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "32",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjE4MTA2"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/22876338/queen-platinum-pudding-recipe-jubilee-menu-mary-berry"
+  },
+  "input_row_number": 4202,
+  "sha256": "41de93dd7721156fc3b084c39caaf6d59a80857f646487fe0c2046a9501ec989",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/22876338/queen-platinum-pudding-recipe-jubilee-menu-mary-berry"
+}

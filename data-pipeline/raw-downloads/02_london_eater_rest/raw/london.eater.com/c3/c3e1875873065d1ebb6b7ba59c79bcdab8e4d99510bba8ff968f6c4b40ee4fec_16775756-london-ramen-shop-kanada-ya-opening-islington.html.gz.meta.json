@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 269995,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T21:45:44+00:00",
+  "final_url": "https://london.eater.com/2017/12/15/16775756/london-ramen-shop-kanada-ya-opening-islington",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "38591",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 21:45:46 GMT",
+    "ETag": "\"6dmykypo5h5s88\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100144-IAD, cache-lon4251-LON",
+    "X-Timer": "S1782510346.919398,VS0,VE234",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "19",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI3ODQ2"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2017/12/15/16775756/london-ramen-shop-kanada-ya-opening-islington"
+  },
+  "input_row_number": 3011,
+  "sha256": "eee4a3809149e0c6554849ac772705b3efa3b3993f2c3e8304d62b5a9801887e",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2017/12/15/16775756/london-ramen-shop-kanada-ya-opening-islington"
+}

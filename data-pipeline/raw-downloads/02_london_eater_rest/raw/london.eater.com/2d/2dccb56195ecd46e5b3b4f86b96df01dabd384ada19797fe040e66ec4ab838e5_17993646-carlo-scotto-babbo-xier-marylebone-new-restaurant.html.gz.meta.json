@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 304696,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T21:24:02+00:00",
+  "final_url": "https://london.eater.com/2018/10/18/17993646/carlo-scotto-babbo-xier-marylebone-new-restaurant",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "40932",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 21:24:04 GMT",
+    "ETag": "\"149xxs0vv1u6j0t\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000174-IAD, cache-lcy-eglc8600027-LCY",
+    "X-Timer": "S1782509044.075277,VS0,VE230",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "22",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI2MDI5"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2018/10/18/17993646/carlo-scotto-babbo-xier-marylebone-new-restaurant"
+  },
+  "input_row_number": 2659,
+  "sha256": "fb2d06484f9232b7164a26137f005ec534bfbe7bbb6c4acce2a5f53389c6719f",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2018/10/18/17993646/carlo-scotto-babbo-xier-marylebone-new-restaurant"
+}

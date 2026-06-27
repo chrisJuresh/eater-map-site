@@ -1,0 +1,43 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 303566,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T20:49:10+00:00",
+  "final_url": "https://london.eater.com/2020/6/12/21289038/uk-coronavirus-lockdown-when-restaurants-reopen-close-latest-news-london",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "46539",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 20:49:12 GMT",
+    "ETag": "\"mny0j67m746hzp\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200100-IAD, cache-lcy-egml8630060-LCY",
+    "X-Timer": "S1782506952.692832,VS0,VE324",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "35",
+    "vm-resource-primary-super-cat": "ZXQyOnN1cGVyQ2F0OjExMDM=",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIwNDkw"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2020/6/12/21289038/uk-coronavirus-lockdown-when-restaurants-reopen-close-latest-news-london"
+  },
+  "input_row_number": 2131,
+  "sha256": "92d19f79889b2f10860b76bf5d02048d3b746df5b183eb8d544260a12b9372e8",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2020/6/12/21289038/uk-coronavirus-lockdown-when-restaurants-reopen-close-latest-news-london"
+}

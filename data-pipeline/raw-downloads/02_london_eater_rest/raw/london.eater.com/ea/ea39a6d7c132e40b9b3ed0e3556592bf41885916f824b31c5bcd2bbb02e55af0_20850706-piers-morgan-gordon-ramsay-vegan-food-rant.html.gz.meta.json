@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 263604,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T21:05:23+00:00",
+  "final_url": "https://london.eater.com/2019/9/5/20850706/piers-morgan-gordon-ramsay-vegan-food-rant",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "923",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "37983",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 21:05:25 GMT",
+    "ETag": "\"66pb4u6a7q5n67\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "HIT, MISS",
+    "X-Cache-Hits": "1, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000137-IAD, cache-lcy-eglc8600082-LCY",
+    "X-Timer": "S1782507926.582588,VS0,VE76",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "57",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIyNTE2"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2019/9/5/20850706/piers-morgan-gordon-ramsay-vegan-food-rant"
+  },
+  "input_row_number": 2364,
+  "sha256": "fc33e7e04f7a173996f3024edbe459b4e5461cc1527f69342167893e53ca61a1",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2019/9/5/20850706/piers-morgan-gordon-ramsay-vegan-food-rant"
+}

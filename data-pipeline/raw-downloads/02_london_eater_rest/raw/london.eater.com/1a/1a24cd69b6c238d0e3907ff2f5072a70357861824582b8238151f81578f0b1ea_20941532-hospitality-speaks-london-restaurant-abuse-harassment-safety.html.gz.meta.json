@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 272846,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T21:00:28+00:00",
+  "final_url": "https://london.eater.com/2019/10/31/20941532/hospitality-speaks-london-restaurant-abuse-harassment-safety",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "38636",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 21:00:29 GMT",
+    "ETag": "\"wad9ieczpw5uea\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000174-IAD, cache-lhr-egwu1540069-LHR",
+    "X-Timer": "S1782507630.524654,VS0,VE240",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "29",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIyNjUy"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2019/10/31/20941532/hospitality-speaks-london-restaurant-abuse-harassment-safety"
+  },
+  "input_row_number": 2299,
+  "sha256": "a8ba87e340f6317d94e494c4a08273f020724fa6612892b14c66467e4b9e844c",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2019/10/31/20941532/hospitality-speaks-london-restaurant-abuse-harassment-safety"
+}

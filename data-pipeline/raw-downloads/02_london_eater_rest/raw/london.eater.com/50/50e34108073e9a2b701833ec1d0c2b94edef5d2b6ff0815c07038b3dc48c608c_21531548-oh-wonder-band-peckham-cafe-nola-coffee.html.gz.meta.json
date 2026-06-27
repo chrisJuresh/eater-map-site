@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 282669,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T20:21:19+00:00",
+  "final_url": "https://london.eater.com/21531548/oh-wonder-band-peckham-cafe-nola-coffee",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "37350",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 20:21:21 GMT",
+    "ETag": "\"c2j0hlq35j620h\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200103-IAD, cache-lcy-eglc8600068-LCY",
+    "X-Timer": "S1782505281.777911,VS0,VE313",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "17",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIwNDcx"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/21531548/oh-wonder-band-peckham-cafe-nola-coffee"
+  },
+  "input_row_number": 1700,
+  "sha256": "bead15e01454315c0fe4e425848d2578e7e8859cb8fe3da905278ac9605a4247",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/21531548/oh-wonder-band-peckham-cafe-nola-coffee"
+}

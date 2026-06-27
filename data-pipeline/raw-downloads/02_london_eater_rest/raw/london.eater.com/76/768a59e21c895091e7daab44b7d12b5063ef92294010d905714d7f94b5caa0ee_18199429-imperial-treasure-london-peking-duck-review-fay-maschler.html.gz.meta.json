@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 305599,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T21:18:39+00:00",
+  "final_url": "https://london.eater.com/2019/1/28/18199429/imperial-treasure-london-peking-duck-review-fay-maschler",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "48695",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 21:18:40 GMT",
+    "ETag": "\"5qp6j4hphh6jj4\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000159-IAD, cache-lhr-egwu1540070-LHR",
+    "X-Timer": "S1782508720.180149,VS0,VE806",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "54",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI1Njc0"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2019/1/28/18199429/imperial-treasure-london-peking-duck-review-fay-maschler"
+  },
+  "input_row_number": 2572,
+  "sha256": "d4ccda3905e1902cdea3872c2e618c649997c4c1773b2d3b13129ff35f63fc04",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2019/1/28/18199429/imperial-treasure-london-peking-duck-review-fay-maschler"
+}

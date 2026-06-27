@@ -1,0 +1,43 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 264416,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T22:17:15+00:00",
+  "final_url": "https://london.eater.com/2021/2/23/22290891/supreme-court-uber-drivers-workers-rights-gig-economy",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "38439",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 22:17:17 GMT",
+    "ETag": "\"m45zkistkn5nwk\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000117-IAD, cache-lcy-eglc8600022-LCY",
+    "X-Timer": "S1782512237.784044,VS0,VE709",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "25",
+    "vm-resource-primary-super-cat": "ZXQyOnN1cGVyQ2F0OjExNTM=",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjE4NzIy"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2021/2/23/22290891/supreme-court-uber-drivers-workers-rights-gig-economy"
+  },
+  "input_row_number": 3456,
+  "sha256": "2a942c25f7670171ea1c87e14f7add441465ca8586e94bf887fafb6fe43e08c6",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2021/2/23/22290891/supreme-court-uber-drivers-workers-rights-gig-economy"
+}

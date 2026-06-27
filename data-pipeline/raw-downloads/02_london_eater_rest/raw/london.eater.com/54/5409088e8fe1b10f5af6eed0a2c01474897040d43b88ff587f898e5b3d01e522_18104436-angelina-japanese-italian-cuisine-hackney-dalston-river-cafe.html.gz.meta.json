@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 285104,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T21:22:23+00:00",
+  "final_url": "https://london.eater.com/2018/11/20/18104436/angelina-japanese-italian-cuisine-hackney-dalston-river-cafe",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "41413",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 21:22:25 GMT",
+    "ETag": "\"6ocgtr7igv63sw\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200123-IAD, cache-lcy-eglc8600068-LCY",
+    "X-Timer": "S1782508945.014833,VS0,VE235",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "28",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI1Mjk0"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2018/11/20/18104436/angelina-japanese-italian-cuisine-hackney-dalston-river-cafe"
+  },
+  "input_row_number": 2632,
+  "sha256": "175d8f766e35be1e39f44a7a2fdf06c43fe74384395b8669b68819ce6de403c1",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2018/11/20/18104436/angelina-japanese-italian-cuisine-hackney-dalston-river-cafe"
+}

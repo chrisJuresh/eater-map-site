@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 265049,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T20:06:02+00:00",
+  "final_url": "https://london.eater.com/2018/8/17/17714752/karma-food-waste-app-sweden-funding-london-restaurants",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "36386",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 20:06:03 GMT",
+    "ETag": "\"qje1m44yhs5odx\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100088-IAD, cache-lhr-egwu1540054-LHR",
+    "X-Timer": "S1782504363.776924,VS0,VE860",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "27",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI0OTIz"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2018/8/17/17714752/karma-food-waste-app-sweden-funding-london-restaurants"
+  },
+  "input_row_number": 1459,
+  "sha256": "14b3c15c7ad642464373d7104761adf0546994374c9912bbbb7e841eabc83a2a",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2018/8/17/17714752/karma-food-waste-app-sweden-funding-london-restaurants"
+}

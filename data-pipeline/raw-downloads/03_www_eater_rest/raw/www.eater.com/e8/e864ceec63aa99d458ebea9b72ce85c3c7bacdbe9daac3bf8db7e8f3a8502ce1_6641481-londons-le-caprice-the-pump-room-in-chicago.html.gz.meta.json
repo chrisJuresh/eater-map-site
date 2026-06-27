@@ -1,0 +1,42 @@
+{
+  "batch_folder": "03_www_eater_rest",
+  "batch_key": "www_eater_rest",
+  "batch_order": 3,
+  "canonical_url": "",
+  "content_length": 270177,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T23:32:08+00:00",
+  "final_url": "https://www.eater.com/2011/10/26/6641481/londons-le-caprice-the-pump-room-in-chicago",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "39548",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 23:32:10 GMT",
+    "ETag": "\"bfqweroazw5sa9\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000173-IAD, cache-lhr-egwu1540064-LHR",
+    "X-Timer": "S1782516729.336253,VS0,VE822",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "27",
+    "x-middleware-rewrite": "/resource/content/post/ZXQyOnBvc3Q6NzM5MDIy"
+  },
+  "input_data": {
+    "url": "https://www.eater.com/2011/10/26/6641481/londons-le-caprice-the-pump-room-in-chicago"
+  },
+  "input_row_number": 4592,
+  "sha256": "1dd839eb48f974943ff504f8be143e2d19e4ae862df27cba041126d503e31c39",
+  "status_code": 200,
+  "title": "",
+  "url": "https://www.eater.com/2011/10/26/6641481/londons-le-caprice-the-pump-room-in-chicago"
+}

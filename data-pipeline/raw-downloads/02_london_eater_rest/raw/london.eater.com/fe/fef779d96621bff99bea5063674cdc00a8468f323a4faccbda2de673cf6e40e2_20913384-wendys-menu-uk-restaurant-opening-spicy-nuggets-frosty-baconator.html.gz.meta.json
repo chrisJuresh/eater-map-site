@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 268659,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T19:53:05+00:00",
+  "final_url": "https://london.eater.com/2019/10/14/20913384/wendys-menu-uk-restaurant-opening-spicy-nuggets-frosty-baconator",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "40739",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 19:53:06 GMT",
+    "ETag": "\"lbbtgmtd8h5r5g\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200140-IAD, cache-lcy-eglc8600065-LCY",
+    "X-Timer": "S1782503587.540032,VS0,VE302",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "67",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIyMzY2"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2019/10/14/20913384/wendys-menu-uk-restaurant-opening-spicy-nuggets-frosty-baconator"
+  },
+  "input_row_number": 1249,
+  "sha256": "06748d9e9d074ce5cab1f63e5ca002723b3c21b0c22486422c2085b325c13783",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2019/10/14/20913384/wendys-menu-uk-restaurant-opening-spicy-nuggets-frosty-baconator"
+}

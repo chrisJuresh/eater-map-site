@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 294102,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T20:06:04+00:00",
+  "final_url": "https://london.eater.com/2018/8/17/17714858/st-john-restaurant-fergus-henderson-bakery-neals-yard-covent-garden",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "38591",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 20:06:06 GMT",
+    "ETag": "\"qrm6y2jf9j6at4\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100158-IAD, cache-lhr-egwu1540025-LHR",
+    "X-Timer": "S1782504366.922953,VS0,VE252",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "20",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI0ODky"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2018/8/17/17714858/st-john-restaurant-fergus-henderson-bakery-neals-yard-covent-garden"
+  },
+  "input_row_number": 1460,
+  "sha256": "ba05950d9c4f713f00223bb1290de11f3d241e597fd8fd4733d9fa14e7fab982",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2018/8/17/17714858/st-john-restaurant-fergus-henderson-bakery-neals-yard-covent-garden"
+}

@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 257293,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T19:46:39+00:00",
+  "final_url": "https://london.eater.com/2020/6/30/21308148/marugame-udon-restaurant-menu-opening-london",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "35675",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 19:46:41 GMT",
+    "ETag": "\"h1qsdnwb2u5ieg\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000055-IAD, cache-lcy-egml8630079-LCY",
+    "X-Timer": "S1782503201.755600,VS0,VE384",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "31",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIwMTg3"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2020/6/30/21308148/marugame-udon-restaurant-menu-opening-london"
+  },
+  "input_row_number": 1145,
+  "sha256": "f3abfa52eff063c1025d4c7f62d6c94b511592f38f0d7b03b51c87c3a49d6953",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2020/6/30/21308148/marugame-udon-restaurant-menu-opening-london"
+}

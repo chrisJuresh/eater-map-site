@@ -1,0 +1,42 @@
+{
+  "batch_folder": "03_www_eater_rest",
+  "batch_key": "www_eater_rest",
+  "batch_order": 3,
+  "canonical_url": "",
+  "content_length": 260967,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T23:24:20+00:00",
+  "final_url": "https://www.eater.com/2009/11/9/6753877/pierre-gagnaire-plans-a-cardboard-cafe-at-london-museum",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "37026",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 23:24:22 GMT",
+    "ETag": "\"barhp0nqtd5l8f\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000148-IAD, cache-lcy-egml8630027-LCY",
+    "X-Timer": "S1782516262.111694,VS0,VE874",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "17",
+    "x-middleware-rewrite": "/resource/content/post/ZXQyOnBvc3Q6NzY2MDY5"
+  },
+  "input_data": {
+    "url": "https://www.eater.com/2009/11/9/6753877/pierre-gagnaire-plans-a-cardboard-cafe-at-london-museum"
+  },
+  "input_row_number": 4481,
+  "sha256": "ae5bc98c965cc1fb9c7fdf4f0ed0e33272070c897f9643e6756eacb55da7d63f",
+  "status_code": 200,
+  "title": "",
+  "url": "https://www.eater.com/2009/11/9/6753877/pierre-gagnaire-plans-a-cardboard-cafe-at-london-museum"
+}

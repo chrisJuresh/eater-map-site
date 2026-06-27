@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 290596,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T21:18:13+00:00",
+  "final_url": "https://london.eater.com/2019/2/1/18206548/three-sheets-cocktail-bar-vennings-highbury-wine-bar",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "37581",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 21:18:15 GMT",
+    "ETag": "\"klob79247g682r\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000037-IAD, cache-lhr-egwu1540029-LHR",
+    "X-Timer": "S1782508695.804236,VS0,VE909",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "27",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI0MzYw"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2019/2/1/18206548/three-sheets-cocktail-bar-vennings-highbury-wine-bar"
+  },
+  "input_row_number": 2565,
+  "sha256": "09e3b21c5aa832665442cba2b3ce1159bfa6275dd69d4578546a8e0c26d79112",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2019/2/1/18206548/three-sheets-cocktail-bar-vennings-highbury-wine-bar"
+}

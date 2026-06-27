@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 263648,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T21:17:55+00:00",
+  "final_url": "https://london.eater.com/2019/2/6/18213794/devis-my-million-pound-menu-bbc-street-food-maltby-street-market",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "37284",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 21:17:57 GMT",
+    "ETag": "\"tjxa7rqmw45n9e\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000040-IAD, cache-lhr-egwu1540025-LHR",
+    "X-Timer": "S1782508677.489098,VS0,VE234",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "26",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI0MTA5"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2019/2/6/18213794/devis-my-million-pound-menu-bbc-street-food-maltby-street-market"
+  },
+  "input_row_number": 2560,
+  "sha256": "891353db658794c1be5ad799f4bfdd67ddcbe7721f5463658ddb09c4f342af03",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2019/2/6/18213794/devis-my-million-pound-menu-bbc-street-food-maltby-street-market"
+}

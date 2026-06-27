@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 706963,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T23:12:53+00:00",
+  "final_url": "https://london.eater.com/pop-culture-food",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "52174",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 23:12:55 GMT",
+    "ETag": "\"utk5abxs53f4ri\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200118-IAD, cache-lcy-eglc8600064-LCY",
+    "X-Timer": "S1782515575.473110,VS0,VE257",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-loop-nav-provider-query": "37",
+    "x-middleware-rewrite": "/resource/category/ZXQzMTpjYXRlZ29yeTo0MjQ="
+  },
+  "input_data": {
+    "url": "https://london.eater.com/pop-culture-food"
+  },
+  "input_row_number": 4312,
+  "sha256": "d88f1ca2341e08854f788aa9ba600b57ffdc6f57d2a09f8e322fa9bff19bcf94",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/pop-culture-food"
+}

@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 421282,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T19:11:05+00:00",
+  "final_url": "https://london.eater.com/2018/10/24/18017824/coal-drops-yard-barrafina-berenjak-soho-jks-michelin-star-london-restaurant-instagram-influencers",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "49569",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 19:11:07 GMT",
+    "ETag": "\"c41jy7rujh90xy\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200172-IAD, cache-lcy-egml8630040-LCY",
+    "X-Timer": "S1782501067.564497,VS0,VE746",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "24",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI0NjA2"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2018/10/24/18017824/coal-drops-yard-barrafina-berenjak-soho-jks-michelin-star-london-restaurant-instagram-influencers"
+  },
+  "input_row_number": 622,
+  "sha256": "792ffb361ba1f09d458861f6ca359e866fcd416e91d2c66507497d49a4d6bd0e",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2018/10/24/18017824/coal-drops-yard-barrafina-berenjak-soho-jks-michelin-star-london-restaurant-instagram-influencers"
+}

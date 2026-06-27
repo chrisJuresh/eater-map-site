@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 491693,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T19:08:29+00:00",
+  "final_url": "https://london.eater.com/2019/6/5/18652217/brat-restaurant-shoreditch-michelin-star-turbot",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "45911",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 19:08:31 GMT",
+    "ETag": "\"qitlf1mf4eaj8n\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000173-IAD, cache-lhr-egwu1540038-LHR",
+    "X-Timer": "S1782500911.754707,VS0,VE329",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "25",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIyODM1"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2019/6/5/18652217/brat-restaurant-shoreditch-michelin-star-turbot"
+  },
+  "input_row_number": 581,
+  "sha256": "abc6d7072deeaa5ae9866499dd86e996b291a66b081b01006b2865bbfdd06ba9",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2019/6/5/18652217/brat-restaurant-shoreditch-michelin-star-turbot"
+}

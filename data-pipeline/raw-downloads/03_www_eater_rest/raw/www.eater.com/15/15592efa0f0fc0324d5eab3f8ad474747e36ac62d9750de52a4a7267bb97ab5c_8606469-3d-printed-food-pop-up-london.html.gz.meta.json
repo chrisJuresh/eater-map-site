@@ -1,0 +1,42 @@
+{
+  "batch_folder": "03_www_eater_rest",
+  "batch_key": "www_eater_rest",
+  "batch_order": 3,
+  "canonical_url": "",
+  "content_length": 267748,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T23:19:42+00:00",
+  "final_url": "https://www.eater.com/2015/5/14/8606469/3d-printed-food-pop-up-london",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "39221",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 23:19:44 GMT",
+    "ETag": "\"5c5a24xnve5qdq\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100164-IAD, cache-lon420114-LON",
+    "X-Timer": "S1782515984.156892,VS0,VE329",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "19",
+    "x-middleware-rewrite": "/resource/content/post/ZXQyOnBvc3Q6NjY4NDc2"
+  },
+  "input_data": {
+    "url": "https://www.eater.com/2015/5/14/8606469/3d-printed-food-pop-up-london"
+  },
+  "input_row_number": 4406,
+  "sha256": "875d92982d0a05a8b30508a226d0cc9d81c0effa46e926e7e904fb929cace415",
+  "status_code": 200,
+  "title": "",
+  "url": "https://www.eater.com/2015/5/14/8606469/3d-printed-food-pop-up-london"
+}

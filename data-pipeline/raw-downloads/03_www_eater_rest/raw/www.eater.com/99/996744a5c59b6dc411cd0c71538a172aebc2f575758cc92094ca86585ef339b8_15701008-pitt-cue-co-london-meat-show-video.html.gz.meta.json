@@ -1,0 +1,42 @@
+{
+  "batch_folder": "03_www_eater_rest",
+  "batch_key": "www_eater_rest",
+  "batch_order": 3,
+  "canonical_url": "",
+  "content_length": 234595,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T23:34:48+00:00",
+  "final_url": "https://www.eater.com/video/2017/5/30/15701008/pitt-cue-co-london-meat-show-video",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "35549",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 23:34:50 GMT",
+    "ETag": "\"r0m8exhkfq50vt\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000098-IAD, cache-lhr-egwu1540063-LHR",
+    "X-Timer": "S1782516891.617784,VS0,VE193",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "18",
+    "x-middleware-rewrite": "/resource/content/post/ZXQyOnBvc3Q6NjMxMzY1"
+  },
+  "input_data": {
+    "url": "https://www.eater.com/video/2017/5/30/15701008/pitt-cue-co-london-meat-show-video"
+  },
+  "input_row_number": 4635,
+  "sha256": "8b3738e74321420e8ef7d39ba5cb8b48c07f801e5c26265fef6a88630ed09611",
+  "status_code": 200,
+  "title": "",
+  "url": "https://www.eater.com/video/2017/5/30/15701008/pitt-cue-co-london-meat-show-video"
+}

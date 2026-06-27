@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 283191,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T21:09:08+00:00",
+  "final_url": "https://london.eater.com/2019/7/11/20690247/action-bronson-eater-london-38-restaurants-brawn-marksman-mangal-2",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "41517",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 21:09:09 GMT",
+    "ETag": "\"mwqy5gpjp162cb\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100118-IAD, cache-lon4273-LON",
+    "X-Timer": "S1782508150.682857,VS0,VE271",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "28",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIyMzU5"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2019/7/11/20690247/action-bronson-eater-london-38-restaurants-brawn-marksman-mangal-2"
+  },
+  "input_row_number": 2418,
+  "sha256": "6ed5d87868f1eab005c8af3ccb0df427c9a20a9594686a1a7cd1a15b2b468efe",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2019/7/11/20690247/action-bronson-eater-london-38-restaurants-brawn-marksman-mangal-2"
+}

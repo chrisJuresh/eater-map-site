@@ -1,0 +1,43 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 307695,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T22:06:34+00:00",
+  "final_url": "https://london.eater.com/22428672/coronavirus-restaurants-london-reopening-workers-jobs-furlough",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "48853",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 22:06:36 GMT",
+    "ETag": "\"1tck3dpzce6l5i\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000131-IAD, cache-lon420145-LON",
+    "X-Timer": "S1782511596.147101,VS0,VE236",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "22",
+    "vm-resource-primary-super-cat": "ZXQyOnN1cGVyQ2F0OjExMDM=",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjE3Nzkw"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/22428672/coronavirus-restaurants-london-reopening-workers-jobs-furlough"
+  },
+  "input_row_number": 3301,
+  "sha256": "cb21cd5cf1b528e9517fae9f13b53a8e1afbb2d7d62b791075cfde42f61bb6d8",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/22428672/coronavirus-restaurants-london-reopening-workers-jobs-furlough"
+}

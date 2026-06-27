@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 258318,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T18:58:30+00:00",
+  "final_url": "https://london.eater.com/2019/1/2/18136325/london-restaurant-delivery-uber-eats-deliveroo-just-eat",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "36915",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 18:58:32 GMT",
+    "ETag": "\"36fqaiiqpt5j80\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000115-IAD, cache-lhr-egwu1540069-LHR",
+    "X-Timer": "S1782500312.597612,VS0,VE639",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "73",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI0MDk0"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2019/1/2/18136325/london-restaurant-delivery-uber-eats-deliveroo-just-eat"
+  },
+  "input_row_number": 435,
+  "sha256": "5fd89a16f870c039a24b62d16a060c51328de83ef515bab7b6e5933ad58cb313",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2019/1/2/18136325/london-restaurant-delivery-uber-eats-deliveroo-just-eat"
+}

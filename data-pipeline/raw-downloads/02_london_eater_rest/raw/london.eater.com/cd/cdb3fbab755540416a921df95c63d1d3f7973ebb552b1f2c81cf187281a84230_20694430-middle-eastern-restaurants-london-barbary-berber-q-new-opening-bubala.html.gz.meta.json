@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 311523,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T19:56:15+00:00",
+  "final_url": "https://london.eater.com/2019/7/15/20694430/middle-eastern-restaurants-london-barbary-berber-q-new-opening-bubala",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "42737",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 19:56:16 GMT",
+    "ETag": "\"i5xpc3f0de6o9w\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200086-IAD, cache-lhr-egwu1540025-LHR",
+    "X-Timer": "S1782503776.433193,VS0,VE258",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "47",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIzMDE1"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2019/7/15/20694430/middle-eastern-restaurants-london-barbary-berber-q-new-opening-bubala"
+  },
+  "input_row_number": 1301,
+  "sha256": "fe09f7144be4fd18bc2ed2cebb9c3e58eb25cbead5f02c0aa3c8d37ff3418e84",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2019/7/15/20694430/middle-eastern-restaurants-london-barbary-berber-q-new-opening-bubala"
+}

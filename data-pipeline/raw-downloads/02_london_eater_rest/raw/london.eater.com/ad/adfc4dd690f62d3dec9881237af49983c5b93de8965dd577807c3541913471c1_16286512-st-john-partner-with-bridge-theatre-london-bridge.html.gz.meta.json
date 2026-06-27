@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 292298,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T22:55:56+00:00",
+  "final_url": "https://london.eater.com/2017/9/11/16286512/st-john-partner-with-bridge-theatre-london-bridge",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "38788",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 22:55:58 GMT",
+    "ETag": "\"15eggedd4p369gi\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000052-IAD, cache-lon420143-LON",
+    "X-Timer": "S1782514558.191448,VS0,VE238",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "25",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI4Njc1"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2017/9/11/16286512/st-john-partner-with-bridge-theatre-london-bridge"
+  },
+  "input_row_number": 4074,
+  "sha256": "d2f1ce7f96bbd94cf36b26b9fefa1e82500dc8286d765abef6181722115be093",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2017/9/11/16286512/st-john-partner-with-bridge-theatre-london-bridge"
+}

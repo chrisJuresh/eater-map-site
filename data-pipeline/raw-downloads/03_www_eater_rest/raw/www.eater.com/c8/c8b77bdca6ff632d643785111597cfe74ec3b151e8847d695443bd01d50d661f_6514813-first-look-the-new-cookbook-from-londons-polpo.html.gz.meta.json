@@ -1,0 +1,42 @@
+{
+  "batch_folder": "03_www_eater_rest",
+  "batch_key": "www_eater_rest",
+  "batch_order": 3,
+  "canonical_url": "",
+  "content_length": 264151,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T23:30:35+00:00",
+  "final_url": "https://www.eater.com/2012/11/29/6514813/first-look-the-new-cookbook-from-londons-polpo",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "37486",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 23:30:37 GMT",
+    "ETag": "\"tl7lrf0qyr5nnr\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200133-IAD, cache-lcy-egml8630079-LCY",
+    "X-Timer": "S1782516637.360873,VS0,VE245",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "34",
+    "x-middleware-rewrite": "/resource/content/post/ZXQyOnBvc3Q6NzIxNDY5"
+  },
+  "input_data": {
+    "url": "https://www.eater.com/2012/11/29/6514813/first-look-the-new-cookbook-from-londons-polpo"
+  },
+  "input_row_number": 4567,
+  "sha256": "ebff05ceb16afcdd306c0a088e86537f3623ff087fcc85482301e6d7f54dc5ca",
+  "status_code": 200,
+  "title": "",
+  "url": "https://www.eater.com/2012/11/29/6514813/first-look-the-new-cookbook-from-londons-polpo"
+}

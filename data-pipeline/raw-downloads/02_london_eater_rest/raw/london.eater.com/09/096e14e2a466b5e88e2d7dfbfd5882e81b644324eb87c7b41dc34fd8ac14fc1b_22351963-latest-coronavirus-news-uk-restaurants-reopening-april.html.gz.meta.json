@@ -1,0 +1,43 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 281219,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T22:06:17+00:00",
+  "final_url": "https://london.eater.com/22351963/latest-coronavirus-news-uk-restaurants-reopening-april",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "40443",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 22:06:19 GMT",
+    "ETag": "\"dkxkme62om60rf\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000067-IAD, cache-lon420127-LON",
+    "X-Timer": "S1782511579.525532,VS0,VE836",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "309",
+    "vm-resource-primary-super-cat": "ZXQyOnN1cGVyQ2F0OjExMDM=",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjE4Mzc5"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/22351963/latest-coronavirus-news-uk-restaurants-reopening-april"
+  },
+  "input_row_number": 3296,
+  "sha256": "a0fb4cfef31ff0639873ae61b5d6b2ba201ea4dc53e864b894b81c567be34a8d",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/22351963/latest-coronavirus-news-uk-restaurants-reopening-april"
+}

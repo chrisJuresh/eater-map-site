@@ -1,0 +1,43 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 290252,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T19:06:46+00:00",
+  "final_url": "https://london.eater.com/2019/11/18/20970515/eater-awards-2019-finalists-best-restaurant-london-design-dish",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "45073",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 19:06:48 GMT",
+    "ETag": "\"44vt8c3yx867sn\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100043-IAD, cache-lon420127-LON",
+    "X-Timer": "S1782500808.012873,VS0,VE368",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "60",
+    "vm-resource-primary-super-cat": "ZXQyOnN1cGVyQ2F0Ojk3MA==",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIxOTUz"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2019/11/18/20970515/eater-awards-2019-finalists-best-restaurant-london-design-dish"
+  },
+  "input_row_number": 553,
+  "sha256": "8704d1d4d1bcf1a9467e76c81f55808ff5afe4eee9fdaa3e44f6c2e7dccbb1d6",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2019/11/18/20970515/eater-awards-2019-finalists-best-restaurant-london-design-dish"
+}

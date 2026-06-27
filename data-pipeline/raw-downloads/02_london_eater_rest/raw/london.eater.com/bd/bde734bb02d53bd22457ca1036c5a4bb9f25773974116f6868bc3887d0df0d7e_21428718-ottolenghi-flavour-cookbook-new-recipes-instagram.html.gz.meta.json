@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 485266,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T22:18:42+00:00",
+  "final_url": "https://london.eater.com/2020/9/10/21428718/ottolenghi-flavour-cookbook-new-recipes-instagram",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "51441",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 22:18:44 GMT",
+    "ETag": "\"61oljocct0ae8b\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000066-IAD, cache-lon4273-LON",
+    "X-Timer": "S1782512324.438262,VS0,VE354",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "44",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjE5OTUz"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2020/9/10/21428718/ottolenghi-flavour-cookbook-new-recipes-instagram"
+  },
+  "input_row_number": 3479,
+  "sha256": "5aa57d388bfd519f57551f2c7a1d16e43d61c3d09136c90f2e45b3c2ca5d04e5",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2020/9/10/21428718/ottolenghi-flavour-cookbook-new-recipes-instagram"
+}

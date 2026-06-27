@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 264476,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T21:06:21+00:00",
+  "final_url": "https://london.eater.com/2019/8/21/20815066/jamie-oliver-naked-chef-bares-all-tv-show-channel-4-time",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "38703",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 21:06:23 GMT",
+    "ETag": "\"wikf4prlh65nws\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000137-IAD, cache-lon4236-LON",
+    "X-Timer": "S1782507983.906564,VS0,VE490",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "29",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIyNjA0"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2019/8/21/20815066/jamie-oliver-naked-chef-bares-all-tv-show-channel-4-time"
+  },
+  "input_row_number": 2380,
+  "sha256": "5a0bd57b6aaa6b6c4c942ff2c1982247ff6c0421b3920ae248cad759bc5069a7",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2019/8/21/20815066/jamie-oliver-naked-chef-bares-all-tv-show-channel-4-time"
+}

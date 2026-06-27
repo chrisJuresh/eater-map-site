@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 341785,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T19:21:41+00:00",
+  "final_url": "https://london.eater.com/2019/12/24/21036358/best-tweets-decade-london-restaurant-food-writers",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "62076",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 19:21:43 GMT",
+    "ETag": "\"17ae974qme37bm1\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000071-IAD, cache-lcy-eglc8600046-LCY",
+    "X-Timer": "S1782501703.552531,VS0,VE603",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "36",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIyMjcz"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2019/12/24/21036358/best-tweets-decade-london-restaurant-food-writers"
+  },
+  "input_row_number": 780,
+  "sha256": "fd1f57a3d63520f7c1ff4505ede55e8814b7a12be28016c16257bc39a480521f",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2019/12/24/21036358/best-tweets-decade-london-restaurant-food-writers"
+}

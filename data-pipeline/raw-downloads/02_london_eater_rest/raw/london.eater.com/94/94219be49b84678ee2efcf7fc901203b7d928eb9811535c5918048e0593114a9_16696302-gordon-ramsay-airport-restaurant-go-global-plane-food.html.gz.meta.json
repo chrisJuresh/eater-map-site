@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 261045,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T20:14:31+00:00",
+  "final_url": "https://london.eater.com/2017/11/24/16696302/gordon-ramsay-airport-restaurant-go-global-plane-food",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "36838",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 20:14:33 GMT",
+    "ETag": "\"r00f5shca45lao\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000085-IAD, cache-lon4227-LON",
+    "X-Timer": "S1782504873.087340,VS0,VE282",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "30",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI3NTQx"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2017/11/24/16696302/gordon-ramsay-airport-restaurant-go-global-plane-food"
+  },
+  "input_row_number": 1590,
+  "sha256": "86d4fb32fe7140b8a057ef70d429a322004b271a1420bbca0f98613c3cc4e24f",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2017/11/24/16696302/gordon-ramsay-airport-restaurant-go-global-plane-food"
+}

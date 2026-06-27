@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 276323,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T22:44:27+00:00",
+  "final_url": "https://london.eater.com/2018/5/14/17351642/dalston-brilliant-corners-pops-up-canalside-for-giant-steps-summer-party-series",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "38794",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 22:44:29 GMT",
+    "ETag": "\"ya6tr75u8x5x0q\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000176-IAD, cache-lhr-egwu1540020-LHR",
+    "X-Timer": "S1782513869.956303,VS0,VE436",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "56",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI3MjU0"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2018/5/14/17351642/dalston-brilliant-corners-pops-up-canalside-for-giant-steps-summer-party-series"
+  },
+  "input_row_number": 3891,
+  "sha256": "b036f5de6e1ee5aa8d55958b8606eae12ea960d50eb71d5246d5516b3bbe4662",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2018/5/14/17351642/dalston-brilliant-corners-pops-up-canalside-for-giant-steps-summer-party-series"
+}

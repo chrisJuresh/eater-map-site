@@ -1,0 +1,43 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 266868,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T19:08:56+00:00",
+  "final_url": "https://london.eater.com/2019/3/28/18285527/michelin-starred-restaurant-foie-gras-the-square",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "37539",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 19:08:58 GMT",
+    "ETag": "\"11v6fmivfw15pr8\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200142-IAD, cache-lhr-egwu1540026-LHR",
+    "X-Timer": "S1782500938.240180,VS0,VE192",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "12",
+    "vm-resource-primary-super-cat": "ZXQyOnN1cGVyQ2F0OjEyMDk=",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIzNjkx"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2019/3/28/18285527/michelin-starred-restaurant-foie-gras-the-square"
+  },
+  "input_row_number": 588,
+  "sha256": "b081612548e8bab94b2103f063a3e46e55031d8616ae5e2405ce9ce9671341c2",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2019/3/28/18285527/michelin-starred-restaurant-foie-gras-the-square"
+}

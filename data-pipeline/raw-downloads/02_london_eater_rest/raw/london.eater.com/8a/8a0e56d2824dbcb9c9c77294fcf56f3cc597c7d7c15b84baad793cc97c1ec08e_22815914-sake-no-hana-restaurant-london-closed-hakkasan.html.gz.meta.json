@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 278795,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T22:09:46+00:00",
+  "final_url": "https://london.eater.com/22815914/sake-no-hana-restaurant-london-closed-hakkasan",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "40872",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 22:09:47 GMT",
+    "ETag": "\"uuhdjmghw65z1g\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200109-IAD, cache-lcy-egml8630041-LCY",
+    "X-Timer": "S1782511788.655820,VS0,VE228",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "27",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjE3MjQ2"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/22815914/sake-no-hana-restaurant-london-closed-hakkasan"
+  },
+  "input_row_number": 3337,
+  "sha256": "7b3ef31817094fc95bd5fb1978dbbab6e32700c44bb4a7656f7b0a9395294bef",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/22815914/sake-no-hana-restaurant-london-closed-hakkasan"
+}

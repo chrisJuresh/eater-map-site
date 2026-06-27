@@ -1,0 +1,42 @@
+{
+  "batch_folder": "03_www_eater_rest",
+  "batch_key": "www_eater_rest",
+  "batch_order": 3,
+  "canonical_url": "",
+  "content_length": 243751,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T23:20:34+00:00",
+  "final_url": "https://www.eater.com/2015/1/14/7548533/watch-hotshot-london-chef-ollie-dabbous-talk-success-and-simplicity",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "36811",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 23:20:36 GMT",
+    "ETag": "\"3mhqgqbrfg57wh\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000071-IAD, cache-lon4249-LON",
+    "X-Timer": "S1782516036.036945,VS0,VE237",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "22",
+    "x-middleware-rewrite": "/resource/content/post/ZXQyOnBvc3Q6Njc1MjQ3"
+  },
+  "input_data": {
+    "url": "https://www.eater.com/2015/1/14/7548533/watch-hotshot-london-chef-ollie-dabbous-talk-success-and-simplicity"
+  },
+  "input_row_number": 4420,
+  "sha256": "c32b2ed49aa000ce13481769e9b763bdee232fea757359f542381b17f51e238d",
+  "status_code": 200,
+  "title": "",
+  "url": "https://www.eater.com/2015/1/14/7548533/watch-hotshot-london-chef-ollie-dabbous-talk-success-and-simplicity"
+}

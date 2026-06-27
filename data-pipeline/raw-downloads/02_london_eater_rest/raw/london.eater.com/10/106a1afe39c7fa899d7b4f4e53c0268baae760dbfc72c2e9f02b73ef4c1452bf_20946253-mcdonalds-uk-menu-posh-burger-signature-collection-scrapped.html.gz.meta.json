@@ -1,0 +1,43 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 260379,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T22:25:22+00:00",
+  "final_url": "https://london.eater.com/2019/11/4/20946253/mcdonalds-uk-menu-posh-burger-signature-collection-scrapped",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "37860",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 22:25:24 GMT",
+    "ETag": "\"w91k21d5r75kmj\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200059-IAD, cache-lhr-egwu1540026-LHR",
+    "X-Timer": "S1782512724.121348,VS0,VE254",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "33",
+    "vm-resource-primary-super-cat": "ZXQyOnN1cGVyQ2F0OjEwOTc=",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIxOTY3"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2019/11/4/20946253/mcdonalds-uk-menu-posh-burger-signature-collection-scrapped"
+  },
+  "input_row_number": 3585,
+  "sha256": "25ae500885af71c67dc59414706d1ec7940dd2f20c271f63b16b3ba8375f710c",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2019/11/4/20946253/mcdonalds-uk-menu-posh-burger-signature-collection-scrapped"
+}

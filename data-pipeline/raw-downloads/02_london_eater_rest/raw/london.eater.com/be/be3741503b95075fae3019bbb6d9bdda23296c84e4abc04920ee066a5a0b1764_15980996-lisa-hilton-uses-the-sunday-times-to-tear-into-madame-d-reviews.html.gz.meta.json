@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 285959,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T21:57:52+00:00",
+  "final_url": "https://london.eater.com/2017/7/17/15980996/lisa-hilton-uses-the-sunday-times-to-tear-into-madame-d-reviews",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "42108",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 21:57:54 GMT",
+    "ETag": "\"t9u1m969ye64et\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100110-IAD, cache-lcy-eglc8600072-LCY",
+    "X-Timer": "S1782511074.144801,VS0,VE199",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "11",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI4Mzky"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2017/7/17/15980996/lisa-hilton-uses-the-sunday-times-to-tear-into-madame-d-reviews"
+  },
+  "input_row_number": 3190,
+  "sha256": "2df0075e67870b2d82c4b4e87a264cea6d577f941e685dea61b2e3967a8592ae",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2017/7/17/15980996/lisa-hilton-uses-the-sunday-times-to-tear-into-madame-d-reviews"
+}

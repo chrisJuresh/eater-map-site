@@ -1,0 +1,41 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 690304,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T23:10:25+00:00",
+  "final_url": "https://london.eater.com/neighborhood/2127/mayfair",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "54570",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 23:10:27 GMT",
+    "ETag": "\"16askxobryuesad\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200122-IAD, cache-lon420118-LON",
+    "X-Timer": "S1782515427.665413,VS0,VE341",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "x-middleware-rewrite": "/resource/content/neighborhood/ZXQzMTpuZWlnaGJvcmhvb2Q6OQ=="
+  },
+  "input_data": {
+    "url": "https://london.eater.com/neighborhood/2127/mayfair"
+  },
+  "input_row_number": 4272,
+  "sha256": "959beee335a5534d27c9d5235d0f568b2647810e840c236e21b0abcb2220f42b",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/neighborhood/2127/mayfair"
+}

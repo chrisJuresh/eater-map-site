@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 288999,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T21:08:43+00:00",
+  "final_url": "https://london.eater.com/2019/7/19/20700455/new-liverpool-street-restaurant-cantonese-roast-meats-three-uncles",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "38244",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 21:08:45 GMT",
+    "ETag": "\"9u49h1f09v66wr\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200042-IAD, cache-lon4225-LON",
+    "X-Timer": "S1782508125.292494,VS0,VE260",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "24",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIyNDA5"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2019/7/19/20700455/new-liverpool-street-restaurant-cantonese-roast-meats-three-uncles"
+  },
+  "input_row_number": 2411,
+  "sha256": "1e337d8a4479a511f0fc555126ea4cb07c58a6a4a4e9df9da1e7db07e6b0c365",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2019/7/19/20700455/new-liverpool-street-restaurant-cantonese-roast-meats-three-uncles"
+}

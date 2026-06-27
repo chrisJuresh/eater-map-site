@@ -1,0 +1,43 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 298150,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T20:20:57+00:00",
+  "final_url": "https://london.eater.com/21455623/coronavirus-latest-news-uk-curfew-restaurants-pubs",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "45333",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 20:20:59 GMT",
+    "ETag": "\"m122ejs5nn6dq2\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200056-IAD, cache-lcy-eglc8600041-LCY",
+    "X-Timer": "S1782505259.978391,VS0,VE267",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "22",
+    "vm-resource-primary-super-cat": "ZXQyOnN1cGVyQ2F0OjExMDM=",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIwMzUy"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/21455623/coronavirus-latest-news-uk-curfew-restaurants-pubs"
+  },
+  "input_row_number": 1694,
+  "sha256": "c6751afce8757ae5ea358fb3119ee6231b7a8ba1b586b60d364197df90079163",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/21455623/coronavirus-latest-news-uk-curfew-restaurants-pubs"
+}

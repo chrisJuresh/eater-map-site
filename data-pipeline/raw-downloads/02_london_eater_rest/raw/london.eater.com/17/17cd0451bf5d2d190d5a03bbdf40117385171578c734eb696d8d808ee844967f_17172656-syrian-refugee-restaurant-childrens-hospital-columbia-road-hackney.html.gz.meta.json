@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 273986,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T21:37:01+00:00",
+  "final_url": "https://london.eater.com/2018/3/29/17172656/syrian-refugee-restaurant-childrens-hospital-columbia-road-hackney",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "40369",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 21:37:02 GMT",
+    "ETag": "\"xz57g2fkzr5v8l\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100070-IAD, cache-lcy-eglc8600086-LCY",
+    "X-Timer": "S1782509823.608606,VS0,VE218",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "22",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI2NDM4"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2018/3/29/17172656/syrian-refugee-restaurant-childrens-hospital-columbia-road-hackney"
+  },
+  "input_row_number": 2868,
+  "sha256": "777c6bc78bb118dc3c7ff7dc32dd5648c7cdc170a6e5230104771d1b94b0e29b",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2018/3/29/17172656/syrian-refugee-restaurant-childrens-hospital-columbia-road-hackney"
+}

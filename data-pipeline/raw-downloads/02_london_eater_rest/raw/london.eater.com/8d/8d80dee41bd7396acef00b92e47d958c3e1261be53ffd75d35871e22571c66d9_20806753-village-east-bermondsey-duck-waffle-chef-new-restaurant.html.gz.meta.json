@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 291980,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T19:54:47+00:00",
+  "final_url": "https://london.eater.com/2019/8/15/20806753/village-east-bermondsey-duck-waffle-chef-new-restaurant",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "38253",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 19:54:48 GMT",
+    "ETag": "\"vk8fii2368696z\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000062-IAD, cache-lon420132-LON",
+    "X-Timer": "S1782503688.444858,VS0,VE297",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "33",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIyMjQ4"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2019/8/15/20806753/village-east-bermondsey-duck-waffle-chef-new-restaurant"
+  },
+  "input_row_number": 1276,
+  "sha256": "48bf8ed9ed762a13e59736aa95c6ef5ecf500f6744d3658c1b8bb9c9853e9854",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2019/8/15/20806753/village-east-bermondsey-duck-waffle-chef-new-restaurant"
+}

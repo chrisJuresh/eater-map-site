@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 270978,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T21:33:45+00:00",
+  "final_url": "https://london.eater.com/2018/5/25/17380728/restaurant-flux-closures-islington-upper-street-n1",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "39548",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 21:33:46 GMT",
+    "ETag": "\"ppif80fhxv5szr\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000123-IAD, cache-lon4234-LON",
+    "X-Timer": "S1782509627.601358,VS0,VE319",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "42",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI1ODI4"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2018/5/25/17380728/restaurant-flux-closures-islington-upper-street-n1"
+  },
+  "input_row_number": 2815,
+  "sha256": "dda0f6b2fdb112a58a450f17c4d08d88bde37c9e924befa5ef2e965f9b9f6d3f",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2018/5/25/17380728/restaurant-flux-closures-islington-upper-street-n1"
+}

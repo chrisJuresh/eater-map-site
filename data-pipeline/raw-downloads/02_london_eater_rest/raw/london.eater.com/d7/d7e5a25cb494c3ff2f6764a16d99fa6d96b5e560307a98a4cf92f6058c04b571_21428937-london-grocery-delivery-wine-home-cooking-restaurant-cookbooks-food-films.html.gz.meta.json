@@ -1,0 +1,41 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 308402,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T19:01:21+00:00",
+  "final_url": "https://london.eater.com/21428937/london-grocery-delivery-wine-home-cooking-restaurant-cookbooks-food-films",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "32551",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 19:01:22 GMT",
+    "ETag": "\"jnowe7xemm6lwo\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000096-IAD, cache-lhr-egwu1540068-LHR",
+    "X-Timer": "S1782500483.558137,VS0,VE371",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "x-middleware-rewrite": "/resource/content/package/ZXQzMTpwYWNrYWdlOjE5Njgw"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/21428937/london-grocery-delivery-wine-home-cooking-restaurant-cookbooks-food-films"
+  },
+  "input_row_number": 466,
+  "sha256": "010b9463b6c43bba621ba31d696dbed0d0860f723be0a5532cffba8320a8df24",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/21428937/london-grocery-delivery-wine-home-cooking-restaurant-cookbooks-food-films"
+}

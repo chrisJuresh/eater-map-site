@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 265499,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T22:54:56+00:00",
+  "final_url": "https://london.eater.com/2017/10/12/16464014/sager-wilde-open-lunch-pasta-deal-paradise-row-hackney",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "37285",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 22:54:58 GMT",
+    "ETag": "\"hqwt6yj1qf5opx\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200121-IAD, cache-lon4265-LON",
+    "X-Timer": "S1782514498.586694,VS0,VE789",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "42",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI3Nzc5"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2017/10/12/16464014/sager-wilde-open-lunch-pasta-deal-paradise-row-hackney"
+  },
+  "input_row_number": 4058,
+  "sha256": "ab3f774f3450c09e46ee3ec324033a8d630cbe4565ac1e107a61189f3b26c793",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2017/10/12/16464014/sager-wilde-open-lunch-pasta-deal-paradise-row-hackney"
+}

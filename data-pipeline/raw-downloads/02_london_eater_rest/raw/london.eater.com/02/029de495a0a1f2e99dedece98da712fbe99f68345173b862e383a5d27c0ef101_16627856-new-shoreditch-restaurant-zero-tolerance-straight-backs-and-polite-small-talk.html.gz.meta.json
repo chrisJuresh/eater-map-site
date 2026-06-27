@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 285630,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T21:48:56+00:00",
+  "final_url": "https://london.eater.com/2017/11/9/16627856/new-shoreditch-restaurant-zero-tolerance-straight-backs-and-polite-small-talk",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "38044",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 21:48:57 GMT",
+    "ETag": "\"w9hfh69sum649o\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200056-IAD, cache-lhr-egwu1540062-LHR",
+    "X-Timer": "S1782510538.575458,VS0,VE259",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "26",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI3OTAx"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2017/11/9/16627856/new-shoreditch-restaurant-zero-tolerance-straight-backs-and-polite-small-talk"
+  },
+  "input_row_number": 3063,
+  "sha256": "14ea170b4664f4aefaffde1c94b1ee6a9b5b45007fd30bb413dbf2434ce18bcf",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2017/11/9/16627856/new-shoreditch-restaurant-zero-tolerance-straight-backs-and-polite-small-talk"
+}

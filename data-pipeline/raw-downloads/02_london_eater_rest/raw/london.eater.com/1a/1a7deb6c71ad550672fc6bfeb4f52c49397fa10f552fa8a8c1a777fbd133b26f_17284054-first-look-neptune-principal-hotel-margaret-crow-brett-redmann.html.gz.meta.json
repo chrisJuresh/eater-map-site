@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 311321,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T22:45:02+00:00",
+  "final_url": "https://london.eater.com/2018/4/26/17284054/first-look-neptune-principal-hotel-margaret-crow-brett-redmann",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "36819",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 22:45:04 GMT",
+    "ETag": "\"15nibruspvk6o1x\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000179-IAD, cache-lcy-egml8630058-LCY",
+    "X-Timer": "S1782513903.222246,VS0,VE993",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "25",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI3NTYy"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2018/4/26/17284054/first-look-neptune-principal-hotel-margaret-crow-brett-redmann"
+  },
+  "input_row_number": 3900,
+  "sha256": "6ac909234476b6105b5f9d00a4ec6600349099223592ae7ff1c92dc34cc29e05",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2018/4/26/17284054/first-look-neptune-principal-hotel-margaret-crow-brett-redmann"
+}

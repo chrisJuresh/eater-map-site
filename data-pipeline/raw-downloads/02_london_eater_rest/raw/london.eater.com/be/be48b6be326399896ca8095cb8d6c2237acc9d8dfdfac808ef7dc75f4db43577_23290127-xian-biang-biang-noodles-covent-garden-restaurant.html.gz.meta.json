@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 281333,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T20:30:58+00:00",
+  "final_url": "https://london.eater.com/2022/8/3/23290127/xian-biang-biang-noodles-covent-garden-restaurant",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "1",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "40826",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 20:31:00 GMT",
+    "ETag": "\"ogjhewq18d60xl\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000133-IAD, cache-lhr-egwu1540049-LHR",
+    "X-Timer": "S1782505859.290236,VS0,VE1257",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "146",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjE2NTQ4"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2022/8/3/23290127/xian-biang-biang-noodles-covent-garden-restaurant"
+  },
+  "input_row_number": 1853,
+  "sha256": "86a84f415442b71c0d974c7cfd569689040717d38fc87167b7672d5161757d19",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2022/8/3/23290127/xian-biang-biang-noodles-covent-garden-restaurant"
+}

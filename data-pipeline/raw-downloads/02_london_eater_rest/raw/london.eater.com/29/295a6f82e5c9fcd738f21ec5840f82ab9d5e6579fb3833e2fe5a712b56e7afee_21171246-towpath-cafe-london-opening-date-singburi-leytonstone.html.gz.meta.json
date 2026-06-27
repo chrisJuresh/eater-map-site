@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 296283,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T19:48:27+00:00",
+  "final_url": "https://london.eater.com/2020/3/9/21171246/towpath-cafe-london-opening-date-singburi-leytonstone",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "43957",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 19:48:28 GMT",
+    "ETag": "\"qcr0h6ainp6cgi\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000081-IAD, cache-lon4241-LON",
+    "X-Timer": "S1782503309.672343,VS0,VE253",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "23",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIyMzY4"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2020/3/9/21171246/towpath-cafe-london-opening-date-singburi-leytonstone"
+  },
+  "input_row_number": 1175,
+  "sha256": "eb4d160b7bf076bc4b94ee4bb7793fb67c7e3120031c1e962fc0501d50ec8473",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2020/3/9/21171246/towpath-cafe-london-opening-date-singburi-leytonstone"
+}

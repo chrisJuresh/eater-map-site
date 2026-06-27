@@ -1,0 +1,42 @@
+{
+  "batch_folder": "03_www_eater_rest",
+  "batch_key": "www_eater_rest",
+  "batch_order": 3,
+  "canonical_url": "",
+  "content_length": 252944,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T23:19:48+00:00",
+  "final_url": "https://www.eater.com/2015/4/27/8502721/london-savoy-grill-first-female-head-chef-kim-woodward-gordon-ramsay",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "783",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "37935",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 23:19:51 GMT",
+    "ETag": "\"blhlubc0455ey8\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "HIT, MISS",
+    "X-Cache-Hits": "1, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100119-IAD, cache-lon4253-LON",
+    "X-Timer": "S1782515991.937802,VS0,VE79",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "26",
+    "x-middleware-rewrite": "/resource/content/post/ZXQyOnBvc3Q6NjY5OTI2"
+  },
+  "input_data": {
+    "url": "https://www.eater.com/2015/4/27/8502721/london-savoy-grill-first-female-head-chef-kim-woodward-gordon-ramsay"
+  },
+  "input_row_number": 4408,
+  "sha256": "a5ddb396b77b1731cc3c465e8923ace2ed5e2f56e755c639cc8c37753858844c",
+  "status_code": 200,
+  "title": "",
+  "url": "https://www.eater.com/2015/4/27/8502721/london-savoy-grill-first-female-head-chef-kim-woodward-gordon-ramsay"
+}

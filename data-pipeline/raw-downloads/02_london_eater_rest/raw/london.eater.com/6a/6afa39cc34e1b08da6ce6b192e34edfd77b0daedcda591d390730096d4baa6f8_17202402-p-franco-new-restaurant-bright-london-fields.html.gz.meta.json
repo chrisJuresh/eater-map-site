@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 286788,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T21:36:50+00:00",
+  "final_url": "https://london.eater.com/2018/4/5/17202402/p-franco-new-restaurant-bright-london-fields",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "44137",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 21:36:51 GMT",
+    "ETag": "\"1c48kpx0tf656m\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100040-IAD, cache-lcy-eglc8600026-LCY",
+    "X-Timer": "S1782509811.334843,VS0,VE442",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "25",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI2MDQ0"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2018/4/5/17202402/p-franco-new-restaurant-bright-london-fields"
+  },
+  "input_row_number": 2864,
+  "sha256": "584133fada88207612bc6bd90f30e995711e0bb47eb294f77959af614bf67c6e",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2018/4/5/17202402/p-franco-new-restaurant-bright-london-fields"
+}

@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 260737,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T22:43:35+00:00",
+  "final_url": "https://london.eater.com/2018/5/29/17404356/heineken-beavertown-craft-beer-investment",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "36180",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 22:43:37 GMT",
+    "ETag": "\"siee7d3vvs5l1f\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000124-IAD, cache-lhr-egwu1540061-LHR",
+    "X-Timer": "S1782513817.785047,VS0,VE277",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "31",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI1Nzkz"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2018/5/29/17404356/heineken-beavertown-craft-beer-investment"
+  },
+  "input_row_number": 3877,
+  "sha256": "b4f0dbdbe4a17df502015ab31cf827e094c2d414f9c7c3f2af909fdbee078919",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2018/5/29/17404356/heineken-beavertown-craft-beer-investment"
+}

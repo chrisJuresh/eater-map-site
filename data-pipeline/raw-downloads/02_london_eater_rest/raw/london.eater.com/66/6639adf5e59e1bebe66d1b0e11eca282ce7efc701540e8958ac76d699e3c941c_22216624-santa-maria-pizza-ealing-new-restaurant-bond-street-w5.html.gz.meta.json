@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 309846,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T20:41:48+00:00",
+  "final_url": "https://london.eater.com/2021/1/7/22216624/santa-maria-pizza-ealing-new-restaurant-bond-street-w5",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "44244",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 20:41:50 GMT",
+    "ETag": "\"bv3167ph896mz8\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200127-IAD, cache-lon420136-LON",
+    "X-Timer": "S1782506510.184608,VS0,VE259",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "46",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIwMDQy"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2021/1/7/22216624/santa-maria-pizza-ealing-new-restaurant-bond-street-w5"
+  },
+  "input_row_number": 2029,
+  "sha256": "395fe181764ebd1d1a0da931af51326c759832594051e04e7a83369c90218541",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2021/1/7/22216624/santa-maria-pizza-ealing-new-restaurant-bond-street-w5"
+}

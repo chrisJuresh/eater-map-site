@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 259901,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T22:53:52+00:00",
+  "final_url": "https://london.eater.com/2017/11/17/16669574/dirty-south-reopens-in-lewisham-burgers-other-side-fried",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "36918",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 22:53:54 GMT",
+    "ETag": "\"c01zundvyo5keu\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000097-IAD, cache-lon420119-LON",
+    "X-Timer": "S1782514434.068724,VS0,VE260",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "26",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI4ODM1"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2017/11/17/16669574/dirty-south-reopens-in-lewisham-burgers-other-side-fried"
+  },
+  "input_row_number": 4042,
+  "sha256": "467390ef63e47a2c5ff906e216a35becd37e939eeeb12d9158673436cc9825a4",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2017/11/17/16669574/dirty-south-reopens-in-lewisham-burgers-other-side-fried"
+}

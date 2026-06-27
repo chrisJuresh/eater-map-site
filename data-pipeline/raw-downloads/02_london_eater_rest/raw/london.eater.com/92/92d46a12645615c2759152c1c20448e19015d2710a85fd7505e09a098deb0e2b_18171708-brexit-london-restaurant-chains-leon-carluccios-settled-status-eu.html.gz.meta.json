@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 263478,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T20:01:54+00:00",
+  "final_url": "https://london.eater.com/2019/1/7/18171708/brexit-london-restaurant-chains-leon-carluccios-settled-status-eu",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "38255",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 20:01:56 GMT",
+    "ETag": "\"rrh889anvo5n5g\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100151-IAD, cache-lhr-egwu1540033-LHR",
+    "X-Timer": "S1782504116.828963,VS0,VE314",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "50",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIzODEy"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2019/1/7/18171708/brexit-london-restaurant-chains-leon-carluccios-settled-status-eu"
+  },
+  "input_row_number": 1391,
+  "sha256": "5a5d5fe43b24800caf73ff7a1e1fada0f14f278589381e126f286a1f2ccc41a7",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2019/1/7/18171708/brexit-london-restaurant-chains-leon-carluccios-settled-status-eu"
+}

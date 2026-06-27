@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 473479,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T21:01:05+00:00",
+  "final_url": "https://london.eater.com/2019/10/23/20928256/patty-bun-burger-padella-pasta-cacio-pepe-london-restaurants",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "46929",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 21:01:07 GMT",
+    "ETag": "\"webwtdi8d9a573\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200132-IAD, cache-lcy-eglc8600029-LCY",
+    "X-Timer": "S1782507667.881911,VS0,VE743",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "17",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIyODMw"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2019/10/23/20928256/patty-bun-burger-padella-pasta-cacio-pepe-london-restaurants"
+  },
+  "input_row_number": 2309,
+  "sha256": "ee0215698a8f7208397d87fad72df551e2b7e2e10dc7627c12704b178bfcccd4",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2019/10/23/20928256/patty-bun-burger-padella-pasta-cacio-pepe-london-restaurants"
+}

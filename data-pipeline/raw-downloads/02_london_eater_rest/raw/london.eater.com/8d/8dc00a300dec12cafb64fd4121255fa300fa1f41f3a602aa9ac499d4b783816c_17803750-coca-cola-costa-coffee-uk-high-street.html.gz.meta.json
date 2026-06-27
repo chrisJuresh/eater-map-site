@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 258849,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T21:26:14+00:00",
+  "final_url": "https://london.eater.com/2018/8/31/17803750/coca-cola-costa-coffee-uk-high-street",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "37082",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 21:26:15 GMT",
+    "ETag": "\"husqpylylt5jnx\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100127-IAD, cache-lcy-eglc8600055-LCY",
+    "X-Timer": "S1782509176.678448,VS0,VE300",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "54",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI1NjE2"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2018/8/31/17803750/coca-cola-costa-coffee-uk-high-street"
+  },
+  "input_row_number": 2694,
+  "sha256": "76dbb62e8b04615c956930d7e58450969f84042e86a512b5c231029d98657a80",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2018/8/31/17803750/coca-cola-costa-coffee-uk-high-street"
+}

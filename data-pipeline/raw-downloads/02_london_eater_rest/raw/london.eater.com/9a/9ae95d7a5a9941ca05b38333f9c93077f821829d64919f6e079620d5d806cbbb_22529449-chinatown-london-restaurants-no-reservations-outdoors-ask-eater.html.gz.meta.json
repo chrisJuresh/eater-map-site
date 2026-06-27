@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 274486,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T22:07:08+00:00",
+  "final_url": "https://london.eater.com/22529449/chinatown-london-restaurants-no-reservations-outdoors-ask-eater",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "1025",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "38535",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 22:07:10 GMT",
+    "ETag": "\"vsk34jb31y5vor\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "HIT, MISS",
+    "X-Cache-Hits": "2, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000160-IAD, cache-lon4238-LON",
+    "X-Timer": "S1782511631.609444,VS0,VE79",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "19",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjE4MzA0"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/22529449/chinatown-london-restaurants-no-reservations-outdoors-ask-eater"
+  },
+  "input_row_number": 3310,
+  "sha256": "d229dd242d6442fd6dae0937068018147831cf73597eb8359ef4b0c52ef25eb1",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/22529449/chinatown-london-restaurants-no-reservations-outdoors-ask-eater"
+}

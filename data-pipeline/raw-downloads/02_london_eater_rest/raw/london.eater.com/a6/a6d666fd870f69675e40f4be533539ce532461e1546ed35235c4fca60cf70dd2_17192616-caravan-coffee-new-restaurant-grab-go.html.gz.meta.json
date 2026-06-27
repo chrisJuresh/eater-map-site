@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 261535,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T20:11:15+00:00",
+  "final_url": "https://london.eater.com/2018/4/3/17192616/caravan-coffee-new-restaurant-grab-go",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "37056",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 20:11:16 GMT",
+    "ETag": "\"gf02t79z515lny\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100122-IAD, cache-lcy-egml8630059-LCY",
+    "X-Timer": "S1782504677.649511,VS0,VE263",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "22",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI2MzIx"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2018/4/3/17192616/caravan-coffee-new-restaurant-grab-go"
+  },
+  "input_row_number": 1537,
+  "sha256": "0eb1b756925baa482248dd4469ea853e1ea1b0f6a2ececaa95e4a5c7a2be457c",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2018/4/3/17192616/caravan-coffee-new-restaurant-grab-go"
+}

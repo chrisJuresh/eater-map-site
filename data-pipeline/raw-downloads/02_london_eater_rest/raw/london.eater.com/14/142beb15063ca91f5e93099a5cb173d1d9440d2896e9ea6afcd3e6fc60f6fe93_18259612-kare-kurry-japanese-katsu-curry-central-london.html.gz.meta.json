@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 265769,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T22:35:09+00:00",
+  "final_url": "https://london.eater.com/2019/3/11/18259612/kare-kurry-japanese-katsu-curry-central-london",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "38197",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 22:35:11 GMT",
+    "ETag": "\"fp18k36uj15owv\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000146-IAD, cache-lcy-egml8630075-LCY",
+    "X-Timer": "S1782513311.876410,VS0,VE289",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "68",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIzNjIy"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2019/3/11/18259612/kare-kurry-japanese-katsu-curry-central-london"
+  },
+  "input_row_number": 3743,
+  "sha256": "4e17ca661a24608ccbeb87f3679c05c11a6f1426997af0bb1551d0682e1f0bdd",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2019/3/11/18259612/kare-kurry-japanese-katsu-curry-central-london"
+}

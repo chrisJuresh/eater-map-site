@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 272414,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T21:32:43+00:00",
+  "final_url": "https://london.eater.com/2018/6/11/17448320/quality-chop-house-launch-new-wine-bar-clerkenwell",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "38777",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 21:32:45 GMT",
+    "ETag": "\"10hwdthf7t85u2e\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000126-IAD, cache-lcy-egml8630098-LCY",
+    "X-Timer": "S1782509566.535863,VS0,VE232",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "23",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjI2MTUz"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2018/6/11/17448320/quality-chop-house-launch-new-wine-bar-clerkenwell"
+  },
+  "input_row_number": 2799,
+  "sha256": "90590d1d9a8011285f99dd9b60f8b897e8380827624d4adf8fbf32d351295daf",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2018/6/11/17448320/quality-chop-house-launch-new-wine-bar-clerkenwell"
+}

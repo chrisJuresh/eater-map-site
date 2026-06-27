@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 276945,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T20:58:26+00:00",
+  "final_url": "https://london.eater.com/2019/12/13/21020201/rihanna-london-annabels-celebrity-sightings-restaurants",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "39689",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 20:58:28 GMT",
+    "ETag": "\"2fartz33vt5xlj\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100072-IAD, cache-lhr-egwu1540025-LHR",
+    "X-Timer": "S1782507508.313824,VS0,VE252",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "32",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIyNjAx"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2019/12/13/21020201/rihanna-london-annabels-celebrity-sightings-restaurants"
+  },
+  "input_row_number": 2269,
+  "sha256": "d4928d77c3b86135d44111f0981cff53a2f366b62632ff794371aaed58a246b1",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2019/12/13/21020201/rihanna-london-annabels-celebrity-sightings-restaurants"
+}

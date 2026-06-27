@@ -1,0 +1,42 @@
+{
+  "batch_folder": "03_www_eater_rest",
+  "batch_key": "www_eater_rest",
+  "batch_order": 3,
+  "canonical_url": "",
+  "content_length": 254419,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T23:20:31+00:00",
+  "final_url": "https://www.eater.com/2015/1/26/7917341/oldest-restaurant-london-shutter-savoy-hotel",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "37841",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 23:20:33 GMT",
+    "ETag": "\"novsqok5pa5g5e\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100047-IAD, cache-lon420112-LON",
+    "X-Timer": "S1782516033.826044,VS0,VE631",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "14",
+    "x-middleware-rewrite": "/resource/content/post/ZXQyOnBvc3Q6Njc1MDE2"
+  },
+  "input_data": {
+    "url": "https://www.eater.com/2015/1/26/7917341/oldest-restaurant-london-shutter-savoy-hotel"
+  },
+  "input_row_number": 4419,
+  "sha256": "4c88867fa8db9d17404a79fff54f5895819150e91688c5f97e6c3feee24a8fd2",
+  "status_code": 200,
+  "title": "",
+  "url": "https://www.eater.com/2015/1/26/7917341/oldest-restaurant-london-shutter-savoy-hotel"
+}

@@ -1,0 +1,42 @@
+{
+  "batch_folder": "02_london_eater_rest",
+  "batch_key": "london_eater_rest",
+  "batch_order": 2,
+  "canonical_url": "",
+  "content_length": 269799,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T22:26:02+00:00",
+  "final_url": "https://london.eater.com/2019/10/17/20918754/amazon-deliveroo-investment-investigation-cma",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "40048",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 22:26:04 GMT",
+    "ETag": "\"2qgy6wr53h5ryp\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kiad7000160-IAD, cache-lcy-eglc8600031-LCY",
+    "X-Timer": "S1782512764.633922,VS0,VE712",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "28",
+    "x-middleware-rewrite": "/resource/content/post/ZXQzMTpwb3N0OjIxOTYy"
+  },
+  "input_data": {
+    "url": "https://london.eater.com/2019/10/17/20918754/amazon-deliveroo-investment-investigation-cma"
+  },
+  "input_row_number": 3596,
+  "sha256": "d50a2ed903a14331dac7d40b8707563286c74d9a0b841966781ba95bb237b6df",
+  "status_code": 200,
+  "title": "",
+  "url": "https://london.eater.com/2019/10/17/20918754/amazon-deliveroo-investment-investigation-cma"
+}

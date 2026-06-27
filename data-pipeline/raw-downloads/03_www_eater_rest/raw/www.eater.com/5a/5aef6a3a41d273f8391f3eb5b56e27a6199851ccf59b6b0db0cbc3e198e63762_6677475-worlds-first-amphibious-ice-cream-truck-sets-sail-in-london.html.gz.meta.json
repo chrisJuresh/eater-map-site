@@ -1,0 +1,42 @@
+{
+  "batch_folder": "03_www_eater_rest",
+  "batch_key": "www_eater_rest",
+  "batch_order": 3,
+  "canonical_url": "",
+  "content_length": 255968,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T23:32:39+00:00",
+  "final_url": "https://www.eater.com/2011/6/1/6677475/worlds-first-amphibious-ice-cream-truck-sets-sail-in-london",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "35289",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 23:32:41 GMT",
+    "ETag": "\"xulq5w8c9l5hdk\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kjyo7100171-IAD, cache-lcy-egml8630097-LCY",
+    "X-Timer": "S1782516761.056586,VS0,VE633",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "20",
+    "x-middleware-rewrite": "/resource/content/post/ZXQyOnBvc3Q6NzQ0OTYw"
+  },
+  "input_data": {
+    "url": "https://www.eater.com/2011/6/1/6677475/worlds-first-amphibious-ice-cream-truck-sets-sail-in-london"
+  },
+  "input_row_number": 4600,
+  "sha256": "b2292a1b99bc8ffbd9288d65f9ee3c9acabec8968080b9cb6400759c36dc3c03",
+  "status_code": 200,
+  "title": "",
+  "url": "https://www.eater.com/2011/6/1/6677475/worlds-first-amphibious-ice-cream-truck-sets-sail-in-london"
+}

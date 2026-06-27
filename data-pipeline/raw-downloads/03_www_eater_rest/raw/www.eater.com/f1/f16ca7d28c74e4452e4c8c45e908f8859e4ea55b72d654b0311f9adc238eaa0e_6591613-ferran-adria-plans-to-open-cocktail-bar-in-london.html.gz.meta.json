@@ -1,0 +1,42 @@
+{
+  "batch_folder": "03_www_eater_rest",
+  "batch_key": "www_eater_rest",
+  "batch_order": 3,
+  "canonical_url": "",
+  "content_length": 266618,
+  "content_type": "text/html",
+  "fetched_at": "2026-06-26T23:23:37+00:00",
+  "final_url": "https://www.eater.com/2012/4/30/6591613/ferran-adria-plans-to-open-cocktail-bar-in-london",
+  "headers": {
+    "Accept-Ranges": "bytes",
+    "Age": "0",
+    "Cache-Control": "no-store,private",
+    "Connection": "close",
+    "Content-Encoding": "gzip",
+    "Content-Length": "37606",
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Fri, 26 Jun 2026 23:23:39 GMT",
+    "ETag": "\"8ezgz80lvh5pl2\"",
+    "Strict-Transport-Security": "max-age=31556952; preload",
+    "Vary": "Accept-Encoding",
+    "Via": "1.1 varnish, 1.1 varnish",
+    "X-Cache": "MISS, MISS",
+    "X-Cache-Hits": "0, 0",
+    "X-Powered-By": "Next.js",
+    "X-Served-By": "cache-iad-kcgs7200104-IAD, cache-lcy-egml8630036-LCY",
+    "X-Timer": "S1782516218.052341,VS0,VE1009",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "content-security-policy": "frame-ancestors https://platform.eater.com https://*.eater.com https://platform.eater.com https://*.eater.com 'self'",
+    "vm-cyclone-community-id": "59d671b0-25d0-4d7a-8792-caef1f0de9ab",
+    "vm-duration-article-category-recirc-query": "22",
+    "x-middleware-rewrite": "/resource/content/post/ZXQyOnBvc3Q6NzMyNDY0"
+  },
+  "input_data": {
+    "url": "https://www.eater.com/2012/4/30/6591613/ferran-adria-plans-to-open-cocktail-bar-in-london"
+  },
+  "input_row_number": 4469,
+  "sha256": "ee9a445863050dddc068a2ccc6c44e6ef80ec916092129dc63bbe6b2512b74bd",
+  "status_code": 200,
+  "title": "",
+  "url": "https://www.eater.com/2012/4/30/6591613/ferran-adria-plans-to-open-cocktail-bar-in-london"
+}
