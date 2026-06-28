@@ -18,7 +18,8 @@
   const VIEW_FIT_PADDING = 48;
   const HOME_VIEW_PADDING = 32;
   const MARKER_SPRITE_PADDING = 10;
-  const MARKER_LAYER_OPACITY = 0.48;
+  const MARKER_LAYER_OPACITY = 0.42;
+  const MAP_TILE_FILTER = 'saturate(1.28) contrast(1.06) brightness(1.02)';
   const PINCH_ZOOM_THRESHOLD = 1.16;
   const DESCRIPTION_VISIBLE_LINES = 4;
   const MOBILE_SEARCH_VISIBLE_RESULTS = 4;
@@ -835,7 +836,7 @@
     on:pointerup={onPointerUp}
     on:pointercancel={onPointerUp}
     on:wheel={onWheel}
-    style={`--topbar-height: ${topbarHeight}px; --mobile-search-visible-results: ${MOBILE_SEARCH_VISIBLE_RESULTS};`}
+    style={`--topbar-height: ${topbarHeight}px; --mobile-search-visible-results: ${MOBILE_SEARCH_VISIBLE_RESULTS}; --map-tile-filter: ${MAP_TILE_FILTER};`}
     role="application"
     aria-label="Restaurant map"
   >
@@ -1042,6 +1043,10 @@
   .marker-layer {
     position: absolute;
     inset: 0;
+  }
+
+  .tile-layer {
+    filter: var(--map-tile-filter, none);
   }
 
   .marker-layer {
