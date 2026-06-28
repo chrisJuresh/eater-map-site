@@ -19,6 +19,7 @@
   const HOME_VIEW_PADDING = 32;
   const MARKER_SPRITE_PADDING = 10;
   const MARKER_LAYER_OPACITY = 0.42;
+  const PRICED_MARKER_LAYER_OPACITY = 1 - (1 - MARKER_LAYER_OPACITY) / 2;
   const MAP_TILE_FILTER = 'saturate(1.28) contrast(1.06) brightness(1.02)';
   const FULL_MARKER_ZOOM = 14;
   const MID_MARKER_ZOOM = 12;
@@ -383,6 +384,10 @@
     return '#d43d2f';
   }
 
+  function markerPriority(restaurant) {
+    return restaurant?.priceRange ? 1 : 0;
+  }
+
   function markerDetail(z, active) {
     if (active || z >= FULL_MARKER_ZOOM) {
       return {
@@ -460,12 +465,31 @@
     layerCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
     layerCtx.clearRect(0, 0, viewportWidth, viewportHeight);
 
+    const regularMarkers = [];
+    const pricedMarkers = [];
     for (const marker of markers) {
       if (marker.restaurant.id === selectedId) continue;
+      if (marker.restaurant.priceRange) {
+        pricedMarkers.push(marker);
+      } else {
+        regularMarkers.push(marker);
+      }
+    }
+
+    for (const marker of regularMarkers) {
       drawMarker(layerCtx, marker, false, z);
     }
     ctx.save();
     ctx.globalAlpha = MARKER_LAYER_OPACITY;
+    ctx.drawImage(markerLayerCanvas, 0, 0, viewportWidth, viewportHeight);
+    ctx.restore();
+
+    layerCtx.clearRect(0, 0, viewportWidth, viewportHeight);
+    for (const marker of pricedMarkers) {
+      drawMarker(layerCtx, marker, false, z);
+    }
+    ctx.save();
+    ctx.globalAlpha = PRICED_MARKER_LAYER_OPACITY;
     ctx.drawImage(markerLayerCanvas, 0, 0, viewportWidth, viewportHeight);
     ctx.restore();
 
@@ -583,7 +607,11 @@
       return null;
     }
 
-    candidates.sort((a, b) => a.distance - b.distance || String(a.id).localeCompare(String(b.id)));
+    candidates.sort((a, b) => {
+      const distanceDifference = a.distance - b.distance;
+      if (Math.abs(distanceDifference) > 4) return distanceDifference;
+      return markerPriority(b.restaurant) - markerPriority(a.restaurant) || distanceDifference || String(a.id).localeCompare(String(b.id));
+    });
     const key = candidates.map((candidate) => candidate.id).join('|');
     const repeatedPick =
       lastMarkerPick &&
