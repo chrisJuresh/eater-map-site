@@ -18,6 +18,7 @@
   const VIEW_FIT_PADDING = 48;
   const HOME_VIEW_PADDING = 32;
   const MARKER_SPRITE_PADDING = 10;
+  const MARKER_LAYER_OPACITY = 0.48;
   const PINCH_ZOOM_THRESHOLD = 1.16;
   const DESCRIPTION_VISIBLE_LINES = 4;
   const MOBILE_SEARCH_VISIBLE_RESULTS = 4;
@@ -46,6 +47,7 @@
   let resizeObserver;
   let markerHitState = { hits: [] };
   let markerSpriteCache = new Map();
+  let markerLayerCanvas;
   let visibleMarkerCount = 0;
   let markerDrawFrame = 0;
   let panFrame = 0;
@@ -62,6 +64,11 @@
   let descriptionScrollbar = { top: 0, height: 100 };
   let descriptionMeasureToken = 0;
   let measuredDescriptionRestaurantId = '';
+  let searchResultsEl;
+  let searchResultsHasMore = false;
+  let searchResultsScrollbar = { top: 0, height: 100 };
+  let searchResultsMeasureToken = 0;
+  let measuredSearchText = '';
 
   const prices = ['all', '$', '$$', '$$$', '$$$$'];
   const roadmapItems = [
@@ -123,6 +130,11 @@
   $: minZoom = getMinimumZoom(stats?.bounds);
   $: if (zoom < minZoom) zoom = minZoom;
   $: {
+    searchText;
+    searchResults.length;
+    scheduleSearchResultsMeasure();
+  }
+  $: {
     selected?.id;
     selected?.description;
     width;
@@ -159,6 +171,33 @@
     const thumbHeight = descriptionHasMore ? clamp((descriptionEl.clientHeight / descriptionEl.scrollHeight) * 100, 18, 100) : 100;
     const thumbTop = descriptionHasMore && maxScroll ? (descriptionEl.scrollTop / maxScroll) * (100 - thumbHeight) : 0;
     descriptionScrollbar = { top: thumbTop, height: thumbHeight };
+  }
+
+  function scheduleSearchResultsMeasure() {
+    const token = ++searchResultsMeasureToken;
+    tick().then(() => {
+      if (token !== searchResultsMeasureToken) return;
+      if (searchResultsEl && searchText !== measuredSearchText) {
+        searchResultsEl.scrollTop = 0;
+        measuredSearchText = searchText;
+      }
+      updateSearchResultsScrollState();
+    });
+  }
+
+  function updateSearchResultsScrollState() {
+    if (!searchResultsEl) {
+      searchResultsHasMore = false;
+      searchResultsScrollbar = { top: 0, height: 100 };
+      measuredSearchText = '';
+      return;
+    }
+
+    const maxScroll = Math.max(0, searchResultsEl.scrollHeight - searchResultsEl.clientHeight);
+    searchResultsHasMore = maxScroll > 1;
+    const thumbHeight = searchResultsHasMore ? clamp((searchResultsEl.clientHeight / searchResultsEl.scrollHeight) * 100, 18, 100) : 100;
+    const thumbTop = searchResultsHasMore && maxScroll ? (searchResultsEl.scrollTop / maxScroll) * (100 - thumbHeight) : 0;
+    searchResultsScrollbar = { top: thumbTop, height: thumbHeight };
   }
 
   function annotateMarkers(items) {
@@ -224,6 +263,7 @@
     if (topbarEl) {
       topbarHeight = Math.ceil(topbarEl.getBoundingClientRect().height);
     }
+    updateSearchResultsScrollState();
     applyFallbackHomeView();
   }
 
@@ -332,13 +372,12 @@
     return markers;
   }
 
-  function markerColor(priceRange, active = false) {
-    const alpha = active ? 0.95 : 0.68;
-    if (priceRange === '$') return `rgba(45, 138, 95, ${alpha})`;
-    if (priceRange === '$$') return `rgba(39, 112, 167, ${alpha})`;
-    if (priceRange === '$$$') return `rgba(127, 82, 161, ${alpha})`;
-    if (priceRange === '$$$$') return `rgba(37, 42, 49, ${alpha})`;
-    return `rgba(212, 61, 47, ${alpha})`;
+  function markerColor(priceRange) {
+    if (priceRange === '$') return '#2d8a5f';
+    if (priceRange === '$$') return '#2770a7';
+    if (priceRange === '$$$') return '#7f52a1';
+    if (priceRange === '$$$$') return '#252a31';
+    return '#d43d2f';
   }
 
   function scheduleMarkerDraw(items, origin, viewportWidth, viewportHeight, z, selectedId, location) {
@@ -377,10 +416,23 @@
     }));
 
     const selectedMarker = selectedId ? markers.find((marker) => marker.restaurant.id === selectedId) : null;
+    if (!markerLayerCanvas) markerLayerCanvas = document.createElement('canvas');
+    if (markerLayerCanvas.width !== targetWidth) markerLayerCanvas.width = targetWidth;
+    if (markerLayerCanvas.height !== targetHeight) markerLayerCanvas.height = targetHeight;
+    const layerCtx = markerLayerCanvas.getContext('2d');
+    if (!layerCtx) return;
+    layerCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    layerCtx.clearRect(0, 0, viewportWidth, viewportHeight);
+
     for (const marker of markers) {
       if (marker.restaurant.id === selectedId) continue;
-      drawMarker(ctx, marker, false);
+      drawMarker(layerCtx, marker, false);
     }
+    ctx.save();
+    ctx.globalAlpha = MARKER_LAYER_OPACITY;
+    ctx.drawImage(markerLayerCanvas, 0, 0, viewportWidth, viewportHeight);
+    ctx.restore();
+
     if (selectedMarker) drawMarker(ctx, selectedMarker, true);
     drawUserLocation(ctx, location, origin, viewportWidth, viewportHeight, z);
   }
@@ -411,15 +463,15 @@
     ctx.shadowOffsetY = active ? 4 : 3;
     ctx.beginPath();
     ctx.arc(center, center, radius, 0, Math.PI * 2);
-    ctx.fillStyle = markerColor(priceRange, active);
+    ctx.fillStyle = markerColor(priceRange);
     ctx.fill();
     ctx.shadowColor = 'transparent';
     ctx.lineWidth = active ? 3 : 2;
-    ctx.strokeStyle = '#ffffff';
+    ctx.strokeStyle = active ? 'rgba(255, 255, 255, 0.86)' : '#ffffff';
     ctx.stroke();
 
     if (priceRange) {
-      ctx.fillStyle = '#ffffff';
+      ctx.fillStyle = active ? 'rgba(255, 255, 255, 0.95)' : '#ffffff';
       ctx.font = `800 ${priceRange.length >= 4 ? 7 : 8}px Inter, system-ui, sans-serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
@@ -472,7 +524,7 @@
   }
 
   function isMapChrome(target) {
-    return Boolean(target?.closest?.('.topbar, .zoom-controls, .price-controls, .results-panel, .attribution'));
+    return Boolean(target?.closest?.('.topbar, .zoom-controls, .price-controls, .results-shell, .results-panel, .attribution'));
   }
 
   function pickMarker(clientX, clientY) {
@@ -854,13 +906,20 @@
     </div>
 
     {#if searchResults.length}
-      <div class="results-panel">
-        {#each searchResults as result (result.id)}
-          <button type="button" on:click={() => selectSearchResult(result)}>
-            <strong>{result.name}</strong>
-            <span>{result.address}</span>
-          </button>
-        {/each}
+      <div class="results-shell">
+        <div class="results-panel" bind:this={searchResultsEl} on:scroll={updateSearchResultsScrollState}>
+          {#each searchResults as result (result.id)}
+            <button type="button" on:click={() => selectSearchResult(result)}>
+              <strong>{result.name}</strong>
+              <span>{result.address}</span>
+            </button>
+          {/each}
+        </div>
+        {#if searchResultsHasMore}
+          <div class="search-results-scrollbar" aria-hidden="true">
+            <span style={`top: ${searchResultsScrollbar.top}%; height: ${searchResultsScrollbar.height}%;`}></span>
+          </div>
+        {/if}
       </div>
     {/if}
 
@@ -1015,6 +1074,7 @@
   .roadmap-menu,
   .zoom-controls,
   .price-controls,
+  .results-shell,
   .results-panel,
   .state-pill {
     pointer-events: auto;
@@ -1187,18 +1247,28 @@
     background: #17201c;
   }
 
-  .results-panel {
+  .results-shell {
     position: absolute;
     top: calc(max(12px, env(safe-area-inset-top)) + var(--topbar-height, 56px) + 8px);
     left: 12px;
     bottom: calc(max(12px, env(safe-area-inset-bottom)) + 50px);
     width: min(420px, calc(100vw - 24px));
+    z-index: 12;
+  }
+
+  .results-panel {
+    position: relative;
+    width: 100%;
+    height: 100%;
     overflow: auto;
     border: 1px solid rgba(23, 32, 28, 0.12);
     border-radius: 8px;
     background: rgba(255, 252, 244, 0.98);
     box-shadow: 0 18px 40px rgba(27, 31, 28, 0.18);
-    z-index: 12;
+  }
+
+  .search-results-scrollbar {
+    display: none;
   }
 
   .results-panel button {
@@ -1551,10 +1621,23 @@
       font-size: 13px;
     }
 
-    .results-panel {
+    .results-shell {
       bottom: auto;
       max-height: calc(var(--mobile-search-visible-results, 4) * 56px);
+    }
+
+    .results-panel {
+      height: auto;
+      max-height: inherit;
       overscroll-behavior: contain;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .results-panel::-webkit-scrollbar {
+      display: none;
+      width: 0;
+      height: 0;
     }
 
     .results-panel button {
@@ -1568,6 +1651,27 @@
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+    }
+
+    .search-results-scrollbar {
+      display: block;
+      position: absolute;
+      top: 3px;
+      right: 3px;
+      bottom: 3px;
+      width: 3px;
+      border-radius: 999px;
+      background: rgba(23, 32, 28, 0.08);
+      pointer-events: none;
+    }
+
+    .search-results-scrollbar span {
+      position: absolute;
+      left: 0;
+      right: 0;
+      min-height: 18%;
+      border-radius: 999px;
+      background: rgba(23, 32, 28, 0.46);
     }
 
     .zoom-controls {
