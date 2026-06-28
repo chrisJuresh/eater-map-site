@@ -20,6 +20,8 @@
   const MARKER_SPRITE_PADDING = 10;
   const MARKER_LAYER_OPACITY = 0.42;
   const MAP_TILE_FILTER = 'saturate(1.28) contrast(1.06) brightness(1.02)';
+  const FULL_MARKER_ZOOM = 14;
+  const MID_MARKER_ZOOM = 12;
   const PINCH_ZOOM_THRESHOLD = 1.16;
   const DESCRIPTION_VISIBLE_LINES = 4;
   const MOBILE_SEARCH_VISIBLE_RESULTS = 4;
@@ -381,6 +383,39 @@
     return '#d43d2f';
   }
 
+  function markerDetail(z, active) {
+    if (active || z >= FULL_MARKER_ZOOM) {
+      return {
+        key: 'full',
+        radius: active ? 17 : 12,
+        strokeWidth: active ? 3 : 2,
+        shadowBlur: active ? 14 : 8,
+        shadowOffsetY: active ? 4 : 3,
+        showPrice: true
+      };
+    }
+
+    if (z >= MID_MARKER_ZOOM) {
+      return {
+        key: 'mid',
+        radius: 7,
+        strokeWidth: 1.5,
+        shadowBlur: 4,
+        shadowOffsetY: 2,
+        showPrice: false
+      };
+    }
+
+    return {
+      key: 'small',
+      radius: 4.5,
+      strokeWidth: 1,
+      shadowBlur: 2,
+      shadowOffsetY: 1,
+      showPrice: false
+    };
+  }
+
   function scheduleMarkerDraw(items, origin, viewportWidth, viewportHeight, z, selectedId, location) {
     if (!markerCanvas || !viewportWidth || !viewportHeight) return;
     if (markerDrawFrame) cancelAnimationFrame(markerDrawFrame);
@@ -427,30 +462,31 @@
 
     for (const marker of markers) {
       if (marker.restaurant.id === selectedId) continue;
-      drawMarker(layerCtx, marker, false);
+      drawMarker(layerCtx, marker, false, z);
     }
     ctx.save();
     ctx.globalAlpha = MARKER_LAYER_OPACITY;
     ctx.drawImage(markerLayerCanvas, 0, 0, viewportWidth, viewportHeight);
     ctx.restore();
 
-    if (selectedMarker) drawMarker(ctx, selectedMarker, true);
+    if (selectedMarker) drawMarker(ctx, selectedMarker, true, z);
     drawUserLocation(ctx, location, origin, viewportWidth, viewportHeight, z);
   }
 
-  function drawMarker(ctx, marker, active) {
-    const sprite = getMarkerSprite(marker.restaurant.priceRange, active);
+  function drawMarker(ctx, marker, active, z) {
+    const sprite = getMarkerSprite(marker.restaurant.priceRange, active, z);
     ctx.drawImage(sprite.canvas, marker.x - sprite.size / 2, marker.y - sprite.size / 2, sprite.size, sprite.size);
   }
 
-  function getMarkerSprite(priceRange, active) {
+  function getMarkerSprite(priceRange, active, z) {
     const dpr = Math.max(1, window.devicePixelRatio || 1);
     const normalizedPrice = priceRange || 'none';
-    const key = `${normalizedPrice}-${active ? 'active' : 'default'}-${dpr}`;
+    const detail = markerDetail(z, active);
+    const key = `${normalizedPrice}-${active ? 'active' : detail.key}-${dpr}`;
     const cached = markerSpriteCache.get(key);
     if (cached) return cached;
 
-    const radius = active ? 17 : 12;
+    const radius = detail.radius;
     const size = (radius + MARKER_SPRITE_PADDING) * 2;
     const canvas = document.createElement('canvas');
     canvas.width = Math.ceil(size * dpr);
@@ -460,18 +496,18 @@
 
     ctx.scale(dpr, dpr);
     ctx.shadowColor = active ? 'rgba(27, 31, 28, 0.42)' : 'rgba(27, 31, 28, 0.26)';
-    ctx.shadowBlur = active ? 14 : 8;
-    ctx.shadowOffsetY = active ? 4 : 3;
+    ctx.shadowBlur = detail.shadowBlur;
+    ctx.shadowOffsetY = detail.shadowOffsetY;
     ctx.beginPath();
     ctx.arc(center, center, radius, 0, Math.PI * 2);
     ctx.fillStyle = markerColor(priceRange);
     ctx.fill();
     ctx.shadowColor = 'transparent';
-    ctx.lineWidth = active ? 3 : 2;
+    ctx.lineWidth = detail.strokeWidth;
     ctx.strokeStyle = active ? 'rgba(255, 255, 255, 0.86)' : '#ffffff';
     ctx.stroke();
 
-    if (priceRange) {
+    if (priceRange && detail.showPrice) {
       ctx.fillStyle = active ? 'rgba(255, 255, 255, 0.95)' : '#ffffff';
       ctx.font = `800 ${priceRange.length >= 4 ? 7 : 8}px Inter, system-ui, sans-serif`;
       ctx.textAlign = 'center';
