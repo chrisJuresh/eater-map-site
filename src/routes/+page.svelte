@@ -661,6 +661,7 @@
   }
 
   function onWheel(event) {
+    if (isMapChrome(event.target)) return;
     event.preventDefault();
     mapWasInteractedWith = true;
     const direction = event.deltaY > 0 ? -1 : 1;
@@ -1190,8 +1191,8 @@
     position: absolute;
     top: calc(max(12px, env(safe-area-inset-top)) + var(--topbar-height, 56px) + 8px);
     left: 12px;
+    bottom: calc(max(12px, env(safe-area-inset-bottom)) + 50px);
     width: min(420px, calc(100vw - 24px));
-    max-height: min(46vh, 420px);
     overflow: auto;
     border: 1px solid rgba(23, 32, 28, 0.12);
     border-radius: 8px;
@@ -1551,6 +1552,7 @@
     }
 
     .results-panel {
+      bottom: auto;
       max-height: calc(var(--mobile-search-visible-results, 4) * 56px);
       overscroll-behavior: contain;
     }
