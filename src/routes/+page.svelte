@@ -52,6 +52,7 @@
   let locationStatus = '';
   let locationWatchId = null;
   let homeViewApplied = false;
+  let pendingLocationView = null;
   let descriptionEl;
   let descriptionHasMore = false;
   let descriptionCanScrollDown = false;
@@ -61,7 +62,6 @@
 
   const prices = ['all', '$', '$$', '$$$', '$$$$'];
   const roadmapItems = [
-    'Display num. of items in search',
     'Remove closed restaurants',
     'Add opening times',
     'Add rating information',
@@ -519,6 +519,36 @@
     pendingCenter = null;
   }
 
+  function isMapInteractionActive() {
+    return activePointers.size > 0 || Boolean(pinchStart) || Boolean(dragStart);
+  }
+
+  function setLocationView(location, options = {}) {
+    if (!location) return;
+    const nextLocationView = {
+      center: { lat: location.lat, lon: location.lon },
+      zoom: clamp(LOCATION_ZOOM, minZoom, MAX_ZOOM)
+    };
+
+    if (options.deferWhileInteracting && isMapInteractionActive()) {
+      pendingLocationView = nextLocationView;
+      return;
+    }
+
+    pendingLocationView = null;
+    center = nextLocationView.center;
+    zoom = nextLocationView.zoom;
+    homeViewApplied = true;
+  }
+
+  function applyPendingLocationView() {
+    if (!pendingLocationView || isMapInteractionActive()) return;
+    center = pendingLocationView.center;
+    zoom = pendingLocationView.zoom;
+    homeViewApplied = true;
+    pendingLocationView = null;
+  }
+
   function eventPoint(event) {
     return { x: event.clientX, y: event.clientY };
   }
@@ -630,6 +660,7 @@
         activePointer = null;
         dragStart = null;
       }
+      applyPendingLocationView();
       return;
     }
 
@@ -641,6 +672,7 @@
     }
     activePointer = null;
     dragStart = null;
+    applyPendingLocationView();
   }
 
   function onWheel(event) {
@@ -681,8 +713,7 @@
 
   function resetMap() {
     if (userLocation) {
-      center = { lat: userLocation.lat, lon: userLocation.lon };
-      zoom = clamp(LOCATION_ZOOM, minZoom, MAX_ZOOM);
+      setLocationView(userLocation);
     } else {
       homeViewApplied = false;
       applyFallbackHomeView();
@@ -699,8 +730,7 @@
       return;
     }
     if (userLocation) {
-      center = { lat: userLocation.lat, lon: userLocation.lon };
-      zoom = clamp(LOCATION_ZOOM, minZoom, MAX_ZOOM);
+      setLocationView(userLocation);
     }
     if (options.restart && locationWatchId !== null) {
       stopLocationTracking();
@@ -718,9 +748,7 @@
         };
         locationStatus = 'Live location on';
         if (firstLocation) {
-          center = { lat: userLocation.lat, lon: userLocation.lon };
-          zoom = clamp(LOCATION_ZOOM, minZoom, MAX_ZOOM);
-          homeViewApplied = true;
+          setLocationView(userLocation, { deferWhileInteracting: true });
         }
       },
       (error) => {
@@ -786,7 +814,14 @@
     <div class="topbar">
       <label class="search">
         <span>Search</span>
-        <input bind:value={query} type="search" placeholder="Restaurant, area, guide" autocomplete="off" />
+        <div class="search-field">
+          <input bind:value={query} type="search" placeholder="Restaurant, area, guide" autocomplete="off" />
+          {#if searchText}
+            <output class="search-count" aria-live="polite">
+              {filteredRestaurants.length.toLocaleString()}
+            </output>
+          {/if}
+        </div>
       </label>
       <button class="reset-button" type="button" on:click={resetMap}>Reset</button>
       <details class="roadmap-menu">
@@ -1008,6 +1043,14 @@
     font-weight: 700;
   }
 
+  .search-field {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+
   .search input {
     width: 100%;
     border: 0;
@@ -1016,6 +1059,18 @@
     color: #17201c;
     font-size: 16px;
     min-width: 0;
+  }
+
+  .search-count {
+    min-width: 30px;
+    padding: 3px 6px;
+    border-radius: 999px;
+    color: #fff;
+    background: #17201c;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1.2;
   }
 
   .reset-button,
