@@ -20,6 +20,10 @@
   const MARKER_SPRITE_PADDING = 10;
   const MARKER_LAYER_OPACITY = 0.42;
   const MAP_TILE_FILTER = 'saturate(1.28) contrast(1.06) brightness(1.02)';
+  const CLUSTER_DISABLE_ZOOM = 16;
+  const CLUSTER_CELL_SIZE = 54;
+  const CLUSTER_MIN_COUNT = 2;
+  const CLUSTER_ZOOM_STEP = 2;
   const PINCH_ZOOM_THRESHOLD = 1.16;
   const DESCRIPTION_VISIBLE_LINES = 4;
   const MOBILE_SEARCH_VISIBLE_RESULTS = 4;
@@ -381,6 +385,67 @@
     return '#d43d2f';
   }
 
+  function clusterRadius(count) {
+    return clamp(15 + Math.log2(count) * 2.2, 18, 30);
+  }
+
+  function formatClusterCount(count) {
+    if (count >= 1000) return `${Math.round(count / 100) / 10}k`;
+    return String(count);
+  }
+
+  function getMarkerDisplayData(markers, selectedId, z) {
+    const selectedMarker = selectedId ? markers.find((marker) => marker.restaurant.id === selectedId) : null;
+    const candidates = selectedId ? markers.filter((marker) => marker.restaurant.id !== selectedId) : markers;
+
+    if (z >= CLUSTER_DISABLE_ZOOM) {
+      return { markers: candidates, clusters: [], selectedMarker };
+    }
+
+    const cells = new Map();
+    for (const marker of candidates) {
+      const key = `${Math.floor(marker.x / CLUSTER_CELL_SIZE)}:${Math.floor(marker.y / CLUSTER_CELL_SIZE)}`;
+      const cell = cells.get(key);
+      if (cell) {
+        cell.push(marker);
+      } else {
+        cells.set(key, [marker]);
+      }
+    }
+
+    const markerItems = [];
+    const clusters = [];
+    for (const [key, cellMarkers] of cells) {
+      if (cellMarkers.length < CLUSTER_MIN_COUNT) {
+        markerItems.push(...cellMarkers);
+        continue;
+      }
+
+      let x = 0;
+      let y = 0;
+      let lat = 0;
+      let lon = 0;
+      for (const marker of cellMarkers) {
+        x += marker.x;
+        y += marker.y;
+        lat += marker.restaurant.lat;
+        lon += marker.restaurant.lon;
+      }
+      const count = cellMarkers.length;
+      clusters.push({
+        id: `cluster:${key}:${count}`,
+        x: x / count,
+        y: y / count,
+        lat: lat / count,
+        lon: lon / count,
+        count,
+        radius: clusterRadius(count)
+      });
+    }
+
+    return { markers: markerItems, clusters, selectedMarker };
+  }
+
   function scheduleMarkerDraw(items, origin, viewportWidth, viewportHeight, z, selectedId, location) {
     if (!markerCanvas || !viewportWidth || !viewportHeight) return;
     if (markerDrawFrame) cancelAnimationFrame(markerDrawFrame);
@@ -408,15 +473,36 @@
 
     const markers = getVisibleMarkerData(items, origin, viewportWidth, viewportHeight, z);
     if (visibleMarkerCount !== markers.length) visibleMarkerCount = markers.length;
-    markerHitState.hits = markers.map((marker) => ({
-      id: marker.restaurant.id,
-      x: marker.x,
-      y: marker.y,
-      radius: marker.restaurant.id === selectedId ? 17 : 13,
-      restaurant: marker.restaurant
-    }));
+    const markerDisplay = getMarkerDisplayData(markers, selectedId, z);
+    markerHitState.hits = [
+      ...markerDisplay.markers.map((marker) => ({
+        type: 'restaurant',
+        id: marker.restaurant.id,
+        x: marker.x,
+        y: marker.y,
+        radius: 13,
+        restaurant: marker.restaurant
+      })),
+      ...markerDisplay.clusters.map((cluster) => ({
+        type: 'cluster',
+        id: cluster.id,
+        x: cluster.x,
+        y: cluster.y,
+        radius: cluster.radius,
+        cluster
+      }))
+    ];
+    if (markerDisplay.selectedMarker) {
+      markerHitState.hits.push({
+        type: 'restaurant',
+        id: markerDisplay.selectedMarker.restaurant.id,
+        x: markerDisplay.selectedMarker.x,
+        y: markerDisplay.selectedMarker.y,
+        radius: 17,
+        restaurant: markerDisplay.selectedMarker.restaurant
+      });
+    }
 
-    const selectedMarker = selectedId ? markers.find((marker) => marker.restaurant.id === selectedId) : null;
     if (!markerLayerCanvas) markerLayerCanvas = document.createElement('canvas');
     if (markerLayerCanvas.width !== targetWidth) markerLayerCanvas.width = targetWidth;
     if (markerLayerCanvas.height !== targetHeight) markerLayerCanvas.height = targetHeight;
@@ -425,8 +511,7 @@
     layerCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
     layerCtx.clearRect(0, 0, viewportWidth, viewportHeight);
 
-    for (const marker of markers) {
-      if (marker.restaurant.id === selectedId) continue;
+    for (const marker of markerDisplay.markers) {
       drawMarker(layerCtx, marker, false);
     }
     ctx.save();
@@ -434,13 +519,21 @@
     ctx.drawImage(markerLayerCanvas, 0, 0, viewportWidth, viewportHeight);
     ctx.restore();
 
-    if (selectedMarker) drawMarker(ctx, selectedMarker, true);
+    for (const cluster of markerDisplay.clusters) {
+      drawCluster(ctx, cluster);
+    }
+    if (markerDisplay.selectedMarker) drawMarker(ctx, markerDisplay.selectedMarker, true);
     drawUserLocation(ctx, location, origin, viewportWidth, viewportHeight, z);
   }
 
   function drawMarker(ctx, marker, active) {
     const sprite = getMarkerSprite(marker.restaurant.priceRange, active);
     ctx.drawImage(sprite.canvas, marker.x - sprite.size / 2, marker.y - sprite.size / 2, sprite.size, sprite.size);
+  }
+
+  function drawCluster(ctx, cluster) {
+    const sprite = getClusterSprite(cluster.count);
+    ctx.drawImage(sprite.canvas, cluster.x - sprite.size / 2, cluster.y - sprite.size / 2, sprite.size, sprite.size);
   }
 
   function getMarkerSprite(priceRange, active) {
@@ -478,6 +571,45 @@
       ctx.textBaseline = 'middle';
       ctx.fillText(priceRange, center, center + 0.5);
     }
+
+    const sprite = { canvas, size };
+    markerSpriteCache.set(key, sprite);
+    return sprite;
+  }
+
+  function getClusterSprite(count) {
+    const dpr = Math.max(1, window.devicePixelRatio || 1);
+    const label = formatClusterCount(count);
+    const radius = clusterRadius(count);
+    const key = `cluster-${label}-${Math.round(radius)}-${dpr}`;
+    const cached = markerSpriteCache.get(key);
+    if (cached) return cached;
+
+    const size = (radius + MARKER_SPRITE_PADDING) * 2;
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.ceil(size * dpr);
+    canvas.height = Math.ceil(size * dpr);
+    const ctx = canvas.getContext('2d');
+    const center = size / 2;
+
+    ctx.scale(dpr, dpr);
+    ctx.shadowColor = 'rgba(27, 31, 28, 0.28)';
+    ctx.shadowBlur = 10;
+    ctx.shadowOffsetY = 3;
+    ctx.beginPath();
+    ctx.arc(center, center, radius, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(23, 32, 28, 0.76)';
+    ctx.fill();
+    ctx.shadowColor = 'transparent';
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.78)';
+    ctx.stroke();
+
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+    ctx.font = `850 ${label.length >= 4 ? 10 : 12}px Inter, system-ui, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(label, center, center + 0.5);
 
     const sprite = { canvas, size };
     markerSpriteCache.set(key, sprite);
@@ -556,7 +688,7 @@
       Math.abs(lastMarkerPick.y - clientY) <= 18;
     const index = repeatedPick ? (lastMarkerPick.index + 1) % candidates.length : 0;
     lastMarkerPick = { key, index, x: clientX, y: clientY };
-    return candidates[index].restaurant;
+    return candidates[index];
   }
 
   function setCenterRaf(nextCenter) {
@@ -707,7 +839,11 @@
     flushPendingCenter();
     if (!dragMoved && !isMapChrome(event.target)) {
       const picked = pickMarker(event.clientX, event.clientY);
-      if (picked) selectRestaurant(picked);
+      if (picked?.type === 'cluster') {
+        focusCluster(picked.cluster);
+      } else if (picked?.restaurant) {
+        selectRestaurant(picked.restaurant);
+      }
     }
     activePointer = null;
     dragStart = null;
@@ -753,6 +889,17 @@
     if (!Number.isFinite(restaurant?.lat) || !Number.isFinite(restaurant?.lon)) return;
     center = { lat: restaurant.lat, lon: restaurant.lon };
     homeViewApplied = true;
+  }
+
+  function focusCluster(cluster) {
+    if (!cluster) return;
+    selected = null;
+    mapWasInteractedWith = true;
+    center = { lat: cluster.lat, lon: cluster.lon };
+    const targetZoom = zoom >= CLUSTER_DISABLE_ZOOM - 1 ? CLUSTER_DISABLE_ZOOM : zoom + CLUSTER_ZOOM_STEP;
+    zoom = clamp(targetZoom, minZoom, MAX_ZOOM);
+    homeViewApplied = true;
+    lastMarkerPick = null;
   }
 
   function closeDetails() {
