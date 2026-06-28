@@ -717,17 +717,32 @@
     if (isMapChrome(event.target)) return;
     event.preventDefault();
     mapWasInteractedWith = true;
+    flushPendingCenter();
     const direction = event.deltaY > 0 ? -1 : 1;
     zoomAt(event.clientX, event.clientY, direction);
+    if (dragStart && activePointer !== null) {
+      const pointer = activePointers.get(activePointer) || eventPoint(event);
+      dragStart = {
+        x: pointer.x,
+        y: pointer.y,
+        centerPx: project(center.lat, center.lon, zoom)
+      };
+      dragMoved = true;
+    }
   }
 
   function zoomAt(clientX, clientY, delta) {
     const nextZoom = clamp(zoom + delta, minZoom, MAX_ZOOM);
     if (nextZoom === zoom || !mapEl) return;
     const rect = mapEl.getBoundingClientRect();
+    const currentCenter = project(center.lat, center.lon, zoom);
+    const currentTopLeft = {
+      x: currentCenter.x - width / 2,
+      y: currentCenter.y - height / 2
+    };
     const before = {
-      x: topLeft.x + clientX - rect.left,
-      y: topLeft.y + clientY - rect.top
+      x: currentTopLeft.x + clientX - rect.left,
+      y: currentTopLeft.y + clientY - rect.top
     };
     const beforeGeo = unproject(before.x, before.y, zoom);
     const afterPoint = project(beforeGeo.lat, beforeGeo.lon, nextZoom);
