@@ -20,8 +20,10 @@
   const MARKER_SPRITE_PADDING = 10;
   const PINCH_ZOOM_THRESHOLD = 1.16;
   const DESCRIPTION_VISIBLE_LINES = 4;
+  const MOBILE_SEARCH_VISIBLE_RESULTS = 4;
 
   let mapEl;
+  let topbarEl;
   let markerCanvas;
   let restaurants = [];
   let stats = null;
@@ -29,6 +31,7 @@
   let loadError = '';
   let width = 0;
   let height = 0;
+  let topbarHeight = 56;
   let minZoom = 5;
   let center = DEFAULT_CENTER;
   let zoom = DEFAULT_ZOOM;
@@ -52,7 +55,7 @@
   let locationStatus = '';
   let locationWatchId = null;
   let homeViewApplied = false;
-  let pendingLocationView = null;
+  let mapWasInteractedWith = false;
   let descriptionEl;
   let descriptionHasMore = false;
   let descriptionCanScrollDown = false;
@@ -77,6 +80,7 @@
   onMount(() => {
     resizeObserver = new ResizeObserver(updateSize);
     if (mapEl) resizeObserver.observe(mapEl);
+    if (topbarEl) resizeObserver.observe(topbarEl);
     updateSize();
     loadRestaurants();
     startLocationTracking();
@@ -212,10 +216,14 @@
   }
 
   function updateSize() {
-    if (!mapEl) return;
-    const rect = mapEl.getBoundingClientRect();
-    width = rect.width;
-    height = rect.height;
+    if (mapEl) {
+      const rect = mapEl.getBoundingClientRect();
+      width = rect.width;
+      height = rect.height;
+    }
+    if (topbarEl) {
+      topbarHeight = Math.ceil(topbarEl.getBoundingClientRect().height);
+    }
     applyFallbackHomeView();
   }
 
@@ -324,12 +332,13 @@
     return markers;
   }
 
-  function markerColor(priceRange) {
-    if (priceRange === '$') return '#2d8a5f';
-    if (priceRange === '$$') return '#2770a7';
-    if (priceRange === '$$$') return '#7f52a1';
-    if (priceRange === '$$$$') return '#252a31';
-    return '#d43d2f';
+  function markerColor(priceRange, active = false) {
+    const alpha = active ? 0.95 : 0.68;
+    if (priceRange === '$') return `rgba(45, 138, 95, ${alpha})`;
+    if (priceRange === '$$') return `rgba(39, 112, 167, ${alpha})`;
+    if (priceRange === '$$$') return `rgba(127, 82, 161, ${alpha})`;
+    if (priceRange === '$$$$') return `rgba(37, 42, 49, ${alpha})`;
+    return `rgba(212, 61, 47, ${alpha})`;
   }
 
   function scheduleMarkerDraw(items, origin, viewportWidth, viewportHeight, z, selectedId, location) {
@@ -402,7 +411,7 @@
     ctx.shadowOffsetY = active ? 4 : 3;
     ctx.beginPath();
     ctx.arc(center, center, radius, 0, Math.PI * 2);
-    ctx.fillStyle = markerColor(priceRange);
+    ctx.fillStyle = markerColor(priceRange, active);
     ctx.fill();
     ctx.shadowColor = 'transparent';
     ctx.lineWidth = active ? 3 : 2;
@@ -519,34 +528,11 @@
     pendingCenter = null;
   }
 
-  function isMapInteractionActive() {
-    return activePointers.size > 0 || Boolean(pinchStart) || Boolean(dragStart);
-  }
-
-  function setLocationView(location, options = {}) {
+  function setLocationView(location) {
     if (!location) return;
-    const nextLocationView = {
-      center: { lat: location.lat, lon: location.lon },
-      zoom: clamp(LOCATION_ZOOM, minZoom, MAX_ZOOM)
-    };
-
-    if (options.deferWhileInteracting && isMapInteractionActive()) {
-      pendingLocationView = nextLocationView;
-      return;
-    }
-
-    pendingLocationView = null;
-    center = nextLocationView.center;
-    zoom = nextLocationView.zoom;
+    center = { lat: location.lat, lon: location.lon };
+    zoom = clamp(LOCATION_ZOOM, minZoom, MAX_ZOOM);
     homeViewApplied = true;
-  }
-
-  function applyPendingLocationView() {
-    if (!pendingLocationView || isMapInteractionActive()) return;
-    center = pendingLocationView.center;
-    zoom = pendingLocationView.zoom;
-    homeViewApplied = true;
-    pendingLocationView = null;
   }
 
   function eventPoint(event) {
@@ -608,6 +594,7 @@
   function onPointerDown(event) {
     if (isMapChrome(event.target)) return;
     if (event.button !== undefined && event.button !== 0) return;
+    mapWasInteractedWith = true;
     activePointers.set(event.pointerId, eventPoint(event));
     mapEl?.setPointerCapture?.(event.pointerId);
     if (activePointers.size >= 2) {
@@ -660,7 +647,6 @@
         activePointer = null;
         dragStart = null;
       }
-      applyPendingLocationView();
       return;
     }
 
@@ -672,11 +658,11 @@
     }
     activePointer = null;
     dragStart = null;
-    applyPendingLocationView();
   }
 
   function onWheel(event) {
     event.preventDefault();
+    mapWasInteractedWith = true;
     const direction = event.deltaY > 0 ? -1 : 1;
     zoomAt(event.clientX, event.clientY, direction);
   }
@@ -705,6 +691,14 @@
 
   function selectRestaurant(restaurant) {
     selected = restaurant;
+  }
+
+  function selectSearchResult(restaurant) {
+    selected = restaurant;
+    mapWasInteractedWith = true;
+    if (!Number.isFinite(restaurant?.lat) || !Number.isFinite(restaurant?.lon)) return;
+    center = { lat: restaurant.lat, lon: restaurant.lon };
+    homeViewApplied = true;
   }
 
   function closeDetails() {
@@ -747,8 +741,8 @@
           accuracy: position.coords.accuracy
         };
         locationStatus = 'Live location on';
-        if (firstLocation) {
-          setLocationView(userLocation, { deferWhileInteracting: true });
+        if (firstLocation && (!mapWasInteractedWith || options.restart)) {
+          setLocationView(userLocation);
         }
       },
       (error) => {
@@ -788,6 +782,7 @@
     on:pointerup={onPointerUp}
     on:pointercancel={onPointerUp}
     on:wheel={onWheel}
+    style={`--topbar-height: ${topbarHeight}px; --mobile-search-visible-results: ${MOBILE_SEARCH_VISIBLE_RESULTS};`}
     role="application"
     aria-label="Restaurant map"
   >
@@ -811,7 +806,7 @@
       <div class="state-pill error">{loadError}</div>
     {/if}
 
-    <div class="topbar">
+    <div class="topbar" bind:this={topbarEl}>
       <label class="search">
         <span>Search</span>
         <div class="search-field">
@@ -860,7 +855,7 @@
     {#if searchResults.length}
       <div class="results-panel">
         {#each searchResults as result (result.id)}
-          <button type="button" on:click={() => selectRestaurant(result)}>
+          <button type="button" on:click={() => selectSearchResult(result)}>
             <strong>{result.name}</strong>
             <span>{result.address}</span>
           </button>
@@ -1193,7 +1188,7 @@
 
   .results-panel {
     position: absolute;
-    top: 76px;
+    top: calc(max(12px, env(safe-area-inset-top)) + var(--topbar-height, 56px) + 8px);
     left: 12px;
     width: min(420px, calc(100vw - 24px));
     max-height: min(46vh, 420px);
@@ -1553,6 +1548,24 @@
     .roadmap-menu summary {
       padding: 0 8px;
       font-size: 13px;
+    }
+
+    .results-panel {
+      max-height: calc(var(--mobile-search-visible-results, 4) * 56px);
+      overscroll-behavior: contain;
+    }
+
+    .results-panel button {
+      height: 56px;
+      padding: 8px 12px;
+      overflow: hidden;
+    }
+
+    .results-panel strong,
+    .results-panel span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .zoom-controls {
