@@ -76,6 +76,7 @@
 
   const prices = ['all', '$', '$$', '$$$', '$$$$'];
   const roadmapItems = [
+    'Offline app',
     'Remove closed restaurants',
     'Add opening times',
     'Add rating information',
