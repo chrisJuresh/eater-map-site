@@ -20,10 +20,12 @@
   const MARKER_SPRITE_PADDING = 10;
   const MARKER_LAYER_OPACITY = 0.42;
   const PRICED_MARKER_LAYER_OPACITY = 1 - (1 - MARKER_LAYER_OPACITY) / 2;
-  const MAP_TILE_FILTER = 'saturate(1.28) contrast(1.06) brightness(1.02)';
+  const WHEEL_ZOOM_PIXEL_SENSITIVITY = 0.0035;
+  const WHEEL_ZOOM_LINE_SENSITIVITY = 0.12;
+  const WHEEL_ZOOM_PAGE_SENSITIVITY = 0.8;
+  const MAX_WHEEL_ZOOM_DELTA = 0.65;
   const FULL_MARKER_ZOOM = 14;
   const MID_MARKER_ZOOM = 12;
-  const PINCH_ZOOM_THRESHOLD = 1.16;
   const DESCRIPTION_VISIBLE_LINES = 4;
   const MOBILE_SEARCH_VISIBLE_RESULTS = 4;
 
@@ -130,6 +132,7 @@
     y: projectedCenter.y - height / 2
   };
   $: visibleTiles = getVisibleTiles(topLeft, width, height, zoom);
+  $: fallbackTiles = getFallbackTiles(topLeft, width, height, zoom);
   $: searchResults = searchText ? filteredRestaurants.slice(0, SEARCH_LIMIT) : [];
   $: totalCount = stats?.entryCount || restaurants.length;
   $: minZoom = getMinimumZoom(stats?.bounds);
@@ -317,6 +320,10 @@
     return getFitZoom(bounds, VIEW_FIT_PADDING, MAX_ZOOM, MIN_ZOOM_FLOOR) || 5;
   }
 
+  function getTileZoom(z) {
+    return clamp(Math.floor(z), MIN_ZOOM_FLOOR, MAX_ZOOM);
+  }
+
   function fitBounds(bounds, options = {}) {
     if (!bounds || !width || !height) return false;
     const padding = options.padding ?? VIEW_FIT_PADDING;
@@ -335,25 +342,44 @@
     }
   }
 
-  function getVisibleTiles(origin, viewportWidth, viewportHeight, z) {
+  function getTileLevelTiles(origin, viewportWidth, viewportHeight, displayZoom, tileZoom, keyPrefix = '') {
     if (!viewportWidth || !viewportHeight) return [];
-    const scaleTiles = 2 ** z;
-    const minX = Math.floor(origin.x / TILE_SIZE) - 1;
-    const maxX = Math.floor((origin.x + viewportWidth) / TILE_SIZE) + 1;
-    const minY = Math.floor(origin.y / TILE_SIZE) - 1;
-    const maxY = Math.floor((origin.y + viewportHeight) / TILE_SIZE) + 1;
+    const tileSize = TILE_SIZE * 2 ** (displayZoom - tileZoom);
+    const scaleTiles = 2 ** tileZoom;
+    const minX = Math.floor(origin.x / tileSize) - 1;
+    const maxX = Math.floor((origin.x + viewportWidth) / tileSize) + 1;
+    const minY = Math.floor(origin.y / tileSize) - 1;
+    const maxY = Math.floor((origin.y + viewportHeight) / tileSize) + 1;
     const tiles = [];
     for (let x = minX; x <= maxX; x += 1) {
       for (let y = minY; y <= maxY; y += 1) {
         if (y < 0 || y >= scaleTiles) continue;
         const wrappedX = ((x % scaleTiles) + scaleTiles) % scaleTiles;
         tiles.push({
-          key: `${z}-${x}-${y}`,
-          url: `https://tile.openstreetmap.org/${z}/${wrappedX}/${y}.png`,
-          left: x * TILE_SIZE - origin.x,
-          top: y * TILE_SIZE - origin.y
+          key: `${keyPrefix}${tileZoom}-${x}-${y}`,
+          url: `https://tile.openstreetmap.org/${tileZoom}/${wrappedX}/${y}.png`,
+          left: x * tileSize - origin.x,
+          top: y * tileSize - origin.y,
+          size: tileSize
         });
       }
+    }
+    return tiles;
+  }
+
+  function getVisibleTiles(origin, viewportWidth, viewportHeight, z) {
+    const tileZoom = getTileZoom(z);
+    return getTileLevelTiles(origin, viewportWidth, viewportHeight, z, tileZoom);
+  }
+
+  function getFallbackTiles(origin, viewportWidth, viewportHeight, z) {
+    if (!viewportWidth || !viewportHeight) return [];
+    const tileZoom = getTileZoom(z);
+    if (tileZoom <= MIN_ZOOM_FLOOR) return [];
+    const tiles = [];
+    const lowestFallbackZoom = Math.max(MIN_ZOOM_FLOOR, tileZoom - 2);
+    for (let fallbackZoom = lowestFallbackZoom; fallbackZoom < tileZoom; fallbackZoom += 1) {
+      tiles.push(...getTileLevelTiles(origin, viewportWidth, viewportHeight, z, fallbackZoom, 'fallback-'));
     }
     return tiles;
   }
@@ -675,11 +701,13 @@
   function startPinch() {
     const [first, second] = firstTwoPointers();
     if (!first || !second) return;
+    flushPendingCenter();
     const midpoint = pointerMidpoint(first, second);
     pinchStart = {
       distance: pointerDistance(first, second),
       midpoint,
-      centerPx: project(center.lat, center.lon, zoom)
+      zoom,
+      anchorGeo: geoAtClient(midpoint.x, midpoint.y)
     };
     activePointer = null;
     dragStart = null;
@@ -694,19 +722,8 @@
 
     const distance = pointerDistance(first, second);
     const midpoint = pointerMidpoint(first, second);
-    const dx = midpoint.x - pinchStart.midpoint.x;
-    const dy = midpoint.y - pinchStart.midpoint.y;
-    setCenterRaf(unproject(pinchStart.centerPx.x - dx, pinchStart.centerPx.y - dy, zoom));
-
-    if (distance > pinchStart.distance * PINCH_ZOOM_THRESHOLD) {
-      flushPendingCenter();
-      zoomAt(midpoint.x, midpoint.y, 1);
-      startPinch();
-    } else if (distance < pinchStart.distance / PINCH_ZOOM_THRESHOLD) {
-      flushPendingCenter();
-      zoomAt(midpoint.x, midpoint.y, -1);
-      startPinch();
-    }
+    const nextZoom = clamp(pinchStart.zoom + Math.log2(Math.max(1, distance) / Math.max(1, pinchStart.distance)), minZoom, MAX_ZOOM);
+    setZoomAtClient(midpoint.x, midpoint.y, nextZoom, pinchStart.anchorGeo);
   }
 
   function onPointerDown(event) {
@@ -781,10 +798,10 @@
   function onWheel(event) {
     if (isMapChrome(event.target)) return;
     event.preventDefault();
+    if (!event.deltaY) return;
     mapWasInteractedWith = true;
     flushPendingCenter();
-    const direction = event.deltaY > 0 ? -1 : 1;
-    zoomAt(event.clientX, event.clientY, direction);
+    zoomAt(event.clientX, event.clientY, getWheelZoomDelta(event));
     if (dragStart && activePointer !== null) {
       const pointer = activePointers.get(activePointer) || eventPoint(event);
       dragStart = {
@@ -796,27 +813,46 @@
     }
   }
 
-  function zoomAt(clientX, clientY, delta) {
-    const nextZoom = clamp(zoom + delta, minZoom, MAX_ZOOM);
-    if (nextZoom === zoom || !mapEl) return;
+  function getWheelZoomDelta(event) {
+    const sensitivity =
+      event.deltaMode === 1
+        ? WHEEL_ZOOM_LINE_SENSITIVITY
+        : event.deltaMode === 2
+          ? WHEEL_ZOOM_PAGE_SENSITIVITY
+          : WHEEL_ZOOM_PIXEL_SENSITIVITY;
+    return clamp(-event.deltaY * sensitivity, -MAX_WHEEL_ZOOM_DELTA, MAX_WHEEL_ZOOM_DELTA);
+  }
+
+  function geoAtClient(clientX, clientY) {
+    if (!mapEl) return center;
     const rect = mapEl.getBoundingClientRect();
     const currentCenter = project(center.lat, center.lon, zoom);
     const currentTopLeft = {
       x: currentCenter.x - width / 2,
       y: currentCenter.y - height / 2
     };
-    const before = {
-      x: currentTopLeft.x + clientX - rect.left,
-      y: currentTopLeft.y + clientY - rect.top
-    };
-    const beforeGeo = unproject(before.x, before.y, zoom);
-    const afterPoint = project(beforeGeo.lat, beforeGeo.lon, nextZoom);
+    return unproject(currentTopLeft.x + clientX - rect.left, currentTopLeft.y + clientY - rect.top, zoom);
+  }
+
+  function setZoomAtClient(clientX, clientY, nextZoom, anchorGeo = null) {
+    if (!mapEl) return;
+    const clampedZoom = clamp(nextZoom, minZoom, MAX_ZOOM);
+    if (clampedZoom === zoom && !anchorGeo) return;
+    const rect = mapEl.getBoundingClientRect();
+    const anchor = anchorGeo || geoAtClient(clientX, clientY);
+    const afterPoint = project(anchor.lat, anchor.lon, clampedZoom);
     const nextTopLeft = {
       x: afterPoint.x - (clientX - rect.left),
       y: afterPoint.y - (clientY - rect.top)
     };
-    center = unproject(nextTopLeft.x + width / 2, nextTopLeft.y + height / 2, nextZoom);
-    zoom = nextZoom;
+    center = unproject(nextTopLeft.x + width / 2, nextTopLeft.y + height / 2, clampedZoom);
+    zoom = clampedZoom;
+  }
+
+  function zoomAt(clientX, clientY, delta) {
+    const nextZoom = clamp(zoom + delta, minZoom, MAX_ZOOM);
+    if (nextZoom === zoom) return;
+    setZoomAtClient(clientX, clientY, nextZoom);
   }
 
   function zoomButton(delta) {
@@ -916,18 +952,27 @@
     on:pointerup={onPointerUp}
     on:pointercancel={onPointerUp}
     on:wheel={onWheel}
-    style={`--topbar-height: ${topbarHeight}px; --mobile-search-visible-results: ${MOBILE_SEARCH_VISIBLE_RESULTS}; --map-tile-filter: ${MAP_TILE_FILTER};`}
+    style={`--topbar-height: ${topbarHeight}px; --mobile-search-visible-results: ${MOBILE_SEARCH_VISIBLE_RESULTS};`}
     role="application"
     aria-label="Restaurant map"
   >
     <div class="tile-layer" aria-hidden="true">
+      {#each fallbackTiles as tile (tile.key)}
+        <img
+          class="tile tile-fallback"
+          src={tile.url}
+          alt=""
+          draggable="false"
+          style={`width: ${tile.size}px; height: ${tile.size}px; transform: translate3d(${tile.left}px, ${tile.top}px, 0);`}
+        />
+      {/each}
       {#each visibleTiles as tile (tile.key)}
         <img
           class="tile"
           src={tile.url}
           alt=""
           draggable="false"
-          style={`transform: translate3d(${tile.left}px, ${tile.top}px, 0);`}
+          style={`width: ${tile.size}px; height: ${tile.size}px; transform: translate3d(${tile.left}px, ${tile.top}px, 0);`}
         />
       {/each}
     </div>
@@ -1125,10 +1170,6 @@
     inset: 0;
   }
 
-  .tile-layer {
-    filter: var(--map-tile-filter, none);
-  }
-
   .marker-layer {
     z-index: 2;
     pointer-events: none;
@@ -1140,6 +1181,7 @@
     height: 256px;
     user-select: none;
     will-change: transform;
+    backface-visibility: hidden;
   }
 
   .topbar {
