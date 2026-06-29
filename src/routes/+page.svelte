@@ -21,6 +21,8 @@
   const MARKER_LAYER_OPACITY = 0.42;
   const PRICED_MARKER_LAYER_OPACITY = 1 - (1 - MARKER_LAYER_OPACITY) / 2;
   const MAP_TILE_FILTER = 'saturate(1.28) contrast(1.06) brightness(1.02)';
+  const WHEEL_ZOOM_DELTA_THRESHOLD = 80;
+  const WHEEL_ZOOM_COOLDOWN_MS = 90;
   const FULL_MARKER_ZOOM = 14;
   const MID_MARKER_ZOOM = 12;
   const PINCH_ZOOM_THRESHOLD = 1.16;
@@ -56,6 +58,8 @@
   let markerDrawFrame = 0;
   let panFrame = 0;
   let pendingCenter = null;
+  let wheelDeltaY = 0;
+  let lastWheelZoomAt = 0;
   let lastMarkerPick = null;
   let userLocation = null;
   let locationStatus = '';
@@ -129,6 +133,7 @@
     y: projectedCenter.y - height / 2
   };
   $: visibleTiles = getVisibleTiles(topLeft, width, height, zoom);
+  $: fallbackTiles = getFallbackTiles(topLeft, width, height, zoom);
   $: searchResults = searchText ? filteredRestaurants.slice(0, SEARCH_LIMIT) : [];
   $: totalCount = stats?.entryCount || restaurants.length;
   $: minZoom = getMinimumZoom(stats?.bounds);
@@ -351,6 +356,33 @@
           url: `https://tile.openstreetmap.org/${z}/${wrappedX}/${y}.png`,
           left: x * TILE_SIZE - origin.x,
           top: y * TILE_SIZE - origin.y
+        });
+      }
+    }
+    return tiles;
+  }
+
+  function getFallbackTiles(origin, viewportWidth, viewportHeight, z) {
+    if (!viewportWidth || !viewportHeight || z <= MIN_ZOOM_FLOOR) return [];
+    const fallbackZoom = z - 1;
+    const tileScale = 2 ** (z - fallbackZoom);
+    const fallbackTileSize = TILE_SIZE * tileScale;
+    const scaleTiles = 2 ** fallbackZoom;
+    const minX = Math.floor(origin.x / fallbackTileSize) - 1;
+    const maxX = Math.floor((origin.x + viewportWidth) / fallbackTileSize) + 1;
+    const minY = Math.floor(origin.y / fallbackTileSize) - 1;
+    const maxY = Math.floor((origin.y + viewportHeight) / fallbackTileSize) + 1;
+    const tiles = [];
+    for (let x = minX; x <= maxX; x += 1) {
+      for (let y = minY; y <= maxY; y += 1) {
+        if (y < 0 || y >= scaleTiles) continue;
+        const wrappedX = ((x % scaleTiles) + scaleTiles) % scaleTiles;
+        tiles.push({
+          key: `${fallbackZoom}-${x}-${y}`,
+          url: `https://tile.openstreetmap.org/${fallbackZoom}/${wrappedX}/${y}.png`,
+          left: x * fallbackTileSize - origin.x,
+          top: y * fallbackTileSize - origin.y,
+          size: fallbackTileSize
         });
       }
     }
@@ -780,9 +812,16 @@
   function onWheel(event) {
     if (isMapChrome(event.target)) return;
     event.preventDefault();
+    if (!event.deltaY) return;
     mapWasInteractedWith = true;
+    wheelDeltaY += event.deltaY;
+    const threshold = event.deltaMode === 1 ? 3 : WHEEL_ZOOM_DELTA_THRESHOLD;
+    const now = performance.now();
+    if (Math.abs(wheelDeltaY) < threshold || now - lastWheelZoomAt < WHEEL_ZOOM_COOLDOWN_MS) return;
     flushPendingCenter();
-    const direction = event.deltaY > 0 ? -1 : 1;
+    const direction = wheelDeltaY > 0 ? -1 : 1;
+    wheelDeltaY = 0;
+    lastWheelZoomAt = now;
     zoomAt(event.clientX, event.clientY, direction);
     if (dragStart && activePointer !== null) {
       const pointer = activePointers.get(activePointer) || eventPoint(event);
@@ -920,6 +959,15 @@
     aria-label="Restaurant map"
   >
     <div class="tile-layer" aria-hidden="true">
+      {#each fallbackTiles as tile (tile.key)}
+        <img
+          class="tile tile-fallback"
+          src={tile.url}
+          alt=""
+          draggable="false"
+          style={`width: ${tile.size}px; height: ${tile.size}px; transform: translate3d(${tile.left}px, ${tile.top}px, 0);`}
+        />
+      {/each}
       {#each visibleTiles as tile (tile.key)}
         <img
           class="tile"
