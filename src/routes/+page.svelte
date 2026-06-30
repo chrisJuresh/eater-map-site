@@ -134,7 +134,7 @@
   $: fallbackTiles = getFallbackTiles(topLeft, width, height, zoom);
   $: searchResults = searchText ? filteredRestaurants.slice(0, SEARCH_LIMIT) : [];
   $: selectedGoogleMapsUrl = selected ? getGoogleMapsUrl(selected) : '';
-  $: selectedCitymapperUrl = selected ? getCitymapperUrl(selected) : '';
+  $: selectedCitymapperLinks = selected ? getCitymapperLinks(selected) : null;
   $: totalCount = stats?.entryCount || restaurants.length;
   $: minZoom = getMinimumZoom(stats?.bounds);
   $: if (zoom < minZoom) zoom = minZoom;
@@ -311,13 +311,51 @@
     return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
   }
 
-  function getCitymapperUrl(restaurant) {
-    if (!hasCoordinates(restaurant)) return '';
+  function getCitymapperLinks(restaurant) {
+    if (!hasCoordinates(restaurant)) return null;
     const params = new URLSearchParams({
       endcoord: `${restaurant.lat},${restaurant.lon}`,
       endname: restaurant.name || restaurant.address || 'Restaurant'
     });
-    return `https://citymapper.com/directions?${params.toString()}`;
+    const query = params.toString();
+    const webUrl = `https://citymapper.com/directions?${query}`;
+    return {
+      webUrl,
+      appUrl: `citymapper://directions?${query}`,
+      androidIntentUrl: `intent://directions?${query}#Intent;scheme=citymapper;package=com.citymapper.app.release;S.browser_fallback_url=${encodeURIComponent(webUrl)};end`
+    };
+  }
+
+  function openCitymapper(event, links) {
+    if (!links || typeof navigator === 'undefined' || typeof window === 'undefined') return;
+    const userAgent = navigator.userAgent || '';
+    const isAndroid = /Android/i.test(userAgent);
+    const isAppleMobile = /iPhone|iPad|iPod/i.test(userAgent);
+    if (!isAndroid && !isAppleMobile) return;
+
+    event.preventDefault();
+    if (isAndroid) {
+      window.location.href = links.androidIntentUrl;
+      return;
+    }
+
+    let fallbackTimer;
+    const cleanup = () => {
+      window.clearTimeout(fallbackTimer);
+      window.removeEventListener('pagehide', cleanup);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+    const handleVisibilityChange = () => {
+      if (document.visibilityState !== 'visible') cleanup();
+    };
+
+    window.addEventListener('pagehide', cleanup, { once: true });
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    fallbackTimer = window.setTimeout(() => {
+      cleanup();
+      if (document.visibilityState === 'visible') window.location.href = links.webUrl;
+    }, 900);
+    window.location.href = links.appUrl;
   }
 
   function getFitZoom(bounds, padding = VIEW_FIT_PADDING, maxZoom = MAX_ZOOM, minZoomLimit = MIN_ZOOM_FLOOR) {
@@ -1133,8 +1171,14 @@
             <span class="action-label-short">Google</span>
           </a>
         {/if}
-        {#if selectedCitymapperUrl}
-          <a href={selectedCitymapperUrl} target="_blank" rel="noreferrer" aria-label={`Open directions to ${selected.name} in Citymapper`}>
+        {#if selectedCitymapperLinks}
+          <a
+            href={selectedCitymapperLinks.webUrl}
+            target="_blank"
+            rel="noreferrer"
+            aria-label={`Open directions to ${selected.name} in Citymapper`}
+            on:click={(event) => openCitymapper(event, selectedCitymapperLinks)}
+          >
             Citymapper
           </a>
         {/if}
