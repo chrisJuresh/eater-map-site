@@ -1139,10 +1139,9 @@
         {/if}
         {#if selectedCitymapperUrl}
           <a
+            class="citymapper-action"
             href={selectedCitymapperUrl}
-            target="_blank"
-            rel="noreferrer"
-            aria-label={`Open directions to ${selected.name} in Citymapper`}
+            aria-label={`Open mobile directions to ${selected.name} in Citymapper`}
           >
             Citymapper
           </a>
@@ -1620,6 +1619,10 @@
     font-weight: 800;
   }
 
+  .actions .citymapper-action {
+    display: none;
+  }
+
   .action-label-short {
     display: none;
   }
@@ -1785,6 +1788,10 @@
       padding: 0 10px;
       font-size: 12px;
       white-space: nowrap;
+    }
+
+    .actions .citymapper-action {
+      display: grid;
     }
 
     .action-label-full {
