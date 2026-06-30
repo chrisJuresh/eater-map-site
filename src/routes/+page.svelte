@@ -28,6 +28,8 @@
   const MID_MARKER_ZOOM = 12;
   const DESCRIPTION_VISIBLE_LINES = 4;
   const MOBILE_SEARCH_VISIBLE_RESULTS = 4;
+  const CITYMAPPER_ANDROID_PACKAGE = 'com.citymapper.app.release';
+  const CITYMAPPER_ANDROID_STORE_URL = `https://play.google.com/store/apps/details?id=${CITYMAPPER_ANDROID_PACKAGE}`;
 
   let mapEl;
   let topbarEl;
@@ -75,6 +77,7 @@
   let searchResultsScrollbar = { top: 0, height: 100 };
   let searchResultsMeasureToken = 0;
   let measuredSearchText = '';
+  let isAndroidDevice = false;
 
   const prices = ['all', '$', '$$', '$$$', '$$$$'];
   const roadmapItems = [
@@ -92,6 +95,7 @@
   ];
 
   onMount(() => {
+    isAndroidDevice = /Android/i.test(navigator.userAgent || '');
     resizeObserver = new ResizeObserver(updateSize);
     if (mapEl) resizeObserver.observe(mapEl);
     if (topbarEl) resizeObserver.observe(topbarEl);
@@ -134,6 +138,8 @@
   $: visibleTiles = getVisibleTiles(topLeft, width, height, zoom);
   $: fallbackTiles = getFallbackTiles(topLeft, width, height, zoom);
   $: searchResults = searchText ? filteredRestaurants.slice(0, SEARCH_LIMIT) : [];
+  $: selectedGoogleMapsUrl = selected ? getGoogleMapsUrl(selected) : '';
+  $: selectedCitymapperUrl = selected ? getCitymapperUrl(selected, userLocation, isAndroidDevice) : '';
   $: totalCount = stats?.entryCount || restaurants.length;
   $: minZoom = getMinimumZoom(stats?.bounds);
   $: if (zoom < minZoom) zoom = minZoom;
@@ -297,6 +303,32 @@
       lat: clamp(lat, -85.05112878, 85.05112878),
       lon: clamp(lon, -180, 180)
     };
+  }
+
+  function hasCoordinates(restaurant) {
+    return Number.isFinite(restaurant?.lat) && Number.isFinite(restaurant?.lon);
+  }
+
+  function getGoogleMapsUrl(restaurant) {
+    if (restaurant?.googleMapsUrl) return restaurant.googleMapsUrl;
+    if (!hasCoordinates(restaurant)) return '';
+    const query = [restaurant.name, restaurant.address].filter(Boolean).join(', ') || `${restaurant.lat},${restaurant.lon}`;
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+  }
+
+  function getCitymapperUrl(restaurant, location = null, useAndroidIntent = false) {
+    if (!hasCoordinates(restaurant)) return '';
+    const params = new URLSearchParams({
+      endcoord: `${restaurant.lat},${restaurant.lon}`,
+      endname: restaurant.name || restaurant.address || 'Restaurant'
+    });
+    if (hasCoordinates(location)) {
+      params.set('startcoord', `${location.lat},${location.lon}`);
+      params.set('startname', 'Current Location');
+    }
+    const query = params.toString();
+    if (!useAndroidIntent) return `https://citymapper.com/directions?${query}`;
+    return `intent://directions?${query}#Intent;scheme=citymapper;package=${CITYMAPPER_ANDROID_PACKAGE};S.browser_fallback_url=${encodeURIComponent(CITYMAPPER_ANDROID_STORE_URL)};end`;
   }
 
   function getFitZoom(bounds, padding = VIEW_FIT_PADDING, maxZoom = MAX_ZOOM, minZoomLimit = MIN_ZOOM_FLOOR) {
@@ -1106,7 +1138,21 @@
       </dl>
 
       <div class="actions">
-        <a href={selected.googleMapsUrl} target="_blank" rel="noreferrer">Map</a>
+        {#if selectedGoogleMapsUrl}
+          <a href={selectedGoogleMapsUrl} target="_blank" rel="noreferrer" aria-label={`Open ${selected.name} in Google Maps`}>
+            <span class="action-label-full">Google Maps</span>
+            <span class="action-label-short">Google</span>
+          </a>
+        {/if}
+        {#if selectedCitymapperUrl}
+          <a
+            class="citymapper-action"
+            href={selectedCitymapperUrl}
+            aria-label={`Open mobile directions to ${selected.name} in Citymapper`}
+          >
+            Citymapper
+          </a>
+        {/if}
         {#if selected.websiteUrl}<a href={selected.websiteUrl} target="_blank" rel="noreferrer">Website</a>{/if}
         {#if selected.bookingUrl}<a href={selected.bookingUrl} target="_blank" rel="noreferrer">Book</a>{/if}
         {#if selected.entryUrl}<a href={selected.entryUrl} target="_blank" rel="noreferrer">Eater</a>{/if}
@@ -1580,6 +1626,14 @@
     font-weight: 800;
   }
 
+  .actions .citymapper-action {
+    display: none;
+  }
+
+  .action-label-short {
+    display: none;
+  }
+
   .empty-panel {
     display: grid;
     align-content: center;
@@ -1720,19 +1774,39 @@
       position: static;
       order: 6;
       display: flex;
+      overflow-x: auto;
       gap: 6px;
       margin: 2px 0 10px;
-      padding: 0;
+      padding: 0 2px 2px;
       background: transparent;
+      overscroll-behavior-x: contain;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .actions::-webkit-scrollbar {
+      display: none;
     }
 
     .actions a {
-      flex: 1 1 0;
-      min-width: 0;
+      flex: 0 0 auto;
+      min-width: 82px;
       min-height: 38px;
-      padding: 0 6px;
+      padding: 0 10px;
       font-size: 12px;
       white-space: nowrap;
+    }
+
+    .actions .citymapper-action {
+      display: grid;
+    }
+
+    .action-label-full {
+      display: none;
+    }
+
+    .action-label-short {
+      display: inline;
     }
 
     .topbar {
