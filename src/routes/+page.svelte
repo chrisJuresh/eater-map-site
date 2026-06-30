@@ -28,6 +28,8 @@
   const MID_MARKER_ZOOM = 12;
   const DESCRIPTION_VISIBLE_LINES = 4;
   const MOBILE_SEARCH_VISIBLE_RESULTS = 4;
+  const CITYMAPPER_ANDROID_PACKAGE = 'com.citymapper.app.release';
+  const CITYMAPPER_ANDROID_STORE_URL = `https://play.google.com/store/apps/details?id=${CITYMAPPER_ANDROID_PACKAGE}`;
 
   let mapEl;
   let topbarEl;
@@ -75,6 +77,7 @@
   let searchResultsScrollbar = { top: 0, height: 100 };
   let searchResultsMeasureToken = 0;
   let measuredSearchText = '';
+  let isAndroidDevice = false;
 
   const prices = ['all', '$', '$$', '$$$', '$$$$'];
   const roadmapItems = [
@@ -91,6 +94,7 @@
   ];
 
   onMount(() => {
+    isAndroidDevice = /Android/i.test(navigator.userAgent || '');
     resizeObserver = new ResizeObserver(updateSize);
     if (mapEl) resizeObserver.observe(mapEl);
     if (topbarEl) resizeObserver.observe(topbarEl);
@@ -134,7 +138,7 @@
   $: fallbackTiles = getFallbackTiles(topLeft, width, height, zoom);
   $: searchResults = searchText ? filteredRestaurants.slice(0, SEARCH_LIMIT) : [];
   $: selectedGoogleMapsUrl = selected ? getGoogleMapsUrl(selected) : '';
-  $: selectedCitymapperUrl = selected ? getCitymapperUrl(selected, userLocation) : '';
+  $: selectedCitymapperUrl = selected ? getCitymapperUrl(selected, userLocation, isAndroidDevice) : '';
   $: totalCount = stats?.entryCount || restaurants.length;
   $: minZoom = getMinimumZoom(stats?.bounds);
   $: if (zoom < minZoom) zoom = minZoom;
@@ -311,7 +315,7 @@
     return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
   }
 
-  function getCitymapperUrl(restaurant, location = null) {
+  function getCitymapperUrl(restaurant, location = null, useAndroidIntent = false) {
     if (!hasCoordinates(restaurant)) return '';
     const params = new URLSearchParams({
       endcoord: `${restaurant.lat},${restaurant.lon}`,
@@ -321,7 +325,9 @@
       params.set('startcoord', `${location.lat},${location.lon}`);
       params.set('startname', 'Current Location');
     }
-    return `https://citymapper.com/directions?${params.toString()}`;
+    const query = params.toString();
+    if (!useAndroidIntent) return `https://citymapper.com/directions?${query}`;
+    return `intent://directions?${query}#Intent;scheme=citymapper;package=${CITYMAPPER_ANDROID_PACKAGE};S.browser_fallback_url=${encodeURIComponent(CITYMAPPER_ANDROID_STORE_URL)};end`;
   }
 
   function getFitZoom(bounds, padding = VIEW_FIT_PADDING, maxZoom = MAX_ZOOM, minZoomLimit = MIN_ZOOM_FLOOR) {
