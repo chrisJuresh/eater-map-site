@@ -6,10 +6,11 @@
   import { layers, namedFlavor } from '@protomaps/basemaps';
 
   const MAX_ZOOM = 18;
-  const MIN_ZOOM = 4;
+  const MIN_ZOOM_ONLINE = 3;
+  const MIN_ZOOM_OFFLINE = 5;
   const LOCATION_ZOOM = 14;
   const SEARCH_ZOOM = 15;
-  // Zoom where the coarse GB basemap hands off to the detailed London basemap.
+  // Zoom where coarse GB tiles hand off to the detailed restaurant-area tiles.
   const BASEMAP_HANDOFF_ZOOM = 9;
   const SEARCH_LIMIT = 80;
   const HOME_VIEW_PADDING = 32;
@@ -18,7 +19,14 @@
   const CITYMAPPER_ANDROID_PACKAGE = 'com.citymapper.app.release';
   const CITYMAPPER_ANDROID_STORE_URL = `https://play.google.com/store/apps/details?id=${CITYMAPPER_ANDROID_PACKAGE}`;
 
-  // ~97% of entries sit inside Greater London; this is the default/home view.
+  // Online: full global vector coverage (keyless). Offline: local tiles only.
+  const ONLINE_STYLE_URL = 'https://tiles.openfreemap.org/styles/positron';
+
+  // The data (and offline basemap) cover Great Britain; keep the offline view here.
+  const COVERAGE_BOUNDS = [
+    [-5.9, 49.8],
+    [1.9, 56.2]
+  ];
   const LONDON_BOUNDS = {
     minLat: 51.2868,
     maxLat: 51.6919,
@@ -26,21 +34,21 @@
     maxLon: 0.334
   };
 
-  // Marker colour by price, matching the previous canvas renderer.
-  const PRICE_COLOR_EXPR = [
-    'match',
-    ['get', 'priceRange'],
-    '$', '#2d8a5f',
-    '$$', '#2770a7',
-    '$$$', '#7f52a1',
-    '$$$$', '#252a31',
-    '#d43d2f'
-  ];
+  // Canvas marker rendering constants (kept from the original renderer).
+  const MARKER_PADDING = 48;
+  const MARKER_SPRITE_PADDING = 10;
+  const MARKER_LAYER_OPACITY = 0.42;
+  const PRICED_MARKER_LAYER_OPACITY = 1 - (1 - MARKER_LAYER_OPACITY) / 2;
+  const FULL_MARKER_ZOOM = 14;
+  const MID_MARKER_ZOOM = 12;
 
   let mapEl;
+  let markerCanvas;
   let topbarEl;
   let map;
   let mapReady = false;
+  let online = true;
+
   let restaurants = [];
   let restaurantById = new Map();
   let stats = null;
@@ -58,6 +66,9 @@
   let mapWasInteractedWith = false;
   let lastMarkerPick = null;
   let resizeObserver;
+  let markerDrawFrame = 0;
+  let markerSpriteCache = new Map();
+  let markerLayerCanvas;
 
   let descriptionEl;
   let descriptionHasMore = false;
@@ -72,51 +83,15 @@
   let measuredSearchText = '';
   let isAndroidDevice = false;
 
-  // Offline download / install-to-home-screen state.
-  let offlineState = 'unknown'; // 'downloading' | 'ready' | 'idle' | 'hidden'
+  // Offline download / install state.
+  let offlineState = 'unknown'; // 'downloading' | 'ready' | 'idle' | 'unknown'
   let downloadLoaded = 0;
   let downloadTotal = 0;
   let deferredInstallPrompt = null;
   let canInstall = false;
   let isIosDevice = false;
   let isStandalone = false;
-  let showIosHelp = false;
-
-  function onBeforeInstallPrompt(event) {
-    event.preventDefault();
-    deferredInstallPrompt = event;
-    canInstall = true;
-  }
-
-  function onServiceWorkerMessage(event) {
-    const data = event.data || {};
-    if (data.type === 'precache-progress') {
-      offlineState = data.loaded >= data.total && data.total > 0 ? 'ready' : 'downloading';
-      downloadLoaded = data.loaded || 0;
-      downloadTotal = data.total || 0;
-    } else if (data.type === 'precache-done') {
-      offlineState = 'ready';
-      if (data.total) {
-        downloadLoaded = data.total;
-        downloadTotal = data.total;
-      }
-    } else if (data.type === 'precache-idle') {
-      if (offlineState === 'unknown') offlineState = 'idle';
-    }
-  }
-
-  async function installApp() {
-    if (deferredInstallPrompt) {
-      deferredInstallPrompt.prompt();
-      await deferredInstallPrompt.userChoice;
-      deferredInstallPrompt = null;
-      canInstall = false;
-    } else if (isIosDevice) {
-      showIosHelp = true;
-    }
-  }
-
-  $: downloadPercent = downloadTotal ? Math.min(100, Math.round((downloadLoaded / downloadTotal) * 100)) : 0;
+  let showInstallHelp = false;
 
   const prices = ['all', '$', '$$', '$$$', '$$$$'];
   const roadmapItems = [
@@ -135,9 +110,46 @@
   onMount(() => {
     isAndroidDevice = /Android/i.test(navigator.userAgent || '');
     isIosDevice = /iPad|iPhone|iPod/i.test(navigator.userAgent || '') && !window.MSStream;
-    isStandalone =
-      window.matchMedia?.('(display-mode: standalone)').matches || navigator.standalone === true;
+    isStandalone = window.matchMedia?.('(display-mode: standalone)').matches || navigator.standalone === true;
+    online = navigator.onLine;
 
+    const protocol = new Protocol();
+    maplibregl.addProtocol('pmtiles', protocol.tile);
+
+    map = new maplibregl.Map({
+      container: mapEl,
+      style: online ? ONLINE_STYLE_URL : buildLocalStyle(),
+      center: [(LONDON_BOUNDS.minLon + LONDON_BOUNDS.maxLon) / 2, (LONDON_BOUNDS.minLat + LONDON_BOUNDS.maxLat) / 2],
+      zoom: 10,
+      minZoom: online ? MIN_ZOOM_ONLINE : MIN_ZOOM_OFFLINE,
+      maxZoom: MAX_ZOOM,
+      maxBounds: online ? undefined : COVERAGE_BOUNDS,
+      attributionControl: false,
+      dragRotate: false,
+      pitchWithRotate: false,
+      renderWorldCopies: false
+    });
+    map.touchZoomRotate.disableRotation();
+
+    map.on('error', (event) => console.error('MapLibre error:', event.error?.message || event.error));
+    map.on('load', () => {
+      mapReady = true;
+      applyFallbackHomeView();
+      scheduleMarkerDraw();
+    });
+    map.on('styledata', scheduleMarkerDraw);
+    map.on('move', scheduleMarkerDraw);
+    map.on('moveend', scheduleMarkerDraw);
+    map.on('movestart', (event) => {
+      if (event.originalEvent) mapWasInteractedWith = true;
+    });
+    map.on('click', (event) => {
+      const picked = pickMarker(event.point);
+      if (picked) selectRestaurant(picked);
+    });
+
+    window.addEventListener('online', onConnectivityChange);
+    window.addEventListener('offline', onConnectivityChange);
     window.addEventListener('beforeinstallprompt', onBeforeInstallPrompt);
     window.addEventListener('appinstalled', () => {
       canInstall = false;
@@ -150,36 +162,11 @@
         .catch(() => {});
     }
 
-    const protocol = new Protocol();
-    maplibregl.addProtocol('pmtiles', protocol.tile);
-
-    map = new maplibregl.Map({
-      container: mapEl,
-      style: buildStyle(),
-      center: [(LONDON_BOUNDS.minLon + LONDON_BOUNDS.maxLon) / 2, (LONDON_BOUNDS.minLat + LONDON_BOUNDS.maxLat) / 2],
-      zoom: 10,
-      minZoom: MIN_ZOOM,
-      maxZoom: MAX_ZOOM,
-      attributionControl: false,
-      dragRotate: false,
-      pitchWithRotate: false,
-      renderWorldCopies: false
-    });
-    map.touchZoomRotate.disableRotation();
-    map.keyboard.disableRotation?.();
-
-    map.on('error', (event) => console.error('MapLibre error:', event.error?.message || event.error, event.error));
-    map.on('load', onMapLoad);
-    map.on('movestart', (event) => {
-      if (event.originalEvent) mapWasInteractedWith = true;
-    });
-    map.on('moveend', updateVisibleMarkerCount);
-    map.on('idle', updateVisibleMarkerCount);
-
     resizeObserver = new ResizeObserver(() => {
       map?.resize();
       if (topbarEl) topbarHeight = Math.ceil(topbarEl.getBoundingClientRect().height);
       updateSearchResultsScrollState();
+      scheduleMarkerDraw();
     });
     if (mapEl) resizeObserver.observe(mapEl);
     if (topbarEl) resizeObserver.observe(topbarEl);
@@ -191,12 +178,12 @@
     return () => {
       resizeObserver?.disconnect();
       stopLocationTracking();
+      window.removeEventListener('online', onConnectivityChange);
+      window.removeEventListener('offline', onConnectivityChange);
+      window.removeEventListener('beforeinstallprompt', onBeforeInstallPrompt);
+      if ('serviceWorker' in navigator) navigator.serviceWorker.removeEventListener('message', onServiceWorkerMessage);
       map?.remove();
       maplibregl.removeProtocol('pmtiles');
-      window.removeEventListener('beforeinstallprompt', onBeforeInstallPrompt);
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.removeEventListener('message', onServiceWorkerMessage);
-      }
     };
   });
 
@@ -205,21 +192,73 @@
     return `${origin}${path}`;
   }
 
-  function buildStyle() {
+  function buildLocalStyle() {
     const flavor = namedFlavor('light');
-    // Coarse whole-country tiles render below the handoff zoom; detailed London
-    // tiles render at/above it. Splitting by zoom avoids double-drawn labels.
+    // Coarse whole-country tiles below the handoff zoom; detailed restaurant-area
+    // tiles at/above it. Namespacing keeps the two layer sets' ids unique.
     const gbLayers = layers('gb', flavor, { lang: 'en' }).map((layer) => ({
       ...layer,
       maxzoom: BASEMAP_HANDOFF_ZOOM
     }));
-    // The two layer sets share layer ids, so namespace the London ones to keep
-    // them unique when both sets live in one style.
-    const londonLayers = layers('london', flavor, { lang: 'en' }).map((layer) => ({
+    const detailLayers = layers('detail', flavor, { lang: 'en' }).map((layer) => ({
       ...layer,
-      id: `london_${layer.id}`,
+      id: `detail_${layer.id}`,
       minzoom: Math.max(layer.minzoom ?? 0, BASEMAP_HANDOFF_ZOOM)
     }));
+
+    // Emphasise railway/tube lines and stations to make navigation easier.
+    const transitLayers = [
+      {
+        id: 'detail_rail_emphasis',
+        type: 'line',
+        source: 'detail',
+        'source-layer': 'roads',
+        minzoom: 10,
+        filter: ['==', ['get', 'kind'], 'rail'],
+        layout: { 'line-join': 'round', 'line-cap': 'round' },
+        paint: {
+          'line-color': '#6f6a86',
+          'line-width': ['interpolate', ['linear'], ['zoom'], 10, 0.8, 14, 2.2, 16, 3.2],
+          'line-dasharray': [3, 1.5],
+          'line-opacity': 0.75
+        }
+      },
+      {
+        id: 'detail_stations',
+        type: 'circle',
+        source: 'detail',
+        'source-layer': 'pois',
+        minzoom: 12,
+        filter: ['==', ['get', 'kind'], 'station'],
+        paint: {
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 12, 2.5, 15, 4.5],
+          'circle-color': '#3b3663',
+          'circle-stroke-color': '#ffffff',
+          'circle-stroke-width': 1.4
+        }
+      },
+      {
+        id: 'detail_station_labels',
+        type: 'symbol',
+        source: 'detail',
+        'source-layer': 'pois',
+        minzoom: 13.5,
+        filter: ['==', ['get', 'kind'], 'station'],
+        layout: {
+          'text-field': ['coalesce', ['get', 'name:en'], ['get', 'name']],
+          'text-font': ['Noto Sans Regular'],
+          'text-size': 10,
+          'text-offset': [0, 0.9],
+          'text-anchor': 'top',
+          'text-optional': true
+        },
+        paint: {
+          'text-color': '#3b3663',
+          'text-halo-color': '#ffffff',
+          'text-halo-width': 1.2
+        }
+      }
+    ];
 
     return {
       version: 8,
@@ -232,128 +271,24 @@
           attribution:
             '<a href="https://protomaps.com" target="_blank" rel="noreferrer">Protomaps</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a>'
         },
-        london: {
+        detail: {
           type: 'vector',
-          url: `pmtiles://${assetUrl('/basemap/london.pmtiles')}`
+          url: `pmtiles://${assetUrl('/basemap/detail.pmtiles')}`
         }
       },
-      layers: [...gbLayers, ...londonLayers]
+      layers: [...gbLayers, ...detailLayers, ...transitLayers]
     };
   }
 
-  function onMapLoad() {
-    map.addSource('restaurants', { type: 'geojson', data: emptyCollection() });
-    map.addSource('user-accuracy', { type: 'geojson', data: emptyCollection() });
-    map.addSource('user-point', { type: 'geojson', data: emptyCollection() });
-
-    map.addLayer({
-      id: 'restaurants',
-      type: 'circle',
-      source: 'restaurants',
-      paint: {
-        'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 3, 12, 5, 14, 6.5, 16, 8],
-        'circle-color': PRICE_COLOR_EXPR,
-        'circle-opacity': ['case', ['==', ['get', 'priceRange'], ''], 0.62, 0.95],
-        'circle-stroke-color': '#ffffff',
-        'circle-stroke-opacity': 0.85,
-        'circle-stroke-width': ['interpolate', ['linear'], ['zoom'], 8, 0.5, 14, 1.2]
-      }
-    });
-
-    map.addLayer({
-      id: 'restaurant-price',
-      type: 'symbol',
-      source: 'restaurants',
-      minzoom: 13,
-      filter: ['!=', ['get', 'priceRange'], ''],
-      layout: {
-        'text-field': ['get', 'priceRange'],
-        'text-font': ['Noto Sans Medium'],
-        'text-size': 9,
-        'text-allow-overlap': true,
-        'text-ignore-placement': true
-      },
-      paint: {
-        'text-color': '#ffffff'
-      }
-    });
-
-    map.addLayer({
-      id: 'user-accuracy',
-      type: 'fill',
-      source: 'user-accuracy',
-      paint: {
-        'fill-color': '#2563eb',
-        'fill-opacity': 0.16
-      }
-    });
-
-    map.addLayer({
-      id: 'user-point',
-      type: 'circle',
-      source: 'user-point',
-      paint: {
-        'circle-radius': 8,
-        'circle-color': '#2563eb',
-        'circle-stroke-color': '#ffffff',
-        'circle-stroke-width': 3
-      }
-    });
-
-    map.addLayer({
-      id: 'restaurant-selected',
-      type: 'circle',
-      source: 'restaurants',
-      filter: ['==', ['get', 'id'], '__none__'],
-      paint: {
-        'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 7, 14, 11, 16, 14],
-        'circle-color': PRICE_COLOR_EXPR,
-        'circle-opacity': 1,
-        'circle-stroke-color': '#ffffff',
-        'circle-stroke-width': 3
-      }
-    });
-
-    map.on('click', onMapClick);
-    for (const layer of ['restaurants', 'restaurant-selected']) {
-      map.on('mouseenter', layer, () => (map.getCanvas().style.cursor = 'pointer'));
-      map.on('mouseleave', layer, () => (map.getCanvas().style.cursor = ''));
-    }
-
-    mapReady = true;
-    updateRestaurantSource(filteredRestaurants);
-    updateSelectedFilter(selected);
-    updateUserLocationLayers(userLocation);
-    applyFallbackHomeView();
-    updateVisibleMarkerCount();
-  }
-
-  function emptyCollection() {
-    return { type: 'FeatureCollection', features: [] };
-  }
-
-  function toFeatureCollection(items) {
-    return {
-      type: 'FeatureCollection',
-      features: items
-        .filter(hasCoordinates)
-        .map((restaurant) => ({
-          type: 'Feature',
-          id: restaurant.id,
-          geometry: { type: 'Point', coordinates: [restaurant.lon, restaurant.lat] },
-          properties: { id: restaurant.id, priceRange: restaurant.priceRange || '' }
-        }))
-    };
-  }
-
-  function updateRestaurantSource(items) {
-    const source = map?.getSource('restaurants');
-    if (source) source.setData(toFeatureCollection(items));
-  }
-
-  function updateSelectedFilter(restaurant) {
-    if (!mapReady) return;
-    map.setFilter('restaurant-selected', ['==', ['get', 'id'], restaurant?.id ?? '__none__']);
+  function onConnectivityChange() {
+    const next = navigator.onLine;
+    if (next === online) return;
+    online = next;
+    if (!map) return;
+    map.setMaxBounds(online ? null : COVERAGE_BOUNDS);
+    map.setMinZoom(online ? MIN_ZOOM_ONLINE : MIN_ZOOM_OFFLINE);
+    map.setStyle(online ? ONLINE_STYLE_URL : buildLocalStyle());
+    scheduleMarkerDraw();
   }
 
   async function loadRestaurants() {
@@ -361,14 +296,11 @@
       const response = await fetch('/data/restaurants.json');
       if (!response.ok) throw new Error(`Data request failed with ${response.status}`);
       const payload = await response.json();
-      restaurants = annotateRestaurants(payload.restaurants || []);
+      restaurants = annotateMarkers(payload.restaurants || []);
       restaurantById = new Map(restaurants.map((restaurant) => [restaurant.id, restaurant]));
       stats = payload.stats || null;
-      if (mapReady) {
-        updateRestaurantSource(filteredRestaurants);
-        applyFallbackHomeView();
-        updateVisibleMarkerCount();
-      }
+      applyFallbackHomeView();
+      scheduleMarkerDraw();
     } catch (error) {
       loadError = error instanceof Error ? error.message : String(error);
     } finally {
@@ -376,24 +308,38 @@
     }
   }
 
-  function annotateRestaurants(items) {
-    return items.map((item) => ({
-      ...item,
-      lat: Number(item.lat),
-      lon: Number(item.lon),
-      searchText: [
-        item.name,
-        item.address,
-        item.pageTitle,
-        item.description,
-        item.priceRange,
-        item.openFor,
-        item.bestFor
-      ]
-        .filter(Boolean)
-        .join(' ')
-        .toLowerCase()
-    }));
+  function annotateMarkers(items) {
+    const duplicateCounts = new Map();
+    const duplicateSeen = new Map();
+    for (const item of items) {
+      const key = `${Number(item.lat).toFixed(6)},${Number(item.lon).toFixed(6)}`;
+      duplicateCounts.set(key, (duplicateCounts.get(key) || 0) + 1);
+    }
+    return items.map((item) => {
+      const key = `${Number(item.lat).toFixed(6)},${Number(item.lon).toFixed(6)}`;
+      const duplicateIndex = duplicateSeen.get(key) || 0;
+      duplicateSeen.set(key, duplicateIndex + 1);
+      const offset = markerOffset(duplicateIndex, duplicateCounts.get(key) || 1);
+      return {
+        ...item,
+        lat: Number(item.lat),
+        lon: Number(item.lon),
+        offsetX: offset.x,
+        offsetY: offset.y,
+        searchText: [item.name, item.address, item.pageTitle, item.description, item.priceRange, item.openFor, item.bestFor]
+          .filter(Boolean)
+          .join(' ')
+          .toLowerCase()
+      };
+    });
+  }
+
+  function markerOffset(index, count) {
+    if (count <= 1) return { x: 0, y: 0 };
+    const ring = Math.floor(index / 8) + 1;
+    const angle = ((index % 8) / 8) * Math.PI * 2;
+    const radius = Math.min(24, 6 + ring * 5);
+    return { x: Math.cos(angle) * radius, y: Math.sin(angle) * radius };
   }
 
   $: searchText = query.trim().toLowerCase();
@@ -406,9 +352,13 @@
   $: selectedGoogleMapsUrl = selected ? getGoogleMapsUrl(selected) : '';
   $: selectedCitymapperUrl = selected ? getCitymapperUrl(selected, userLocation, isAndroidDevice) : '';
   $: totalCount = stats?.entryCount || restaurants.length;
-  $: if (mapReady) updateRestaurantSource(filteredRestaurants);
-  $: updateSelectedFilter(selected);
-  $: if (mapReady) updateUserLocationLayers(userLocation);
+  $: downloadPercent = downloadTotal ? Math.min(100, Math.round((downloadLoaded / downloadTotal) * 100)) : 0;
+  $: {
+    filteredRestaurants;
+    selected;
+    userLocation;
+    if (mapReady) scheduleMarkerDraw();
+  }
   $: {
     searchText;
     searchResults.length;
@@ -420,47 +370,225 @@
     scheduleDescriptionMeasure();
   }
 
-  function updateVisibleMarkerCount() {
-    if (!mapReady) return;
-    const features = map.queryRenderedFeatures({ layers: ['restaurants'] });
-    const ids = new Set();
-    for (const feature of features) ids.add(feature.properties.id);
-    if (visibleMarkerCount !== ids.size) visibleMarkerCount = ids.size;
+  // ---- Canvas marker overlay -------------------------------------------------
+
+  function scheduleMarkerDraw() {
+    if (!markerCanvas || !map) return;
+    if (markerDrawFrame) return;
+    markerDrawFrame = requestAnimationFrame(() => {
+      markerDrawFrame = 0;
+      drawMarkers();
+    });
   }
 
-  function onMapClick(event) {
-    const pad = 8; // tap tolerance in pixels
-    const box = [
-      [event.point.x - pad, event.point.y - pad],
-      [event.point.x + pad, event.point.y + pad]
-    ];
-    const features = map.queryRenderedFeatures(box, {
-      layers: ['restaurant-selected', 'restaurants']
-    });
-    if (!features.length) return;
+  function drawMarkers() {
+    if (!map || !markerCanvas || !mapEl) return;
+    const width = mapEl.clientWidth;
+    const height = mapEl.clientHeight;
+    if (!width || !height) return;
 
-    const seen = new Set();
-    const ids = [];
-    for (const feature of features) {
-      const id = feature.properties.id;
-      if (!seen.has(id)) {
-        seen.add(id);
-        ids.push(id);
+    const dpr = Math.max(1, window.devicePixelRatio || 1);
+    const targetWidth = Math.round(width * dpr);
+    const targetHeight = Math.round(height * dpr);
+    if (markerCanvas.width !== targetWidth) markerCanvas.width = targetWidth;
+    if (markerCanvas.height !== targetHeight) markerCanvas.height = targetHeight;
+    markerCanvas.style.width = `${width}px`;
+    markerCanvas.style.height = `${height}px`;
+
+    const ctx = markerCanvas.getContext('2d');
+    if (!ctx) return;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, width, height);
+
+    const z = map.getZoom();
+    const selectedId = selected?.id;
+    const markers = [];
+    for (const restaurant of filteredRestaurants) {
+      const point = map.project([restaurant.lon, restaurant.lat]);
+      const x = point.x + restaurant.offsetX;
+      const y = point.y + restaurant.offsetY;
+      if (x < -MARKER_PADDING || x > width + MARKER_PADDING || y < -MARKER_PADDING || y > height + MARKER_PADDING) continue;
+      markers.push({ restaurant, x, y });
+    }
+    if (visibleMarkerCount !== markers.length) visibleMarkerCount = markers.length;
+
+    if (!markerLayerCanvas) markerLayerCanvas = document.createElement('canvas');
+    if (markerLayerCanvas.width !== targetWidth) markerLayerCanvas.width = targetWidth;
+    if (markerLayerCanvas.height !== targetHeight) markerLayerCanvas.height = targetHeight;
+    const layerCtx = markerLayerCanvas.getContext('2d');
+    if (!layerCtx) return;
+    layerCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    const regularMarkers = [];
+    const pricedMarkers = [];
+    let selectedMarker = null;
+    for (const marker of markers) {
+      if (marker.restaurant.id === selectedId) {
+        selectedMarker = marker;
+        continue;
       }
+      if (marker.restaurant.priceRange) pricedMarkers.push(marker);
+      else regularMarkers.push(marker);
     }
 
-    const key = ids.join('|');
-    const repeatedPick =
-      lastMarkerPick &&
-      lastMarkerPick.key === key &&
-      Math.abs(lastMarkerPick.x - event.point.x) <= 18 &&
-      Math.abs(lastMarkerPick.y - event.point.y) <= 18;
-    const index = repeatedPick ? (lastMarkerPick.index + 1) % ids.length : 0;
-    lastMarkerPick = { key, index, x: event.point.x, y: event.point.y };
+    // Composite each group at a flat opacity so overlapping markers do not darken.
+    layerCtx.clearRect(0, 0, width, height);
+    for (const marker of regularMarkers) drawMarker(layerCtx, marker, false, z);
+    ctx.save();
+    ctx.globalAlpha = MARKER_LAYER_OPACITY;
+    ctx.drawImage(markerLayerCanvas, 0, 0, width, height);
+    ctx.restore();
 
-    const restaurant = restaurantById.get(ids[index]);
-    if (restaurant) selectRestaurant(restaurant);
+    layerCtx.clearRect(0, 0, width, height);
+    for (const marker of pricedMarkers) drawMarker(layerCtx, marker, false, z);
+    ctx.save();
+    ctx.globalAlpha = PRICED_MARKER_LAYER_OPACITY;
+    ctx.drawImage(markerLayerCanvas, 0, 0, width, height);
+    ctx.restore();
+
+    if (selectedMarker) drawMarker(ctx, selectedMarker, true, z);
+    drawUserLocation(ctx, userLocation, z);
   }
+
+  function markerColor(priceRange) {
+    if (priceRange === '$') return '#2d8a5f';
+    if (priceRange === '$$') return '#2770a7';
+    if (priceRange === '$$$') return '#7f52a1';
+    if (priceRange === '$$$$') return '#252a31';
+    return '#d43d2f';
+  }
+
+  function markerPriority(restaurant) {
+    return restaurant?.priceRange ? 1 : 0;
+  }
+
+  function markerDetail(z, active) {
+    if (active || z >= FULL_MARKER_ZOOM) {
+      return { key: 'full', radius: active ? 17 : 12, strokeWidth: active ? 3 : 2, shadowBlur: active ? 14 : 8, shadowOffsetY: active ? 4 : 3, showPrice: true };
+    }
+    if (z >= MID_MARKER_ZOOM) {
+      return { key: 'mid', radius: 7, strokeWidth: 1.5, shadowBlur: 4, shadowOffsetY: 2, showPrice: false };
+    }
+    return { key: 'small', radius: 4.5, strokeWidth: 1, shadowBlur: 2, shadowOffsetY: 1, showPrice: false };
+  }
+
+  function drawMarker(ctx, marker, active, z) {
+    const sprite = getMarkerSprite(marker.restaurant.priceRange, active, z);
+    ctx.drawImage(sprite.canvas, marker.x - sprite.size / 2, marker.y - sprite.size / 2, sprite.size, sprite.size);
+  }
+
+  function getMarkerSprite(priceRange, active, z) {
+    const dpr = Math.max(1, window.devicePixelRatio || 1);
+    const normalizedPrice = priceRange || 'none';
+    const detail = markerDetail(z, active);
+    const key = `${normalizedPrice}-${active ? 'active' : detail.key}-${dpr}`;
+    const cached = markerSpriteCache.get(key);
+    if (cached) return cached;
+
+    const radius = detail.radius;
+    const size = (radius + MARKER_SPRITE_PADDING) * 2;
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.ceil(size * dpr);
+    canvas.height = Math.ceil(size * dpr);
+    const ctx = canvas.getContext('2d');
+    const center = size / 2;
+
+    ctx.scale(dpr, dpr);
+    ctx.shadowColor = active ? 'rgba(27, 31, 28, 0.42)' : 'rgba(27, 31, 28, 0.26)';
+    ctx.shadowBlur = detail.shadowBlur;
+    ctx.shadowOffsetY = detail.shadowOffsetY;
+    ctx.beginPath();
+    ctx.arc(center, center, radius, 0, Math.PI * 2);
+    ctx.fillStyle = markerColor(priceRange);
+    ctx.fill();
+    ctx.shadowColor = 'transparent';
+    ctx.lineWidth = detail.strokeWidth;
+    ctx.strokeStyle = active ? 'rgba(255, 255, 255, 0.86)' : '#ffffff';
+    ctx.stroke();
+
+    if (priceRange && detail.showPrice) {
+      ctx.fillStyle = active ? 'rgba(255, 255, 255, 0.95)' : '#ffffff';
+      ctx.font = `800 ${priceRange.length >= 4 ? 7 : 8}px Inter, system-ui, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(priceRange, center, center + 0.5);
+    }
+
+    const sprite = { canvas, size };
+    markerSpriteCache.set(key, sprite);
+    return sprite;
+  }
+
+  function drawUserLocation(ctx, location, z) {
+    if (!location || !hasCoordinates(location)) return;
+    const point = map.project([location.lon, location.lat]);
+    const x = point.x;
+    const y = point.y;
+
+    const accuracyRadius = location.accuracy ? clamp(location.accuracy / metersPerPixel(location.lat, z), 10, 90) : 0;
+
+    ctx.save();
+    if (accuracyRadius) {
+      ctx.beginPath();
+      ctx.arc(x, y, accuracyRadius, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(37, 99, 235, 0.16)';
+      ctx.fill();
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = 'rgba(37, 99, 235, 0.28)';
+      ctx.stroke();
+    }
+    ctx.shadowColor = 'rgba(27, 31, 28, 0.28)';
+    ctx.shadowBlur = 8;
+    ctx.shadowOffsetY = 3;
+    ctx.beginPath();
+    ctx.arc(x, y, 8, 0, Math.PI * 2);
+    ctx.fillStyle = '#2563eb';
+    ctx.fill();
+    ctx.shadowColor = 'transparent';
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = '#ffffff';
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function metersPerPixel(lat, z) {
+    return (156543.03392 * Math.cos((lat * Math.PI) / 180)) / 2 ** z;
+  }
+
+  function pickMarker(point) {
+    if (!map) return null;
+    const selectedId = selected?.id;
+    const candidates = [];
+    for (const restaurant of filteredRestaurants) {
+      const projected = map.project([restaurant.lon, restaurant.lat]);
+      const x = projected.x + restaurant.offsetX;
+      const y = projected.y + restaurant.offsetY;
+      const distance = Math.hypot(point.x - x, point.y - y);
+      const radius = restaurant.id === selectedId ? 17 : 13;
+      if (distance <= radius + 8) candidates.push({ restaurant, distance });
+    }
+    if (!candidates.length) {
+      lastMarkerPick = null;
+      return null;
+    }
+    candidates.sort((a, b) => {
+      const distanceDifference = a.distance - b.distance;
+      if (Math.abs(distanceDifference) > 4) return distanceDifference;
+      return (
+        markerPriority(b.restaurant) - markerPriority(a.restaurant) ||
+        distanceDifference ||
+        String(a.restaurant.id).localeCompare(String(b.restaurant.id))
+      );
+    });
+    const key = candidates.map((candidate) => candidate.restaurant.id).join('|');
+    const repeatedPick =
+      lastMarkerPick && lastMarkerPick.key === key && Math.abs(lastMarkerPick.x - point.x) <= 18 && Math.abs(lastMarkerPick.y - point.y) <= 18;
+    const index = repeatedPick ? (lastMarkerPick.index + 1) % candidates.length : 0;
+    lastMarkerPick = { key, index, x: point.x, y: point.y };
+    return candidates[index].restaurant;
+  }
+
+  // ---- Details / search panels (unchanged behaviour) -------------------------
 
   function scheduleDescriptionMeasure() {
     const selectedRestaurantId = selected?.id || '';
@@ -483,7 +611,6 @@
       measuredDescriptionRestaurantId = '';
       return;
     }
-
     const maxScroll = Math.max(0, descriptionEl.scrollHeight - descriptionEl.clientHeight);
     descriptionHasMore = maxScroll > 1;
     descriptionCanScrollDown = maxScroll - descriptionEl.scrollTop > 1;
@@ -511,7 +638,6 @@
       measuredSearchText = '';
       return;
     }
-
     const maxScroll = Math.max(0, searchResultsEl.scrollHeight - searchResultsEl.clientHeight);
     searchResultsHasMore = maxScroll > 1;
     const thumbHeight = searchResultsHasMore ? clamp((searchResultsEl.clientHeight / searchResultsEl.scrollHeight) * 100, 18, 100) : 100;
@@ -549,28 +675,29 @@
     return `intent://directions?${query}#Intent;scheme=citymapper;package=${CITYMAPPER_ANDROID_PACKAGE};S.browser_fallback_url=${encodeURIComponent(CITYMAPPER_ANDROID_STORE_URL)};end`;
   }
 
-  function boundsAsLngLat(bounds) {
-    return [
-      [bounds.minLon, bounds.minLat],
-      [bounds.maxLon, bounds.maxLat]
-    ];
-  }
+  // ---- View helpers ----------------------------------------------------------
 
   function applyFallbackHomeView() {
     if (!mapReady || homeViewApplied || userLocation) return;
-    map.fitBounds(boundsAsLngLat(LONDON_BOUNDS), { padding: HOME_VIEW_PADDING, maxZoom: 11, animate: false });
+    map.fitBounds(
+      [
+        [LONDON_BOUNDS.minLon, LONDON_BOUNDS.minLat],
+        [LONDON_BOUNDS.maxLon, LONDON_BOUNDS.maxLat]
+      ],
+      { padding: HOME_VIEW_PADDING, maxZoom: 11, animate: false }
+    );
     homeViewApplied = true;
   }
 
   function setLocationView(location) {
     if (!location || !mapReady) return;
-    map.flyTo({ center: [location.lon, location.lat], zoom: clamp(LOCATION_ZOOM, MIN_ZOOM, MAX_ZOOM) });
+    map.flyTo({ center: [location.lon, location.lat], zoom: clamp(LOCATION_ZOOM, map.getMinZoom(), MAX_ZOOM) });
     homeViewApplied = true;
   }
 
   function zoomButton(delta) {
     if (!map) return;
-    map.easeTo({ zoom: clamp(map.getZoom() + delta, MIN_ZOOM, MAX_ZOOM), duration: 200 });
+    map.easeTo({ zoom: clamp(map.getZoom() + delta, map.getMinZoom(), MAX_ZOOM), duration: 200 });
   }
 
   function selectRestaurant(restaurant) {
@@ -602,59 +729,13 @@
     }
   }
 
-  function geoCircle(lat, lon, radiusMeters, points = 48) {
-    const coords = [];
-    const earthRadius = 6371000;
-    const angular = radiusMeters / earthRadius;
-    const latR = (lat * Math.PI) / 180;
-    const lonR = (lon * Math.PI) / 180;
-    for (let i = 0; i <= points; i += 1) {
-      const bearing = (i / points) * 2 * Math.PI;
-      const lat2 = Math.asin(Math.sin(latR) * Math.cos(angular) + Math.cos(latR) * Math.sin(angular) * Math.cos(bearing));
-      const lon2 =
-        lonR + Math.atan2(Math.sin(bearing) * Math.sin(angular) * Math.cos(latR), Math.cos(angular) - Math.sin(latR) * Math.sin(lat2));
-      coords.push([(lon2 * 180) / Math.PI, (lat2 * 180) / Math.PI]);
-    }
-    return { type: 'Feature', geometry: { type: 'Polygon', coordinates: [coords] }, properties: {} };
-  }
-
-  function updateUserLocationLayers(location) {
-    const pointSource = map?.getSource('user-point');
-    const accuracySource = map?.getSource('user-accuracy');
-    if (!pointSource || !accuracySource) return;
-
-    if (!location || !hasCoordinates(location)) {
-      pointSource.setData(emptyCollection());
-      accuracySource.setData(emptyCollection());
-      return;
-    }
-
-    pointSource.setData({
-      type: 'FeatureCollection',
-      features: [{ type: 'Feature', geometry: { type: 'Point', coordinates: [location.lon, location.lat] }, properties: {} }]
-    });
-
-    if (location.accuracy) {
-      accuracySource.setData({
-        type: 'FeatureCollection',
-        features: [geoCircle(location.lat, location.lon, location.accuracy)]
-      });
-    } else {
-      accuracySource.setData(emptyCollection());
-    }
-  }
-
   function startLocationTracking(options = {}) {
     if (!navigator.geolocation) {
       locationStatus = 'Location unavailable';
       return;
     }
-    if (userLocation) {
-      setLocationView(userLocation);
-    }
-    if (options.restart && locationWatchId !== null) {
-      stopLocationTracking();
-    }
+    if (userLocation) setLocationView(userLocation);
+    if (options.restart && locationWatchId !== null) stopLocationTracking();
     if (locationWatchId !== null) return;
 
     locationStatus = 'Locating';
@@ -667,20 +748,15 @@
           accuracy: position.coords.accuracy
         };
         locationStatus = 'Live location on';
-        if (firstLocation && (!mapWasInteractedWith || options.restart)) {
-          setLocationView(userLocation);
-        }
+        if (firstLocation && (!mapWasInteractedWith || options.restart)) setLocationView(userLocation);
+        scheduleMarkerDraw();
       },
       (error) => {
         locationStatus = error.message || 'Location unavailable';
         stopLocationTracking();
         applyFallbackHomeView();
       },
-      {
-        enableHighAccuracy: true,
-        maximumAge: 10000,
-        timeout: 15000
-      }
+      { enableHighAccuracy: true, maximumAge: 10000, timeout: 15000 }
     );
   }
 
@@ -689,19 +765,53 @@
     navigator.geolocation.clearWatch(locationWatchId);
     locationWatchId = null;
   }
+
+  // ---- Offline download / install -------------------------------------------
+
+  function onBeforeInstallPrompt(event) {
+    event.preventDefault();
+    deferredInstallPrompt = event;
+    canInstall = true;
+  }
+
+  function onServiceWorkerMessage(event) {
+    const data = event.data || {};
+    if (data.type === 'precache-progress') {
+      offlineState = data.loaded >= data.total && data.total > 0 ? 'ready' : 'downloading';
+      downloadLoaded = data.loaded || 0;
+      downloadTotal = data.total || 0;
+    } else if (data.type === 'precache-done') {
+      offlineState = 'ready';
+      if (data.total) {
+        downloadLoaded = data.total;
+        downloadTotal = data.total;
+      }
+    } else if (data.type === 'precache-idle') {
+      if (offlineState === 'unknown') offlineState = 'idle';
+    }
+  }
+
+  async function onOfflineButton() {
+    if (deferredInstallPrompt) {
+      deferredInstallPrompt.prompt();
+      await deferredInstallPrompt.userChoice;
+      deferredInstallPrompt = null;
+      canInstall = false;
+      return;
+    }
+    showInstallHelp = true;
+  }
 </script>
 
 <svelte:head>
   <title>Eater Restaurant Map</title>
-  <meta
-    name="description"
-    content="Full map of restaurants featured in Eater map guides. Works offline."
-  />
+  <meta name="description" content="Full map of restaurants featured in Eater map guides. Works offline." />
 </svelte:head>
 
 <main class="app-shell">
   <section class="map" style={`--topbar-height: ${topbarHeight}px; --mobile-search-visible-results: ${MOBILE_SEARCH_VISIBLE_RESULTS};`}>
     <div class="map-canvas" bind:this={mapEl} role="application" aria-label="Restaurant map"></div>
+    <canvas class="marker-layer" bind:this={markerCanvas} aria-hidden="true"></canvas>
 
     {#if loading}
       <div class="state-pill">Loading</div>
@@ -715,21 +825,30 @@
         <div class="search-field">
           <input bind:value={query} type="search" placeholder="Restaurant, area, guide" autocomplete="off" />
           {#if searchText}
-            <output class="search-count" aria-live="polite">
-              {filteredRestaurants.length.toLocaleString()}
-            </output>
+            <output class="search-count" aria-live="polite">{filteredRestaurants.length.toLocaleString()}</output>
           {/if}
         </div>
       </label>
       <button class="reset-button" type="button" on:click={resetMap}>Reset</button>
-      <details class="roadmap-menu">
-        <summary>Roadmap</summary>
-        <ul>
-          {#each roadmapItems as item}
-            <li>{item}</li>
-          {/each}
-        </ul>
-      </details>
+      {#if !isStandalone}
+        <button
+          class="offline-button"
+          class:downloading={offlineState === 'downloading'}
+          class:ready={offlineState === 'ready'}
+          type="button"
+          on:click={onOfflineButton}
+          title={offlineState === 'downloading' ? `Saving offline map (${downloadPercent}%)` : 'Available offline — tap to install'}
+        >
+          <span class="offline-dot" class:online={online}></span>
+          {#if offlineState === 'downloading'}
+            Saving {downloadPercent}%
+          {:else if offlineState === 'ready'}
+            Offline ✓
+          {:else}
+            Install
+          {/if}
+        </button>
+      {/if}
     </div>
 
     <div class="zoom-controls" aria-label="Zoom controls">
@@ -773,53 +892,21 @@
       </div>
     {/if}
 
+    <details class="roadmap-menu">
+      <summary>Roadmap</summary>
+      <ul>
+        {#each roadmapItems as item}
+          <li>{item}</li>
+        {/each}
+      </ul>
+    </details>
+
     <div class="attribution">
       <a href="https://protomaps.com" target="_blank" rel="noreferrer">Protomaps</a>
       <span aria-hidden="true">·</span>
       <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a>
     </div>
-
-    {#if !isStandalone && (offlineState === 'downloading' || offlineState === 'ready') && !searchResults.length}
-      <div class="offline-pill" class:downloading={offlineState === 'downloading'}>
-        {#if offlineState === 'downloading'}
-          <span class="offline-status">
-            <span class="offline-spinner" aria-hidden="true"></span>
-            Saving offline map… {downloadTotal ? `${downloadPercent}%` : `${Math.round(downloadLoaded / 1048576)} MB`}
-          </span>
-          {#if downloadTotal}
-            <span class="offline-bar" aria-hidden="true"><span style={`width: ${downloadPercent}%;`}></span></span>
-          {/if}
-        {:else}
-          <span class="offline-status">
-            <span class="offline-check" aria-hidden="true">✓</span>
-            Available offline
-          </span>
-          {#if canInstall}
-            <button type="button" class="offline-action" on:click={installApp}>Install app</button>
-          {:else if isIosDevice}
-            <button type="button" class="offline-action" on:click={() => (showIosHelp = true)}>Add to Home Screen</button>
-          {/if}
-          <button type="button" class="offline-dismiss" on:click={() => (offlineState = 'hidden')} aria-label="Dismiss">×</button>
-        {/if}
-      </div>
-    {/if}
   </section>
-
-  {#if showIosHelp}
-    <div class="ios-help" role="dialog" aria-modal="true" on:click={() => (showIosHelp = false)}>
-      <div class="ios-help-card" on:click|stopPropagation>
-        <h2>Install on iPhone or iPad</h2>
-        <p>To keep the map on your home screen and use it offline:</p>
-        <ol>
-          <li>Tap the <strong>Share</strong> button in Safari (the square with an up arrow).</li>
-          <li>Scroll down and choose <strong>Add to Home Screen</strong>.</li>
-          <li>Tap <strong>Add</strong>, then open the app from your home screen.</li>
-        </ol>
-        <p class="ios-help-note">The map is already saved on this device, so it will work with no internet.</p>
-        <button type="button" on:click={() => (showIosHelp = false)}>Got it</button>
-      </div>
-    </div>
-  {/if}
 
   <aside class:open={selected} class="details-panel">
     {#if selected}
@@ -852,24 +939,12 @@
       {/if}
 
       <dl class="facts">
-        {#if selected.bestFor}
-          <div><dt>Best For</dt><dd>{selected.bestFor}</dd></div>
-        {/if}
-        {#if selected.mustTryDish}
-          <div><dt>Must Try</dt><dd>{selected.mustTryDish}</dd></div>
-        {/if}
-        {#if selected.knowBeforeYouGo}
-          <div><dt>Know First</dt><dd>{selected.knowBeforeYouGo}</dd></div>
-        {/if}
-        {#if selected.outdoorSeating}
-          <div><dt>Outdoor</dt><dd>{selected.outdoorSeating}</dd></div>
-        {/if}
-        {#if selected.additionalLocationNotes}
-          <div><dt>More Locations</dt><dd>{selected.additionalLocationNotes}</dd></div>
-        {/if}
-        {#if selected.phone}
-          <div><dt>Phone</dt><dd><a href={`tel:${selected.phone}`}>{selected.phone}</a></dd></div>
-        {/if}
+        {#if selected.bestFor}<div><dt>Best For</dt><dd>{selected.bestFor}</dd></div>{/if}
+        {#if selected.mustTryDish}<div><dt>Must Try</dt><dd>{selected.mustTryDish}</dd></div>{/if}
+        {#if selected.knowBeforeYouGo}<div><dt>Know First</dt><dd>{selected.knowBeforeYouGo}</dd></div>{/if}
+        {#if selected.outdoorSeating}<div><dt>Outdoor</dt><dd>{selected.outdoorSeating}</dd></div>{/if}
+        {#if selected.additionalLocationNotes}<div><dt>More Locations</dt><dd>{selected.additionalLocationNotes}</dd></div>{/if}
+        {#if selected.phone}<div><dt>Phone</dt><dd><a href={`tel:${selected.phone}`}>{selected.phone}</a></dd></div>{/if}
       </dl>
 
       <div class="actions">
@@ -880,11 +955,7 @@
           </a>
         {/if}
         {#if selectedCitymapperUrl}
-          <a
-            class="citymapper-action"
-            href={selectedCitymapperUrl}
-            aria-label={`Open mobile directions to ${selected.name} in Citymapper`}
-          >
+          <a class="citymapper-action" href={selectedCitymapperUrl} aria-label={`Open mobile directions to ${selected.name} in Citymapper`}>
             Citymapper
           </a>
         {/if}
@@ -902,6 +973,27 @@
   </aside>
 </main>
 
+{#if showInstallHelp}
+  <div class="install-help" role="dialog" aria-modal="true" on:click={() => (showInstallHelp = false)}>
+    <div class="install-help-card" on:click|stopPropagation>
+      <h2>Install for offline use</h2>
+      {#if isIosDevice}
+        <ol>
+          <li>Tap the <strong>Share</strong> button in Safari (square with an up arrow).</li>
+          <li>Choose <strong>Add to Home Screen</strong>, then <strong>Add</strong>.</li>
+        </ol>
+      {:else}
+        <ol>
+          <li>Open your browser menu (⋮ or ≡).</li>
+          <li>Choose <strong>Install app</strong> or <strong>Add to Home Screen</strong>.</li>
+        </ol>
+      {/if}
+      <p class="install-help-note">The map is already saved on this device{offlineState === 'ready' ? '' : ' (finishing download…)'}, so it works with no internet.</p>
+      <button type="button" on:click={() => (showInstallHelp = false)}>Got it</button>
+    </div>
+  </div>
+{/if}
+
 <style>
   :global(*) {
     box-sizing: border-box;
@@ -912,8 +1004,7 @@
     margin: 0;
     min-height: 100%;
     overflow: hidden;
-    font-family:
-      Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     color: #17201c;
     background: #f5f2ea;
   }
@@ -944,7 +1035,13 @@
     inset: 0;
   }
 
-  /* MapLibre draws its own controls; we use custom chrome instead. */
+  .marker-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+  }
+
   :global(.maplibregl-ctrl-top-right),
   :global(.maplibregl-ctrl-bottom-left),
   :global(.maplibregl-ctrl-bottom-right),
@@ -966,6 +1063,7 @@
 
   .search,
   .reset-button,
+  .offline-button,
   .roadmap-menu,
   .zoom-controls,
   .price-controls,
@@ -1025,6 +1123,7 @@
   }
 
   .reset-button,
+  .offline-button,
   .zoom-controls button,
   .price-controls button {
     border: 1px solid rgba(23, 32, 28, 0.14);
@@ -1041,15 +1140,47 @@
     font-weight: 700;
   }
 
-  .roadmap-menu {
-    position: relative;
+  .offline-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     min-width: 96px;
+    height: 48px;
+    padding: 0 12px;
+    border-radius: 8px;
+    font-weight: 800;
+    white-space: nowrap;
+    justify-content: center;
+  }
+
+  .offline-button.ready {
+    color: #1f6b45;
+  }
+
+  .offline-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #b9b1a3;
+    flex: 0 0 auto;
+  }
+
+  .offline-dot.online {
+    background: #2d8a5f;
+  }
+
+  .roadmap-menu {
+    position: absolute;
+    right: 12px;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    min-width: 96px;
+    z-index: 9;
     color: #17201c;
   }
 
   .roadmap-menu summary {
     display: grid;
-    height: 48px;
+    height: 40px;
     place-items: center;
     padding: 0 12px;
     border: 1px solid rgba(23, 32, 28, 0.14);
@@ -1059,7 +1190,6 @@
     cursor: pointer;
     font-weight: 800;
     list-style: none;
-    pointer-events: auto;
   }
 
   .roadmap-menu summary::-webkit-details-marker {
@@ -1073,8 +1203,8 @@
 
   .roadmap-menu ul {
     position: absolute;
-    top: 56px;
     right: 0;
+    bottom: 48px;
     display: grid;
     gap: 7px;
     width: min(320px, calc(100vw - 24px));
@@ -1086,7 +1216,6 @@
     border-radius: 8px;
     background: rgba(255, 252, 244, 0.98);
     box-shadow: 0 18px 40px rgba(27, 31, 28, 0.18);
-    pointer-events: auto;
   }
 
   .roadmap-menu li {
@@ -1111,14 +1240,14 @@
     font-weight: 800;
   }
 
-  .zoom-controls button.active {
-    color: #fff;
-    background: #2563eb;
-  }
-
   .zoom-controls .location-button {
     font-size: 12px;
     letter-spacing: 0;
+  }
+
+  .zoom-controls .location-button.active {
+    color: #fff;
+    background: #2563eb;
   }
 
   .price-controls {
@@ -1210,7 +1339,7 @@
 
   .attribution {
     position: absolute;
-    right: 10px;
+    right: 118px;
     bottom: 8px;
     z-index: 8;
     display: flex;
@@ -1223,156 +1352,6 @@
 
   .attribution a {
     color: #38433e;
-  }
-
-  .offline-pill {
-    position: absolute;
-    top: calc(max(12px, env(safe-area-inset-top)) + var(--topbar-height, 56px) + 8px);
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 11;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    max-width: calc(100vw - 24px);
-    padding: 8px 10px 8px 14px;
-    border: 1px solid rgba(23, 32, 28, 0.14);
-    border-radius: 999px;
-    background: rgba(255, 252, 244, 0.98);
-    box-shadow: 0 10px 26px rgba(27, 31, 28, 0.16);
-    font-size: 13px;
-    font-weight: 700;
-    color: #17201c;
-    pointer-events: auto;
-  }
-
-  .offline-pill.downloading {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 6px;
-    border-radius: 12px;
-    padding: 10px 14px;
-  }
-
-  .offline-status {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    white-space: nowrap;
-  }
-
-  .offline-check {
-    color: #2d8a5f;
-    font-weight: 900;
-  }
-
-  .offline-spinner {
-    width: 13px;
-    height: 13px;
-    border: 2px solid rgba(23, 32, 28, 0.2);
-    border-top-color: #2563eb;
-    border-radius: 50%;
-    animation: offline-spin 0.7s linear infinite;
-  }
-
-  @keyframes offline-spin {
-    to {
-      transform: rotate(360deg);
-    }
-  }
-
-  .offline-bar {
-    display: block;
-    height: 4px;
-    border-radius: 999px;
-    background: rgba(23, 32, 28, 0.12);
-    overflow: hidden;
-  }
-
-  .offline-bar span {
-    display: block;
-    height: 100%;
-    border-radius: 999px;
-    background: #2563eb;
-    transition: width 200ms ease;
-  }
-
-  .offline-action {
-    padding: 6px 12px;
-    border: 0;
-    border-radius: 999px;
-    color: #fff;
-    background: #17201c;
-    font-weight: 800;
-    font-size: 12px;
-    cursor: pointer;
-  }
-
-  .offline-dismiss {
-    width: 24px;
-    height: 24px;
-    padding: 0;
-    border: 0;
-    border-radius: 999px;
-    color: #6a5f55;
-    background: transparent;
-    font-size: 18px;
-    line-height: 1;
-    cursor: pointer;
-  }
-
-  .ios-help {
-    position: fixed;
-    inset: 0;
-    z-index: 40;
-    display: grid;
-    place-items: center;
-    padding: 20px;
-    background: rgba(23, 32, 28, 0.5);
-  }
-
-  .ios-help-card {
-    width: min(360px, 100%);
-    padding: 20px 22px;
-    border-radius: 14px;
-    background: #fffdf7;
-    box-shadow: 0 24px 60px rgba(27, 31, 28, 0.3);
-  }
-
-  .ios-help-card h2 {
-    margin: 0 0 8px;
-    font-size: 18px;
-  }
-
-  .ios-help-card p {
-    margin: 0 0 10px;
-    color: #5f675f;
-    line-height: 1.4;
-    font-size: 14px;
-  }
-
-  .ios-help-card ol {
-    margin: 0 0 12px;
-    padding-left: 20px;
-    display: grid;
-    gap: 8px;
-    line-height: 1.4;
-    font-size: 14px;
-  }
-
-  .ios-help-note {
-    font-size: 13px;
-  }
-
-  .ios-help-card button {
-    width: 100%;
-    min-height: 42px;
-    border: 0;
-    border-radius: 8px;
-    color: #fff;
-    background: #17201c;
-    font-weight: 800;
-    cursor: pointer;
   }
 
   .details-panel {
@@ -1518,6 +1497,56 @@
 
   .empty-panel p:last-child {
     color: #5f675f;
+  }
+
+  .install-help {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    display: grid;
+    place-items: center;
+    padding: 20px;
+    background: rgba(23, 32, 28, 0.5);
+  }
+
+  .install-help-card {
+    width: min(360px, 100%);
+    padding: 20px 22px;
+    border-radius: 14px;
+    background: #fffdf7;
+    box-shadow: 0 24px 60px rgba(27, 31, 28, 0.3);
+  }
+
+  .install-help-card h2 {
+    margin: 0 0 12px;
+    font-size: 18px;
+  }
+
+  .install-help-card ol {
+    margin: 0 0 12px;
+    padding-left: 20px;
+    display: grid;
+    gap: 8px;
+    line-height: 1.4;
+    font-size: 14px;
+  }
+
+  .install-help-note {
+    margin: 0 0 14px;
+    color: #5f675f;
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
+  .install-help-card button {
+    width: 100%;
+    min-height: 42px;
+    border: 0;
+    border-radius: 8px;
+    color: #fff;
+    background: #17201c;
+    font-weight: 800;
+    cursor: pointer;
   }
 
   @media (max-width: 820px) {
@@ -1686,14 +1715,11 @@
     }
 
     .topbar {
-      grid-template-columns: minmax(0, 1fr) 58px 88px;
+      grid-template-columns: minmax(0, 1fr) 58px auto;
     }
 
-    .roadmap-menu {
-      min-width: 88px;
-    }
-
-    .roadmap-menu summary {
+    .offline-button {
+      min-width: 84px;
       padding: 0 8px;
       font-size: 13px;
     }
@@ -1755,9 +1781,18 @@
       top: 98px;
     }
 
+    .roadmap-menu {
+      min-width: 84px;
+    }
+
+    .roadmap-menu summary {
+      padding: 0 8px;
+      font-size: 13px;
+    }
+
     .price-controls {
-      right: 12px;
       overflow-x: auto;
+      max-width: calc(100vw - 24px);
       padding-bottom: 2px;
     }
   }
