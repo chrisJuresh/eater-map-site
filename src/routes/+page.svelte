@@ -6,7 +6,8 @@
   import { layers, namedFlavor } from '@protomaps/basemaps';
 
   const MAX_ZOOM = 18;
-  const MIN_ZOOM = 5;
+  const MIN_ZOOM_ONLINE = 2;
+  const MIN_ZOOM_OFFLINE_FLOOR = 4;
   const LOCATION_ZOOM = 14;
   const SEARCH_ZOOM = 15;
   // Zoom where coarse GB tiles hand off to the detailed restaurant-area tiles.
@@ -18,10 +19,25 @@
   const CITYMAPPER_ANDROID_PACKAGE = 'com.citymapper.app.release';
   const CITYMAPPER_ANDROID_STORE_URL = `https://play.google.com/store/apps/details?id=${CITYMAPPER_ANDROID_PACKAGE}`;
 
-  // The data (and basemap) cover Great Britain; keep the view within it.
-  const COVERAGE_BOUNDS = [
-    [-5.9, 49.8],
-    [1.9, 56.2]
+  // Online: full global Protomaps detail via the API key. This key is
+  // domain-restricted (CORS-locked to *.chrisj.uk), so it is safe to ship in the
+  // client bundle — it only works from our own origins. Override via the
+  // VITE_PROTOMAPS_KEY env var (e.g. a rotated key) in .env / Vercel if desired.
+  const PROTOMAPS_KEY = import.meta.env.VITE_PROTOMAPS_KEY || 'db63a88f9891fd92';
+  const ONLINE_TILE_URL = PROTOMAPS_KEY
+    ? `https://api.protomaps.com/tiles/v4/{z}/{x}/{y}.mvt?key=${PROTOMAPS_KEY}`
+    : '';
+
+  // Offline pan limit (GB + margin) so you can zoom out to the whole country with
+  // padding but not wander into empty space. GB_FIT_BOUNDS is the data extent used
+  // to compute how far out you can zoom so every restaurant stays in view.
+  const OFFLINE_MAX_BOUNDS = [
+    [-8.5, 48.6],
+    [4.5, 57.6]
+  ];
+  const GB_FIT_BOUNDS = [
+    [-5.55, 50.08],
+    [1.4, 55.97]
   ];
   const LONDON_BOUNDS = {
     minLat: 51.2868,
@@ -113,14 +129,15 @@
     const protocol = new Protocol();
     maplibregl.addProtocol('pmtiles', protocol.tile);
 
+    const startOnline = online && Boolean(ONLINE_TILE_URL);
     map = new maplibregl.Map({
       container: mapEl,
-      style: buildLocalStyle(),
+      style: startOnline ? buildOnlineStyle() : buildLocalStyle(),
       center: [(LONDON_BOUNDS.minLon + LONDON_BOUNDS.maxLon) / 2, (LONDON_BOUNDS.minLat + LONDON_BOUNDS.maxLat) / 2],
       zoom: 10,
-      minZoom: MIN_ZOOM,
+      minZoom: startOnline ? MIN_ZOOM_ONLINE : MIN_ZOOM_OFFLINE_FLOOR,
       maxZoom: MAX_ZOOM,
-      maxBounds: COVERAGE_BOUNDS,
+      maxBounds: startOnline ? undefined : OFFLINE_MAX_BOUNDS,
       attributionControl: false,
       dragRotate: false,
       pitchWithRotate: false,
@@ -131,6 +148,7 @@
     map.on('error', (event) => console.error('MapLibre error:', event.error?.message || event.error));
     map.on('load', () => {
       mapReady = true;
+      if (!startOnline) updateOfflineMinZoom();
       applyFallbackHomeView();
       scheduleMarkerDraw();
     });
@@ -163,6 +181,7 @@
       map?.resize();
       if (topbarEl) topbarHeight = Math.ceil(topbarEl.getBoundingClientRect().height);
       updateSearchResultsScrollState();
+      if (!(online && ONLINE_TILE_URL)) updateOfflineMinZoom();
       scheduleMarkerDraw();
     });
     if (mapEl) resizeObserver.observe(mapEl);
@@ -189,57 +208,45 @@
     return `${origin}${path}`;
   }
 
-  function buildLocalStyle() {
-    const flavor = namedFlavor('light');
-    // Coarse whole-country tiles below the handoff zoom; detailed restaurant-area
-    // tiles at/above it. Namespacing keeps the two layer sets' ids unique.
-    const gbLayers = layers('gb', flavor, { lang: 'en' }).map((layer) => ({
-      ...layer,
-      maxzoom: BASEMAP_HANDOFF_ZOOM
-    }));
-    const detailLayers = layers('detail', flavor, { lang: 'en' }).map((layer) => ({
-      ...layer,
-      id: `detail_${layer.id}`,
-      minzoom: Math.max(layer.minzoom ?? 0, BASEMAP_HANDOFF_ZOOM)
-    }));
-
-    // Emphasise railway/tube lines and stations to make navigation easier.
-    const transitLayers = [
+  // Railway/tube lines + stations, kept steadily visible (from the handoff zoom up)
+  // so they don't pop in and out. Reused for the local and online sources.
+  function transitLayers(source) {
+    return [
       {
-        id: 'detail_rail_emphasis',
+        id: `${source}_rail_emphasis`,
         type: 'line',
-        source: 'detail',
+        source,
         'source-layer': 'roads',
-        minzoom: 10,
+        minzoom: BASEMAP_HANDOFF_ZOOM,
         filter: ['==', ['get', 'kind'], 'rail'],
         layout: { 'line-join': 'round', 'line-cap': 'round' },
         paint: {
           'line-color': '#6f6a86',
-          'line-width': ['interpolate', ['linear'], ['zoom'], 10, 0.8, 14, 2.2, 16, 3.2],
+          'line-width': ['interpolate', ['linear'], ['zoom'], 9, 0.6, 12, 1.4, 14, 2.2, 16, 3.2],
           'line-dasharray': [3, 1.5],
-          'line-opacity': 0.75
+          'line-opacity': 0.8
         }
       },
       {
-        id: 'detail_stations',
+        id: `${source}_stations`,
         type: 'circle',
-        source: 'detail',
+        source,
         'source-layer': 'pois',
-        minzoom: 12,
+        minzoom: 11,
         filter: ['==', ['get', 'kind'], 'station'],
         paint: {
-          'circle-radius': ['interpolate', ['linear'], ['zoom'], 12, 2.5, 15, 4.5],
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 11, 2, 15, 4.5],
           'circle-color': '#3b3663',
           'circle-stroke-color': '#ffffff',
           'circle-stroke-width': 1.4
         }
       },
       {
-        id: 'detail_station_labels',
+        id: `${source}_station_labels`,
         type: 'symbol',
-        source: 'detail',
+        source,
         'source-layer': 'pois',
-        minzoom: 13.5,
+        minzoom: 13,
         filter: ['==', ['get', 'kind'], 'station'],
         layout: {
           'text-field': ['coalesce', ['get', 'name:en'], ['get', 'name']],
@@ -256,6 +263,21 @@
         }
       }
     ];
+  }
+
+  function buildLocalStyle() {
+    const flavor = namedFlavor('light');
+    // Coarse whole-country tiles below the handoff zoom; detailed restaurant-area
+    // tiles at/above it. Namespacing keeps the two layer sets' ids unique.
+    const gbLayers = layers('gb', flavor, { lang: 'en' }).map((layer) => ({
+      ...layer,
+      maxzoom: BASEMAP_HANDOFF_ZOOM
+    }));
+    const detailLayers = layers('detail', flavor, { lang: 'en' }).map((layer) => ({
+      ...layer,
+      id: `detail_${layer.id}`,
+      minzoom: Math.max(layer.minzoom ?? 0, BASEMAP_HANDOFF_ZOOM)
+    }));
 
     return {
       version: 8,
@@ -273,14 +295,59 @@
           url: `pmtiles://${assetUrl('/basemap/detail.pmtiles')}`
         }
       },
-      layers: [...gbLayers, ...detailLayers, ...transitLayers]
+      layers: [...gbLayers, ...detailLayers, ...transitLayers('detail')]
     };
   }
 
+  // Online: full global Protomaps (all cities, all labels, max zoom) via the API.
+  function buildOnlineStyle() {
+    const flavor = namedFlavor('light');
+    return {
+      version: 8,
+      glyphs: assetUrl('/basemap/fonts/{fontstack}/{range}.pbf'),
+      sprite: assetUrl('/basemap/sprites/light'),
+      sources: {
+        world: {
+          type: 'vector',
+          tiles: [ONLINE_TILE_URL],
+          maxzoom: 15,
+          attribution:
+            '<a href="https://protomaps.com" target="_blank" rel="noreferrer">Protomaps</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a>'
+        }
+      },
+      layers: [...layers('world', flavor, { lang: 'en' }), ...transitLayers('world')]
+    };
+  }
+
+  // Zoom out far enough (offline) that the whole covered area fits with padding,
+  // computed for the current viewport so it works on desktop and mobile.
+  function updateOfflineMinZoom() {
+    if (!map) return;
+    const camera = map.cameraForBounds(GB_FIT_BOUNDS, { padding: 24 });
+    if (camera && Number.isFinite(camera.zoom)) {
+      map.setMinZoom(Math.max(MIN_ZOOM_OFFLINE_FLOOR - 1, camera.zoom - 0.25));
+    }
+  }
+
+  function applyBasemap() {
+    if (!map) return;
+    if (online && ONLINE_TILE_URL) {
+      map.setMaxBounds(null);
+      map.setMinZoom(MIN_ZOOM_ONLINE);
+      map.setStyle(buildOnlineStyle());
+    } else {
+      map.setStyle(buildLocalStyle());
+      map.setMaxBounds(OFFLINE_MAX_BOUNDS);
+      updateOfflineMinZoom();
+    }
+    scheduleMarkerDraw();
+  }
+
   function onConnectivityChange() {
-    // The map itself is fully local (same Protomaps tiles online or off); this only
-    // updates the connectivity indicator and whether external links will work.
-    online = navigator.onLine;
+    const next = navigator.onLine;
+    if (next === online) return;
+    online = next;
+    applyBasemap();
   }
 
   async function loadRestaurants() {
@@ -835,10 +902,10 @@
           {#if offlineState === 'downloading'}
             Saving {downloadPercent}%
           {:else if offlineState === 'ready'}
+            Offline
             <svg class="offline-icon" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
               <path d="M4 12.5l5 5 11-11" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
-            Offline
           {:else}
             Install
           {/if}
@@ -1166,7 +1233,7 @@
 
   .offline-icon {
     flex: 0 0 auto;
-    margin-right: -2px;
+    margin-left: -1px;
   }
 
   .roadmap-menu {
