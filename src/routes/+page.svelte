@@ -208,41 +208,41 @@
     return `${origin}${path}`;
   }
 
-  // Colour-coded Tube/DLR/Overground/Elizabeth lines from the bundled GeoJSON.
-  // Always visible (its own overlay), so the tube map shows even at low zoom —
-  // Protomaps omits subway geometry from low-zoom tiles, hence the old "pop in".
+  // All rail from the bundled GeoJSON: a navy base of every passenger track
+  // (complete coverage), plus colour-coded Tube/DLR/Overground/Elizabeth/rail
+  // routes on top. Always visible so the whole network shows even at low zoom
+  // (Protomaps omits most rail from low-zoom tiles and never colour-codes it).
   const TUBE_SOURCE = { type: 'geojson', data: '/tube-lines.geojson' };
-  const TUBE_LAYER = {
-    id: 'tube-lines',
-    type: 'line',
-    source: 'tube',
-    layout: { 'line-join': 'round', 'line-cap': 'round' },
-    paint: {
-      'line-color': ['coalesce', ['get', 'color'], '#666666'],
-      'line-width': ['interpolate', ['linear'], ['zoom'], 6, 0.8, 10, 1.6, 13, 2.8, 16, 4.5],
-      'line-opacity': 0.9
+  const RAIL_LAYERS = [
+    {
+      id: 'rail-base',
+      type: 'line',
+      source: 'tube',
+      filter: ['==', ['get', 'base'], true],
+      layout: { 'line-join': 'round', 'line-cap': 'round' },
+      paint: {
+        'line-color': '#41476b',
+        'line-width': ['interpolate', ['linear'], ['zoom'], 8, 0.4, 12, 1, 14, 1.6, 16, 2.4],
+        'line-opacity': 0.55
+      }
+    },
+    {
+      id: 'tube-lines',
+      type: 'line',
+      source: 'tube',
+      filter: ['==', ['get', 'base'], false],
+      layout: { 'line-join': 'round', 'line-cap': 'round' },
+      paint: {
+        'line-color': ['coalesce', ['get', 'color'], '#666666'],
+        'line-width': ['interpolate', ['linear'], ['zoom'], 6, 1, 10, 1.9, 13, 3, 16, 4.8],
+        'line-opacity': 0.95
+      }
     }
-  };
+  ];
 
-  // National-rail context (grey) + stations, from the basemap vector source. Tube
-  // itself is drawn by the colour-coded overlay above, not here.
+  // Stations from the basemap vector source (rail lines come from RAIL_LAYERS).
   function transitLayers(source) {
     return [
-      {
-        id: `${source}_rail_emphasis`,
-        type: 'line',
-        source,
-        'source-layer': 'roads',
-        minzoom: BASEMAP_HANDOFF_ZOOM,
-        filter: ['all', ['==', ['get', 'kind'], 'rail'], ['==', ['get', 'kind_detail'], 'rail']],
-        layout: { 'line-join': 'round', 'line-cap': 'round' },
-        paint: {
-          'line-color': '#8a8598',
-          'line-width': ['interpolate', ['linear'], ['zoom'], 9, 0.5, 12, 1.2, 14, 1.8, 16, 2.6],
-          'line-dasharray': [3, 1.5],
-          'line-opacity': 0.7
-        }
-      },
       {
         id: `${source}_stations`,
         type: 'circle',
@@ -337,10 +337,9 @@
     };
   }
 
-  // Stack: basemap -> national rail (grey) -> colour-coded tube overlay -> stations.
+  // Stack: basemap -> navy rail base -> colour-coded lines -> stations.
   function composeTransit(baseLayers, source) {
-    const [rail, stations, stationLabels] = transitLayers(source);
-    return [...baseLayers, rail, TUBE_LAYER, stations, stationLabels];
+    return [...baseLayers, ...RAIL_LAYERS, ...transitLayers(source)];
   }
 
   // Zoom out far enough (offline) that the whole covered area fits with padding,
