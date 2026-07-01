@@ -38,6 +38,8 @@ const RESTAURANTS = join(ROOT, 'static', 'data', 'restaurants.json');
 // Great Britain data bounds (from static/data/restaurants.json stats.bounds)
 const GB_BBOX = '-5.55,50.08,1.40,55.97';
 
+// z14 keeps the file under GitHub's 100 MB limit; buildings are present from z11
+// in the tiles, so they still render (overzoomed) when you zoom right in.
 const DETAIL_MAXZOOM = Number(process.env.DETAIL_MAXZOOM ?? 14);
 const GB_MAXZOOM = Number(process.env.GB_MAXZOOM ?? 9);
 
