@@ -1,71 +1,64 @@
 <script>
   import { onMount, tick } from 'svelte';
+  import maplibregl from 'maplibre-gl';
+  import 'maplibre-gl/dist/maplibre-gl.css';
+  import { Protocol } from 'pmtiles';
+  import { layers, namedFlavor } from '@protomaps/basemaps';
 
-  const TILE_SIZE = 256;
-  const MIN_ZOOM_FLOOR = 3;
-  const MAX_ZOOM = 19;
+  const MAX_ZOOM = 18;
+  const MIN_ZOOM = 4;
   const LOCATION_ZOOM = 14;
-  const DEFAULT_CENTER = { lat: 51.5074, lon: -0.1278 };
-  const DEFAULT_ZOOM = 9;
-  const LONDON_FALLBACK_BOUNDS = {
-    minLat: 51.2868,
-    maxLat: 51.6919,
-    minLon: -0.5103,
-    maxLon: 0.334
-  };
+  const SEARCH_ZOOM = 15;
+  // Zoom where the coarse GB basemap hands off to the detailed London basemap.
+  const BASEMAP_HANDOFF_ZOOM = 9;
   const SEARCH_LIMIT = 80;
-  const MARKER_PADDING = 48;
-  const VIEW_FIT_PADDING = 48;
   const HOME_VIEW_PADDING = 32;
-  const MARKER_SPRITE_PADDING = 10;
-  const MARKER_LAYER_OPACITY = 0.42;
-  const PRICED_MARKER_LAYER_OPACITY = 1 - (1 - MARKER_LAYER_OPACITY) / 2;
-  const WHEEL_ZOOM_PIXEL_SENSITIVITY = 0.0035;
-  const WHEEL_ZOOM_LINE_SENSITIVITY = 0.12;
-  const WHEEL_ZOOM_PAGE_SENSITIVITY = 0.8;
-  const MAX_WHEEL_ZOOM_DELTA = 0.65;
-  const FULL_MARKER_ZOOM = 14;
-  const MID_MARKER_ZOOM = 12;
   const DESCRIPTION_VISIBLE_LINES = 4;
   const MOBILE_SEARCH_VISIBLE_RESULTS = 4;
   const CITYMAPPER_ANDROID_PACKAGE = 'com.citymapper.app.release';
   const CITYMAPPER_ANDROID_STORE_URL = `https://play.google.com/store/apps/details?id=${CITYMAPPER_ANDROID_PACKAGE}`;
 
+  // ~97% of entries sit inside Greater London; this is the default/home view.
+  const LONDON_BOUNDS = {
+    minLat: 51.2868,
+    maxLat: 51.6919,
+    minLon: -0.5103,
+    maxLon: 0.334
+  };
+
+  // Marker colour by price, matching the previous canvas renderer.
+  const PRICE_COLOR_EXPR = [
+    'match',
+    ['get', 'priceRange'],
+    '$', '#2d8a5f',
+    '$$', '#2770a7',
+    '$$$', '#7f52a1',
+    '$$$$', '#252a31',
+    '#d43d2f'
+  ];
+
   let mapEl;
   let topbarEl;
-  let markerCanvas;
+  let map;
+  let mapReady = false;
   let restaurants = [];
+  let restaurantById = new Map();
   let stats = null;
   let loading = true;
   let loadError = '';
-  let width = 0;
-  let height = 0;
   let topbarHeight = 56;
-  let minZoom = 5;
-  let center = DEFAULT_CENTER;
-  let zoom = DEFAULT_ZOOM;
   let selected = null;
   let query = '';
   let priceFilter = 'all';
-  let activePointers = new Map();
-  let activePointer = null;
-  let dragStart = null;
-  let dragMoved = false;
-  let pinchStart = null;
-  let resizeObserver;
-  let markerHitState = { hits: [] };
-  let markerSpriteCache = new Map();
-  let markerLayerCanvas;
   let visibleMarkerCount = 0;
-  let markerDrawFrame = 0;
-  let panFrame = 0;
-  let pendingCenter = null;
-  let lastMarkerPick = null;
   let userLocation = null;
   let locationStatus = '';
   let locationWatchId = null;
   let homeViewApplied = false;
   let mapWasInteractedWith = false;
+  let lastMarkerPick = null;
+  let resizeObserver;
+
   let descriptionEl;
   let descriptionHasMore = false;
   let descriptionCanScrollDown = false;
@@ -95,32 +88,247 @@
 
   onMount(() => {
     isAndroidDevice = /Android/i.test(navigator.userAgent || '');
-    resizeObserver = new ResizeObserver(updateSize);
+
+    const protocol = new Protocol();
+    maplibregl.addProtocol('pmtiles', protocol.tile);
+
+    map = new maplibregl.Map({
+      container: mapEl,
+      style: buildStyle(),
+      center: [(LONDON_BOUNDS.minLon + LONDON_BOUNDS.maxLon) / 2, (LONDON_BOUNDS.minLat + LONDON_BOUNDS.maxLat) / 2],
+      zoom: 10,
+      minZoom: MIN_ZOOM,
+      maxZoom: MAX_ZOOM,
+      attributionControl: false,
+      dragRotate: false,
+      pitchWithRotate: false,
+      renderWorldCopies: false
+    });
+    map.touchZoomRotate.disableRotation();
+    map.keyboard.disableRotation?.();
+
+    map.on('error', (event) => console.error('MapLibre error:', event.error?.message || event.error, event.error));
+    map.on('load', onMapLoad);
+    map.on('movestart', (event) => {
+      if (event.originalEvent) mapWasInteractedWith = true;
+    });
+    map.on('moveend', updateVisibleMarkerCount);
+    map.on('idle', updateVisibleMarkerCount);
+
+    resizeObserver = new ResizeObserver(() => {
+      map?.resize();
+      if (topbarEl) topbarHeight = Math.ceil(topbarEl.getBoundingClientRect().height);
+      updateSearchResultsScrollState();
+    });
     if (mapEl) resizeObserver.observe(mapEl);
     if (topbarEl) resizeObserver.observe(topbarEl);
-    updateSize();
+    if (topbarEl) topbarHeight = Math.ceil(topbarEl.getBoundingClientRect().height);
+
     loadRestaurants();
     startLocationTracking();
 
     return () => {
       resizeObserver?.disconnect();
       stopLocationTracking();
+      map?.remove();
+      maplibregl.removeProtocol('pmtiles');
     };
   });
+
+  function assetUrl(path) {
+    const origin = typeof location !== 'undefined' ? location.origin : '';
+    return `${origin}${path}`;
+  }
+
+  function buildStyle() {
+    const flavor = namedFlavor('light');
+    // Coarse whole-country tiles render below the handoff zoom; detailed London
+    // tiles render at/above it. Splitting by zoom avoids double-drawn labels.
+    const gbLayers = layers('gb', flavor, { lang: 'en' }).map((layer) => ({
+      ...layer,
+      maxzoom: BASEMAP_HANDOFF_ZOOM
+    }));
+    // The two layer sets share layer ids, so namespace the London ones to keep
+    // them unique when both sets live in one style.
+    const londonLayers = layers('london', flavor, { lang: 'en' }).map((layer) => ({
+      ...layer,
+      id: `london_${layer.id}`,
+      minzoom: Math.max(layer.minzoom ?? 0, BASEMAP_HANDOFF_ZOOM)
+    }));
+
+    return {
+      version: 8,
+      glyphs: assetUrl('/basemap/fonts/{fontstack}/{range}.pbf'),
+      sprite: assetUrl('/basemap/sprites/light'),
+      sources: {
+        gb: {
+          type: 'vector',
+          url: `pmtiles://${assetUrl('/basemap/gb.pmtiles')}`,
+          attribution:
+            '<a href="https://protomaps.com" target="_blank" rel="noreferrer">Protomaps</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a>'
+        },
+        london: {
+          type: 'vector',
+          url: `pmtiles://${assetUrl('/basemap/london.pmtiles')}`
+        }
+      },
+      layers: [...gbLayers, ...londonLayers]
+    };
+  }
+
+  function onMapLoad() {
+    map.addSource('restaurants', { type: 'geojson', data: emptyCollection() });
+    map.addSource('user-accuracy', { type: 'geojson', data: emptyCollection() });
+    map.addSource('user-point', { type: 'geojson', data: emptyCollection() });
+
+    map.addLayer({
+      id: 'restaurants',
+      type: 'circle',
+      source: 'restaurants',
+      paint: {
+        'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 3, 12, 5, 14, 6.5, 16, 8],
+        'circle-color': PRICE_COLOR_EXPR,
+        'circle-opacity': ['case', ['==', ['get', 'priceRange'], ''], 0.62, 0.95],
+        'circle-stroke-color': '#ffffff',
+        'circle-stroke-opacity': 0.85,
+        'circle-stroke-width': ['interpolate', ['linear'], ['zoom'], 8, 0.5, 14, 1.2]
+      }
+    });
+
+    map.addLayer({
+      id: 'restaurant-price',
+      type: 'symbol',
+      source: 'restaurants',
+      minzoom: 13,
+      filter: ['!=', ['get', 'priceRange'], ''],
+      layout: {
+        'text-field': ['get', 'priceRange'],
+        'text-font': ['Noto Sans Medium'],
+        'text-size': 9,
+        'text-allow-overlap': true,
+        'text-ignore-placement': true
+      },
+      paint: {
+        'text-color': '#ffffff'
+      }
+    });
+
+    map.addLayer({
+      id: 'user-accuracy',
+      type: 'fill',
+      source: 'user-accuracy',
+      paint: {
+        'fill-color': '#2563eb',
+        'fill-opacity': 0.16
+      }
+    });
+
+    map.addLayer({
+      id: 'user-point',
+      type: 'circle',
+      source: 'user-point',
+      paint: {
+        'circle-radius': 8,
+        'circle-color': '#2563eb',
+        'circle-stroke-color': '#ffffff',
+        'circle-stroke-width': 3
+      }
+    });
+
+    map.addLayer({
+      id: 'restaurant-selected',
+      type: 'circle',
+      source: 'restaurants',
+      filter: ['==', ['get', 'id'], '__none__'],
+      paint: {
+        'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 7, 14, 11, 16, 14],
+        'circle-color': PRICE_COLOR_EXPR,
+        'circle-opacity': 1,
+        'circle-stroke-color': '#ffffff',
+        'circle-stroke-width': 3
+      }
+    });
+
+    map.on('click', onMapClick);
+    for (const layer of ['restaurants', 'restaurant-selected']) {
+      map.on('mouseenter', layer, () => (map.getCanvas().style.cursor = 'pointer'));
+      map.on('mouseleave', layer, () => (map.getCanvas().style.cursor = ''));
+    }
+
+    mapReady = true;
+    updateRestaurantSource(filteredRestaurants);
+    updateSelectedFilter(selected);
+    updateUserLocationLayers(userLocation);
+    applyFallbackHomeView();
+    updateVisibleMarkerCount();
+  }
+
+  function emptyCollection() {
+    return { type: 'FeatureCollection', features: [] };
+  }
+
+  function toFeatureCollection(items) {
+    return {
+      type: 'FeatureCollection',
+      features: items
+        .filter(hasCoordinates)
+        .map((restaurant) => ({
+          type: 'Feature',
+          id: restaurant.id,
+          geometry: { type: 'Point', coordinates: [restaurant.lon, restaurant.lat] },
+          properties: { id: restaurant.id, priceRange: restaurant.priceRange || '' }
+        }))
+    };
+  }
+
+  function updateRestaurantSource(items) {
+    const source = map?.getSource('restaurants');
+    if (source) source.setData(toFeatureCollection(items));
+  }
+
+  function updateSelectedFilter(restaurant) {
+    if (!mapReady) return;
+    map.setFilter('restaurant-selected', ['==', ['get', 'id'], restaurant?.id ?? '__none__']);
+  }
 
   async function loadRestaurants() {
     try {
       const response = await fetch('/data/restaurants.json');
       if (!response.ok) throw new Error(`Data request failed with ${response.status}`);
       const payload = await response.json();
-      restaurants = annotateMarkers(payload.restaurants || []);
+      restaurants = annotateRestaurants(payload.restaurants || []);
+      restaurantById = new Map(restaurants.map((restaurant) => [restaurant.id, restaurant]));
       stats = payload.stats || null;
-      applyFallbackHomeView();
+      if (mapReady) {
+        updateRestaurantSource(filteredRestaurants);
+        applyFallbackHomeView();
+        updateVisibleMarkerCount();
+      }
     } catch (error) {
       loadError = error instanceof Error ? error.message : String(error);
     } finally {
       loading = false;
     }
+  }
+
+  function annotateRestaurants(items) {
+    return items.map((item) => ({
+      ...item,
+      lat: Number(item.lat),
+      lon: Number(item.lon),
+      searchText: [
+        item.name,
+        item.address,
+        item.pageTitle,
+        item.description,
+        item.priceRange,
+        item.openFor,
+        item.bestFor
+      ]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase()
+    }));
   }
 
   $: searchText = query.trim().toLowerCase();
@@ -129,19 +337,13 @@
     if (!searchText) return true;
     return restaurant.searchText.includes(searchText);
   });
-  $: projectedCenter = project(center.lat, center.lon, zoom);
-  $: topLeft = {
-    x: projectedCenter.x - width / 2,
-    y: projectedCenter.y - height / 2
-  };
-  $: visibleTiles = getVisibleTiles(topLeft, width, height, zoom);
-  $: fallbackTiles = getFallbackTiles(topLeft, width, height, zoom);
   $: searchResults = searchText ? filteredRestaurants.slice(0, SEARCH_LIMIT) : [];
   $: selectedGoogleMapsUrl = selected ? getGoogleMapsUrl(selected) : '';
   $: selectedCitymapperUrl = selected ? getCitymapperUrl(selected, userLocation, isAndroidDevice) : '';
   $: totalCount = stats?.entryCount || restaurants.length;
-  $: minZoom = getMinimumZoom(stats?.bounds);
-  $: if (zoom < minZoom) zoom = minZoom;
+  $: if (mapReady) updateRestaurantSource(filteredRestaurants);
+  $: updateSelectedFilter(selected);
+  $: if (mapReady) updateUserLocationLayers(userLocation);
   $: {
     searchText;
     searchResults.length;
@@ -150,11 +352,50 @@
   $: {
     selected?.id;
     selected?.description;
-    width;
-    height;
     scheduleDescriptionMeasure();
   }
-  $: scheduleMarkerDraw(filteredRestaurants, topLeft, width, height, zoom, selected?.id, userLocation);
+
+  function updateVisibleMarkerCount() {
+    if (!mapReady) return;
+    const features = map.queryRenderedFeatures({ layers: ['restaurants'] });
+    const ids = new Set();
+    for (const feature of features) ids.add(feature.properties.id);
+    if (visibleMarkerCount !== ids.size) visibleMarkerCount = ids.size;
+  }
+
+  function onMapClick(event) {
+    const pad = 8; // tap tolerance in pixels
+    const box = [
+      [event.point.x - pad, event.point.y - pad],
+      [event.point.x + pad, event.point.y + pad]
+    ];
+    const features = map.queryRenderedFeatures(box, {
+      layers: ['restaurant-selected', 'restaurants']
+    });
+    if (!features.length) return;
+
+    const seen = new Set();
+    const ids = [];
+    for (const feature of features) {
+      const id = feature.properties.id;
+      if (!seen.has(id)) {
+        seen.add(id);
+        ids.push(id);
+      }
+    }
+
+    const key = ids.join('|');
+    const repeatedPick =
+      lastMarkerPick &&
+      lastMarkerPick.key === key &&
+      Math.abs(lastMarkerPick.x - event.point.x) <= 18 &&
+      Math.abs(lastMarkerPick.y - event.point.y) <= 18;
+    const index = repeatedPick ? (lastMarkerPick.index + 1) % ids.length : 0;
+    lastMarkerPick = { key, index, x: event.point.x, y: event.point.y };
+
+    const restaurant = restaurantById.get(ids[index]);
+    if (restaurant) selectRestaurant(restaurant);
+  }
 
   function scheduleDescriptionMeasure() {
     const selectedRestaurantId = selected?.id || '';
@@ -213,95 +454,8 @@
     searchResultsScrollbar = { top: thumbTop, height: thumbHeight };
   }
 
-  function annotateMarkers(items) {
-    const duplicateCounts = new Map();
-    const duplicateSeen = new Map();
-
-    for (const item of items) {
-      const key = `${Number(item.lat).toFixed(6)},${Number(item.lon).toFixed(6)}`;
-      duplicateCounts.set(key, (duplicateCounts.get(key) || 0) + 1);
-    }
-
-    return items.map((item) => {
-      const key = `${Number(item.lat).toFixed(6)},${Number(item.lon).toFixed(6)}`;
-      const duplicateIndex = duplicateSeen.get(key) || 0;
-      duplicateSeen.set(key, duplicateIndex + 1);
-      const offset = markerOffset(duplicateIndex, duplicateCounts.get(key) || 1);
-      const lat = Number(item.lat);
-      const lon = Number(item.lon);
-      const basePoint = project(lat, lon, 0);
-      return {
-        ...item,
-        lat,
-        lon,
-        duplicateCount: duplicateCounts.get(key) || 1,
-        duplicateIndex,
-        offsetX: offset.x,
-        offsetY: offset.y,
-        mapX: basePoint.x,
-        mapY: basePoint.y,
-        searchText: [
-          item.name,
-          item.address,
-          item.pageTitle,
-          item.description,
-          item.priceRange,
-          item.openFor,
-          item.bestFor
-        ]
-          .filter(Boolean)
-          .join(' ')
-          .toLowerCase()
-      };
-    });
-  }
-
-  function markerOffset(index, count) {
-    if (count <= 1) return { x: 0, y: 0 };
-    const ring = Math.floor(index / 8) + 1;
-    const angle = ((index % 8) / 8) * Math.PI * 2;
-    const radius = Math.min(24, 6 + ring * 5);
-    return {
-      x: Math.cos(angle) * radius,
-      y: Math.sin(angle) * radius
-    };
-  }
-
-  function updateSize() {
-    if (mapEl) {
-      const rect = mapEl.getBoundingClientRect();
-      width = rect.width;
-      height = rect.height;
-    }
-    if (topbarEl) {
-      topbarHeight = Math.ceil(topbarEl.getBoundingClientRect().height);
-    }
-    updateSearchResultsScrollState();
-    applyFallbackHomeView();
-  }
-
   function clamp(value, min, max) {
     return Math.min(max, Math.max(min, value));
-  }
-
-  function project(lat, lon, z) {
-    const sin = Math.sin((clamp(lat, -85.05112878, 85.05112878) * Math.PI) / 180);
-    const scale = TILE_SIZE * 2 ** z;
-    return {
-      x: ((lon + 180) / 360) * scale,
-      y: (0.5 - Math.log((1 + sin) / (1 - sin)) / (4 * Math.PI)) * scale
-    };
-  }
-
-  function unproject(x, y, z) {
-    const scale = TILE_SIZE * 2 ** z;
-    const lon = (x / scale) * 360 - 180;
-    const n = Math.PI - (2 * Math.PI * y) / scale;
-    const lat = (180 / Math.PI) * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n)));
-    return {
-      lat: clamp(lat, -85.05112878, 85.05112878),
-      lon: clamp(lon, -180, 180)
-    };
   }
 
   function hasCoordinates(restaurant) {
@@ -330,564 +484,28 @@
     return `intent://directions?${query}#Intent;scheme=citymapper;package=${CITYMAPPER_ANDROID_PACKAGE};S.browser_fallback_url=${encodeURIComponent(CITYMAPPER_ANDROID_STORE_URL)};end`;
   }
 
-  function getFitZoom(bounds, padding = VIEW_FIT_PADDING, maxZoom = MAX_ZOOM, minZoomLimit = MIN_ZOOM_FLOOR) {
-    if (!bounds || !width || !height) return;
-    const availableWidth = Math.max(1, width - padding * 2);
-    const availableHeight = Math.max(1, height - padding * 2);
-    for (let z = maxZoom; z >= minZoomLimit; z -= 1) {
-      const northwest = project(bounds.maxLat, bounds.minLon, z);
-      const southeast = project(bounds.minLat, bounds.maxLon, z);
-      if (
-        Math.abs(southeast.x - northwest.x) <= availableWidth &&
-        Math.abs(southeast.y - northwest.y) <= availableHeight
-      ) {
-        return z;
-      }
-    }
-    return minZoomLimit;
-  }
-
-  function getMinimumZoom(bounds) {
-    return getFitZoom(bounds, VIEW_FIT_PADDING, MAX_ZOOM, MIN_ZOOM_FLOOR) || 5;
-  }
-
-  function getTileZoom(z) {
-    return clamp(Math.floor(z), MIN_ZOOM_FLOOR, MAX_ZOOM);
-  }
-
-  function fitBounds(bounds, options = {}) {
-    if (!bounds || !width || !height) return false;
-    const padding = options.padding ?? VIEW_FIT_PADDING;
-    const maxZoom = options.maxZoom ?? MAX_ZOOM;
-    const centerLat = (bounds.minLat + bounds.maxLat) / 2;
-    const centerLon = (bounds.minLon + bounds.maxLon) / 2;
-    center = { lat: centerLat, lon: centerLon };
-    zoom = clamp(getFitZoom(bounds, padding, maxZoom, minZoom), minZoom, maxZoom);
-    return true;
+  function boundsAsLngLat(bounds) {
+    return [
+      [bounds.minLon, bounds.minLat],
+      [bounds.maxLon, bounds.maxLat]
+    ];
   }
 
   function applyFallbackHomeView() {
-    if (homeViewApplied || userLocation) return;
-    if (fitBounds(LONDON_FALLBACK_BOUNDS, { padding: HOME_VIEW_PADDING, maxZoom: 11 })) {
-      homeViewApplied = true;
-    }
-  }
-
-  function getTileLevelTiles(origin, viewportWidth, viewportHeight, displayZoom, tileZoom, keyPrefix = '') {
-    if (!viewportWidth || !viewportHeight) return [];
-    const tileSize = TILE_SIZE * 2 ** (displayZoom - tileZoom);
-    const scaleTiles = 2 ** tileZoom;
-    const minX = Math.floor(origin.x / tileSize) - 1;
-    const maxX = Math.floor((origin.x + viewportWidth) / tileSize) + 1;
-    const minY = Math.floor(origin.y / tileSize) - 1;
-    const maxY = Math.floor((origin.y + viewportHeight) / tileSize) + 1;
-    const tiles = [];
-    for (let x = minX; x <= maxX; x += 1) {
-      for (let y = minY; y <= maxY; y += 1) {
-        if (y < 0 || y >= scaleTiles) continue;
-        const wrappedX = ((x % scaleTiles) + scaleTiles) % scaleTiles;
-        tiles.push({
-          key: `${keyPrefix}${tileZoom}-${x}-${y}`,
-          url: `https://tile.openstreetmap.org/${tileZoom}/${wrappedX}/${y}.png`,
-          left: x * tileSize - origin.x,
-          top: y * tileSize - origin.y,
-          size: tileSize
-        });
-      }
-    }
-    return tiles;
-  }
-
-  function getVisibleTiles(origin, viewportWidth, viewportHeight, z) {
-    const tileZoom = getTileZoom(z);
-    return getTileLevelTiles(origin, viewportWidth, viewportHeight, z, tileZoom);
-  }
-
-  function getFallbackTiles(origin, viewportWidth, viewportHeight, z) {
-    if (!viewportWidth || !viewportHeight) return [];
-    const tileZoom = getTileZoom(z);
-    if (tileZoom <= MIN_ZOOM_FLOOR) return [];
-    const tiles = [];
-    const lowestFallbackZoom = Math.max(MIN_ZOOM_FLOOR, tileZoom - 2);
-    for (let fallbackZoom = lowestFallbackZoom; fallbackZoom < tileZoom; fallbackZoom += 1) {
-      tiles.push(...getTileLevelTiles(origin, viewportWidth, viewportHeight, z, fallbackZoom, 'fallback-'));
-    }
-    return tiles;
-  }
-
-  function getVisibleMarkerData(items, origin, viewportWidth, viewportHeight, z) {
-    if (!viewportWidth || !viewportHeight) return [];
-    const scale = 2 ** z;
-    const markers = [];
-    for (const restaurant of items) {
-      const x = restaurant.mapX * scale - origin.x + restaurant.offsetX;
-      const y = restaurant.mapY * scale - origin.y + restaurant.offsetY;
-      if (
-        x >= -MARKER_PADDING &&
-        x <= viewportWidth + MARKER_PADDING &&
-        y >= -MARKER_PADDING &&
-        y <= viewportHeight + MARKER_PADDING
-      ) {
-        markers.push({ restaurant, x, y });
-      }
-    }
-    return markers;
-  }
-
-  function markerColor(priceRange) {
-    if (priceRange === '$') return '#2d8a5f';
-    if (priceRange === '$$') return '#2770a7';
-    if (priceRange === '$$$') return '#7f52a1';
-    if (priceRange === '$$$$') return '#252a31';
-    return '#d43d2f';
-  }
-
-  function markerPriority(restaurant) {
-    return restaurant?.priceRange ? 1 : 0;
-  }
-
-  function markerDetail(z, active) {
-    if (active || z >= FULL_MARKER_ZOOM) {
-      return {
-        key: 'full',
-        radius: active ? 17 : 12,
-        strokeWidth: active ? 3 : 2,
-        shadowBlur: active ? 14 : 8,
-        shadowOffsetY: active ? 4 : 3,
-        showPrice: true
-      };
-    }
-
-    if (z >= MID_MARKER_ZOOM) {
-      return {
-        key: 'mid',
-        radius: 7,
-        strokeWidth: 1.5,
-        shadowBlur: 4,
-        shadowOffsetY: 2,
-        showPrice: false
-      };
-    }
-
-    return {
-      key: 'small',
-      radius: 4.5,
-      strokeWidth: 1,
-      shadowBlur: 2,
-      shadowOffsetY: 1,
-      showPrice: false
-    };
-  }
-
-  function scheduleMarkerDraw(items, origin, viewportWidth, viewportHeight, z, selectedId, location) {
-    if (!markerCanvas || !viewportWidth || !viewportHeight) return;
-    if (markerDrawFrame) cancelAnimationFrame(markerDrawFrame);
-    markerDrawFrame = requestAnimationFrame(() => {
-      markerDrawFrame = 0;
-      drawMarkers(items, origin, viewportWidth, viewportHeight, z, selectedId, location);
-    });
-  }
-
-  function drawMarkers(items, origin, viewportWidth, viewportHeight, z, selectedId, location) {
-    const canvas = markerCanvas;
-    if (!canvas) return;
-    const dpr = Math.max(1, window.devicePixelRatio || 1);
-    const targetWidth = Math.max(1, Math.round(viewportWidth * dpr));
-    const targetHeight = Math.max(1, Math.round(viewportHeight * dpr));
-    if (canvas.width !== targetWidth) canvas.width = targetWidth;
-    if (canvas.height !== targetHeight) canvas.height = targetHeight;
-    canvas.style.width = `${viewportWidth}px`;
-    canvas.style.height = `${viewportHeight}px`;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.clearRect(0, 0, viewportWidth, viewportHeight);
-
-    const markers = getVisibleMarkerData(items, origin, viewportWidth, viewportHeight, z);
-    if (visibleMarkerCount !== markers.length) visibleMarkerCount = markers.length;
-    markerHitState.hits = markers.map((marker) => ({
-      id: marker.restaurant.id,
-      x: marker.x,
-      y: marker.y,
-      radius: marker.restaurant.id === selectedId ? 17 : 13,
-      restaurant: marker.restaurant
-    }));
-
-    const selectedMarker = selectedId ? markers.find((marker) => marker.restaurant.id === selectedId) : null;
-    if (!markerLayerCanvas) markerLayerCanvas = document.createElement('canvas');
-    if (markerLayerCanvas.width !== targetWidth) markerLayerCanvas.width = targetWidth;
-    if (markerLayerCanvas.height !== targetHeight) markerLayerCanvas.height = targetHeight;
-    const layerCtx = markerLayerCanvas.getContext('2d');
-    if (!layerCtx) return;
-    layerCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    layerCtx.clearRect(0, 0, viewportWidth, viewportHeight);
-
-    const regularMarkers = [];
-    const pricedMarkers = [];
-    for (const marker of markers) {
-      if (marker.restaurant.id === selectedId) continue;
-      if (marker.restaurant.priceRange) {
-        pricedMarkers.push(marker);
-      } else {
-        regularMarkers.push(marker);
-      }
-    }
-
-    for (const marker of regularMarkers) {
-      drawMarker(layerCtx, marker, false, z);
-    }
-    ctx.save();
-    ctx.globalAlpha = MARKER_LAYER_OPACITY;
-    ctx.drawImage(markerLayerCanvas, 0, 0, viewportWidth, viewportHeight);
-    ctx.restore();
-
-    layerCtx.clearRect(0, 0, viewportWidth, viewportHeight);
-    for (const marker of pricedMarkers) {
-      drawMarker(layerCtx, marker, false, z);
-    }
-    ctx.save();
-    ctx.globalAlpha = PRICED_MARKER_LAYER_OPACITY;
-    ctx.drawImage(markerLayerCanvas, 0, 0, viewportWidth, viewportHeight);
-    ctx.restore();
-
-    if (selectedMarker) drawMarker(ctx, selectedMarker, true, z);
-    drawUserLocation(ctx, location, origin, viewportWidth, viewportHeight, z);
-  }
-
-  function drawMarker(ctx, marker, active, z) {
-    const sprite = getMarkerSprite(marker.restaurant.priceRange, active, z);
-    ctx.drawImage(sprite.canvas, marker.x - sprite.size / 2, marker.y - sprite.size / 2, sprite.size, sprite.size);
-  }
-
-  function getMarkerSprite(priceRange, active, z) {
-    const dpr = Math.max(1, window.devicePixelRatio || 1);
-    const normalizedPrice = priceRange || 'none';
-    const detail = markerDetail(z, active);
-    const key = `${normalizedPrice}-${active ? 'active' : detail.key}-${dpr}`;
-    const cached = markerSpriteCache.get(key);
-    if (cached) return cached;
-
-    const radius = detail.radius;
-    const size = (radius + MARKER_SPRITE_PADDING) * 2;
-    const canvas = document.createElement('canvas');
-    canvas.width = Math.ceil(size * dpr);
-    canvas.height = Math.ceil(size * dpr);
-    const ctx = canvas.getContext('2d');
-    const center = size / 2;
-
-    ctx.scale(dpr, dpr);
-    ctx.shadowColor = active ? 'rgba(27, 31, 28, 0.42)' : 'rgba(27, 31, 28, 0.26)';
-    ctx.shadowBlur = detail.shadowBlur;
-    ctx.shadowOffsetY = detail.shadowOffsetY;
-    ctx.beginPath();
-    ctx.arc(center, center, radius, 0, Math.PI * 2);
-    ctx.fillStyle = markerColor(priceRange);
-    ctx.fill();
-    ctx.shadowColor = 'transparent';
-    ctx.lineWidth = detail.strokeWidth;
-    ctx.strokeStyle = active ? 'rgba(255, 255, 255, 0.86)' : '#ffffff';
-    ctx.stroke();
-
-    if (priceRange && detail.showPrice) {
-      ctx.fillStyle = active ? 'rgba(255, 255, 255, 0.95)' : '#ffffff';
-      ctx.font = `800 ${priceRange.length >= 4 ? 7 : 8}px Inter, system-ui, sans-serif`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(priceRange, center, center + 0.5);
-    }
-
-    const sprite = { canvas, size };
-    markerSpriteCache.set(key, sprite);
-    return sprite;
-  }
-
-  function drawUserLocation(ctx, location, origin, viewportWidth, viewportHeight, z) {
-    if (!location) return;
-    const point = project(location.lat, location.lon, z);
-    const x = point.x - origin.x;
-    const y = point.y - origin.y;
-    if (x < -100 || x > viewportWidth + 100 || y < -100 || y > viewportHeight + 100) return;
-
-    const accuracyRadius = location.accuracy
-      ? clamp(location.accuracy / metersPerPixel(location.lat, z), 10, 90)
-      : 0;
-
-    ctx.save();
-    if (accuracyRadius) {
-      ctx.beginPath();
-      ctx.arc(x, y, accuracyRadius, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(37, 99, 235, 0.16)';
-      ctx.fill();
-      ctx.lineWidth = 1;
-      ctx.strokeStyle = 'rgba(37, 99, 235, 0.28)';
-      ctx.stroke();
-    }
-
-    ctx.shadowColor = 'rgba(27, 31, 28, 0.28)';
-    ctx.shadowBlur = 8;
-    ctx.shadowOffsetY = 3;
-    ctx.beginPath();
-    ctx.arc(x, y, 8, 0, Math.PI * 2);
-    ctx.fillStyle = '#2563eb';
-    ctx.fill();
-    ctx.shadowColor = 'transparent';
-    ctx.lineWidth = 3;
-    ctx.strokeStyle = '#ffffff';
-    ctx.stroke();
-    ctx.restore();
-  }
-
-  function metersPerPixel(lat, z) {
-    return (156543.03392 * Math.cos((lat * Math.PI) / 180)) / 2 ** z;
-  }
-
-  function isMapChrome(target) {
-    return Boolean(target?.closest?.('.topbar, .zoom-controls, .price-controls, .results-shell, .results-panel, .attribution'));
-  }
-
-  function pickMarker(clientX, clientY) {
-    if (!mapEl) return null;
-    const rect = mapEl.getBoundingClientRect();
-    const x = clientX - rect.left;
-    const y = clientY - rect.top;
-    const candidates = [];
-    for (const hit of markerHitState.hits) {
-      const dx = x - hit.x;
-      const dy = y - hit.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-      if (distance <= hit.radius + 10) {
-        candidates.push({ ...hit, distance });
-      }
-    }
-    if (!candidates.length) {
-      lastMarkerPick = null;
-      return null;
-    }
-
-    candidates.sort((a, b) => {
-      const distanceDifference = a.distance - b.distance;
-      if (Math.abs(distanceDifference) > 4) return distanceDifference;
-      return markerPriority(b.restaurant) - markerPriority(a.restaurant) || distanceDifference || String(a.id).localeCompare(String(b.id));
-    });
-    const key = candidates.map((candidate) => candidate.id).join('|');
-    const repeatedPick =
-      lastMarkerPick &&
-      lastMarkerPick.key === key &&
-      Math.abs(lastMarkerPick.x - clientX) <= 18 &&
-      Math.abs(lastMarkerPick.y - clientY) <= 18;
-    const index = repeatedPick ? (lastMarkerPick.index + 1) % candidates.length : 0;
-    lastMarkerPick = { key, index, x: clientX, y: clientY };
-    return candidates[index].restaurant;
-  }
-
-  function setCenterRaf(nextCenter) {
-    pendingCenter = nextCenter;
-    if (panFrame) return;
-    panFrame = requestAnimationFrame(() => {
-      panFrame = 0;
-      if (pendingCenter) {
-        center = pendingCenter;
-        pendingCenter = null;
-      }
-    });
-  }
-
-  function flushPendingCenter() {
-    if (!pendingCenter) return;
-    if (panFrame) {
-      cancelAnimationFrame(panFrame);
-      panFrame = 0;
-    }
-    center = pendingCenter;
-    pendingCenter = null;
-  }
-
-  function setLocationView(location) {
-    if (!location) return;
-    center = { lat: location.lat, lon: location.lon };
-    zoom = clamp(LOCATION_ZOOM, minZoom, MAX_ZOOM);
+    if (!mapReady || homeViewApplied || userLocation) return;
+    map.fitBounds(boundsAsLngLat(LONDON_BOUNDS), { padding: HOME_VIEW_PADDING, maxZoom: 11, animate: false });
     homeViewApplied = true;
   }
 
-  function eventPoint(event) {
-    return { x: event.clientX, y: event.clientY };
-  }
-
-  function pointerDistance(a, b) {
-    return Math.hypot(a.x - b.x, a.y - b.y);
-  }
-
-  function pointerMidpoint(a, b) {
-    return {
-      x: (a.x + b.x) / 2,
-      y: (a.y + b.y) / 2
-    };
-  }
-
-  function firstTwoPointers() {
-    return [...activePointers.values()].slice(0, 2);
-  }
-
-  function startPinch() {
-    const [first, second] = firstTwoPointers();
-    if (!first || !second) return;
-    flushPendingCenter();
-    const midpoint = pointerMidpoint(first, second);
-    pinchStart = {
-      distance: pointerDistance(first, second),
-      midpoint,
-      zoom,
-      anchorGeo: geoAtClient(midpoint.x, midpoint.y)
-    };
-    activePointer = null;
-    dragStart = null;
-    dragMoved = true;
-  }
-
-  function updatePinch() {
-    const [first, second] = firstTwoPointers();
-    if (!first || !second) return;
-    if (!pinchStart) startPinch();
-    if (!pinchStart) return;
-
-    const distance = pointerDistance(first, second);
-    const midpoint = pointerMidpoint(first, second);
-    const nextZoom = clamp(pinchStart.zoom + Math.log2(Math.max(1, distance) / Math.max(1, pinchStart.distance)), minZoom, MAX_ZOOM);
-    setZoomAtClient(midpoint.x, midpoint.y, nextZoom, pinchStart.anchorGeo);
-  }
-
-  function onPointerDown(event) {
-    if (isMapChrome(event.target)) return;
-    if (event.button !== undefined && event.button !== 0) return;
-    mapWasInteractedWith = true;
-    activePointers.set(event.pointerId, eventPoint(event));
-    mapEl?.setPointerCapture?.(event.pointerId);
-    if (activePointers.size >= 2) {
-      flushPendingCenter();
-      startPinch();
-      return;
-    }
-    activePointer = event.pointerId;
-    dragMoved = false;
-    dragStart = {
-      x: event.clientX,
-      y: event.clientY,
-      centerPx: project(center.lat, center.lon, zoom)
-    };
-  }
-
-  function onPointerMove(event) {
-    if (activePointers.has(event.pointerId)) {
-      activePointers.set(event.pointerId, eventPoint(event));
-    }
-    if (activePointers.size >= 2) {
-      updatePinch();
-      return;
-    }
-    if (activePointer !== event.pointerId || !dragStart) return;
-    const dx = event.clientX - dragStart.x;
-    const dy = event.clientY - dragStart.y;
-    if (Math.abs(dx) + Math.abs(dy) > 3) dragMoved = true;
-    setCenterRaf(unproject(dragStart.centerPx.x - dx, dragStart.centerPx.y - dy, zoom));
-  }
-
-  function onPointerUp(event) {
-    const wasPinching = Boolean(pinchStart) || activePointers.size >= 2;
-    activePointers.delete(event.pointerId);
-    mapEl?.releasePointerCapture?.(event.pointerId);
-
-    if (wasPinching) {
-      flushPendingCenter();
-      pinchStart = null;
-      const remainingPointer = activePointers.entries().next().value;
-      if (remainingPointer) {
-        activePointer = remainingPointer[0];
-        dragStart = {
-          x: remainingPointer[1].x,
-          y: remainingPointer[1].y,
-          centerPx: project(center.lat, center.lon, zoom)
-        };
-        dragMoved = true;
-      } else {
-        activePointer = null;
-        dragStart = null;
-      }
-      return;
-    }
-
-    if (activePointer !== event.pointerId) return;
-    flushPendingCenter();
-    if (!dragMoved && !isMapChrome(event.target)) {
-      const picked = pickMarker(event.clientX, event.clientY);
-      if (picked) selectRestaurant(picked);
-    }
-    activePointer = null;
-    dragStart = null;
-  }
-
-  function onWheel(event) {
-    if (isMapChrome(event.target)) return;
-    event.preventDefault();
-    if (!event.deltaY) return;
-    mapWasInteractedWith = true;
-    flushPendingCenter();
-    zoomAt(event.clientX, event.clientY, getWheelZoomDelta(event));
-    if (dragStart && activePointer !== null) {
-      const pointer = activePointers.get(activePointer) || eventPoint(event);
-      dragStart = {
-        x: pointer.x,
-        y: pointer.y,
-        centerPx: project(center.lat, center.lon, zoom)
-      };
-      dragMoved = true;
-    }
-  }
-
-  function getWheelZoomDelta(event) {
-    const sensitivity =
-      event.deltaMode === 1
-        ? WHEEL_ZOOM_LINE_SENSITIVITY
-        : event.deltaMode === 2
-          ? WHEEL_ZOOM_PAGE_SENSITIVITY
-          : WHEEL_ZOOM_PIXEL_SENSITIVITY;
-    return clamp(-event.deltaY * sensitivity, -MAX_WHEEL_ZOOM_DELTA, MAX_WHEEL_ZOOM_DELTA);
-  }
-
-  function geoAtClient(clientX, clientY) {
-    if (!mapEl) return center;
-    const rect = mapEl.getBoundingClientRect();
-    const currentCenter = project(center.lat, center.lon, zoom);
-    const currentTopLeft = {
-      x: currentCenter.x - width / 2,
-      y: currentCenter.y - height / 2
-    };
-    return unproject(currentTopLeft.x + clientX - rect.left, currentTopLeft.y + clientY - rect.top, zoom);
-  }
-
-  function setZoomAtClient(clientX, clientY, nextZoom, anchorGeo = null) {
-    if (!mapEl) return;
-    const clampedZoom = clamp(nextZoom, minZoom, MAX_ZOOM);
-    if (clampedZoom === zoom && !anchorGeo) return;
-    const rect = mapEl.getBoundingClientRect();
-    const anchor = anchorGeo || geoAtClient(clientX, clientY);
-    const afterPoint = project(anchor.lat, anchor.lon, clampedZoom);
-    const nextTopLeft = {
-      x: afterPoint.x - (clientX - rect.left),
-      y: afterPoint.y - (clientY - rect.top)
-    };
-    center = unproject(nextTopLeft.x + width / 2, nextTopLeft.y + height / 2, clampedZoom);
-    zoom = clampedZoom;
-  }
-
-  function zoomAt(clientX, clientY, delta) {
-    const nextZoom = clamp(zoom + delta, minZoom, MAX_ZOOM);
-    if (nextZoom === zoom) return;
-    setZoomAtClient(clientX, clientY, nextZoom);
+  function setLocationView(location) {
+    if (!location || !mapReady) return;
+    map.flyTo({ center: [location.lon, location.lat], zoom: clamp(LOCATION_ZOOM, MIN_ZOOM, MAX_ZOOM) });
+    homeViewApplied = true;
   }
 
   function zoomButton(delta) {
-    zoomAt(width / 2 + (mapEl?.getBoundingClientRect().left || 0), height / 2 + (mapEl?.getBoundingClientRect().top || 0), delta);
+    if (!map) return;
+    map.easeTo({ zoom: clamp(map.getZoom() + delta, MIN_ZOOM, MAX_ZOOM), duration: 200 });
   }
 
   function selectRestaurant(restaurant) {
@@ -897,9 +515,9 @@
   function selectSearchResult(restaurant) {
     selected = restaurant;
     mapWasInteractedWith = true;
-    if (!Number.isFinite(restaurant?.lat) || !Number.isFinite(restaurant?.lon)) return;
-    center = { lat: restaurant.lat, lon: restaurant.lon };
+    if (!hasCoordinates(restaurant)) return;
     homeViewApplied = true;
+    map?.flyTo({ center: [restaurant.lon, restaurant.lat], zoom: Math.max(map.getZoom(), SEARCH_ZOOM) });
   }
 
   function closeDetails() {
@@ -907,16 +525,58 @@
   }
 
   function resetMap() {
+    selected = null;
+    query = '';
+    priceFilter = 'all';
+    lastMarkerPick = null;
     if (userLocation) {
       setLocationView(userLocation);
     } else {
       homeViewApplied = false;
       applyFallbackHomeView();
     }
-    selected = null;
-    query = '';
-    priceFilter = 'all';
-    lastMarkerPick = null;
+  }
+
+  function geoCircle(lat, lon, radiusMeters, points = 48) {
+    const coords = [];
+    const earthRadius = 6371000;
+    const angular = radiusMeters / earthRadius;
+    const latR = (lat * Math.PI) / 180;
+    const lonR = (lon * Math.PI) / 180;
+    for (let i = 0; i <= points; i += 1) {
+      const bearing = (i / points) * 2 * Math.PI;
+      const lat2 = Math.asin(Math.sin(latR) * Math.cos(angular) + Math.cos(latR) * Math.sin(angular) * Math.cos(bearing));
+      const lon2 =
+        lonR + Math.atan2(Math.sin(bearing) * Math.sin(angular) * Math.cos(latR), Math.cos(angular) - Math.sin(latR) * Math.sin(lat2));
+      coords.push([(lon2 * 180) / Math.PI, (lat2 * 180) / Math.PI]);
+    }
+    return { type: 'Feature', geometry: { type: 'Polygon', coordinates: [coords] }, properties: {} };
+  }
+
+  function updateUserLocationLayers(location) {
+    const pointSource = map?.getSource('user-point');
+    const accuracySource = map?.getSource('user-accuracy');
+    if (!pointSource || !accuracySource) return;
+
+    if (!location || !hasCoordinates(location)) {
+      pointSource.setData(emptyCollection());
+      accuracySource.setData(emptyCollection());
+      return;
+    }
+
+    pointSource.setData({
+      type: 'FeatureCollection',
+      features: [{ type: 'Feature', geometry: { type: 'Point', coordinates: [location.lon, location.lat] }, properties: {} }]
+    });
+
+    if (location.accuracy) {
+      accuracySource.setData({
+        type: 'FeatureCollection',
+        features: [geoCircle(location.lat, location.lon, location.accuracy)]
+      });
+    } else {
+      accuracySource.setData(emptyCollection());
+    }
   }
 
   function startLocationTracking(options = {}) {
@@ -970,45 +630,13 @@
   <title>Eater Restaurant Map</title>
   <meta
     name="description"
-    content="Full map of restaurants featured in Eater map guides."
+    content="Full map of restaurants featured in Eater map guides. Works offline."
   />
 </svelte:head>
 
 <main class="app-shell">
-  <section
-    class="map"
-    bind:this={mapEl}
-    on:pointerdown={onPointerDown}
-    on:pointermove={onPointerMove}
-    on:pointerup={onPointerUp}
-    on:pointercancel={onPointerUp}
-    on:wheel={onWheel}
-    style={`--topbar-height: ${topbarHeight}px; --mobile-search-visible-results: ${MOBILE_SEARCH_VISIBLE_RESULTS};`}
-    role="application"
-    aria-label="Restaurant map"
-  >
-    <div class="tile-layer" aria-hidden="true">
-      {#each fallbackTiles as tile (tile.key)}
-        <img
-          class="tile tile-fallback"
-          src={tile.url}
-          alt=""
-          draggable="false"
-          style={`width: ${tile.size}px; height: ${tile.size}px; transform: translate3d(${tile.left}px, ${tile.top}px, 0);`}
-        />
-      {/each}
-      {#each visibleTiles as tile (tile.key)}
-        <img
-          class="tile"
-          src={tile.url}
-          alt=""
-          draggable="false"
-          style={`width: ${tile.size}px; height: ${tile.size}px; transform: translate3d(${tile.left}px, ${tile.top}px, 0);`}
-        />
-      {/each}
-    </div>
-
-    <canvas class="marker-layer" bind:this={markerCanvas} aria-hidden="true"></canvas>
+  <section class="map" style={`--topbar-height: ${topbarHeight}px; --mobile-search-visible-results: ${MOBILE_SEARCH_VISIBLE_RESULTS};`}>
+    <div class="map-canvas" bind:this={mapEl} role="application" aria-label="Restaurant map"></div>
 
     {#if loading}
       <div class="state-pill">Loading</div>
@@ -1081,6 +709,8 @@
     {/if}
 
     <div class="attribution">
+      <a href="https://protomaps.com" target="_blank" rel="noreferrer">Protomaps</a>
+      <span aria-hidden="true">·</span>
       <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a>
     </div>
   </section>
@@ -1200,33 +830,20 @@
     min-width: 0;
     height: 100%;
     overflow: hidden;
-    touch-action: none;
     background: #d8dfd4;
-    cursor: grab;
   }
 
-  .map:active {
-    cursor: grabbing;
-  }
-
-  .tile-layer,
-  .marker-layer {
+  .map-canvas {
     position: absolute;
     inset: 0;
   }
 
-  .marker-layer {
-    z-index: 2;
-    pointer-events: none;
-  }
-
-  .tile {
-    position: absolute;
-    width: 256px;
-    height: 256px;
-    user-select: none;
-    will-change: transform;
-    backface-visibility: hidden;
+  /* MapLibre draws its own controls; we use custom chrome instead. */
+  :global(.maplibregl-ctrl-top-right),
+  :global(.maplibregl-ctrl-bottom-left),
+  :global(.maplibregl-ctrl-bottom-right),
+  :global(.maplibregl-ctrl-top-left) {
+    display: none;
   }
 
   .topbar {
@@ -1336,6 +953,7 @@
     cursor: pointer;
     font-weight: 800;
     list-style: none;
+    pointer-events: auto;
   }
 
   .roadmap-menu summary::-webkit-details-marker {
@@ -1362,6 +980,7 @@
     border-radius: 8px;
     background: rgba(255, 252, 244, 0.98);
     box-shadow: 0 18px 40px rgba(27, 31, 28, 0.18);
+    pointer-events: auto;
   }
 
   .roadmap-menu li {
@@ -1488,6 +1107,8 @@
     right: 10px;
     bottom: 8px;
     z-index: 8;
+    display: flex;
+    gap: 5px;
     padding: 3px 6px;
     border-radius: 5px;
     background: rgba(255, 252, 244, 0.82);

@@ -1,5 +1,17 @@
 # Deployment Notes
 
+## Offline Basemap + PWA
+
+The app is a static, offline-first PWA (`@sveltejs/adapter-static`). `pnpm build` writes the self-contained site to `build/`. `vercel.json` points Vercel at that output directory. The offline vector basemap lives in `static/basemap/` and is built separately with `pnpm build:basemap` (see README). The `*.pmtiles` files are stored via Git LFS, so ensure LFS is available wherever the repo is cloned/built.
+
+Current generated basemap sizes:
+
+- `static/basemap/london.pmtiles` (Greater London, zoom 14): ~72 MB
+- `static/basemap/gb.pmtiles` (Great Britain, zoom 9): ~14 MB
+- `static/basemap/fonts/` + `sprites/`: ~2 MB
+
+Note on iOS: Safari PWAs can evict Cache Storage under memory pressure. Keeping `london.pmtiles` modest (drop `LONDON_MAXZOOM` to 13 if needed) keeps the install reliable on iOS. Android requests persistent storage automatically.
+
 ## Data Build
 
 The rich scrape database stays outside the hosted app. To rebuild the small public database and the JSON used by the website, run:
