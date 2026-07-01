@@ -72,6 +72,52 @@
   let measuredSearchText = '';
   let isAndroidDevice = false;
 
+  // Offline download / install-to-home-screen state.
+  let offlineState = 'unknown'; // 'downloading' | 'ready' | 'idle' | 'hidden'
+  let downloadLoaded = 0;
+  let downloadTotal = 0;
+  let deferredInstallPrompt = null;
+  let canInstall = false;
+  let isIosDevice = false;
+  let isStandalone = false;
+  let showIosHelp = false;
+
+  function onBeforeInstallPrompt(event) {
+    event.preventDefault();
+    deferredInstallPrompt = event;
+    canInstall = true;
+  }
+
+  function onServiceWorkerMessage(event) {
+    const data = event.data || {};
+    if (data.type === 'precache-progress') {
+      offlineState = data.loaded >= data.total && data.total > 0 ? 'ready' : 'downloading';
+      downloadLoaded = data.loaded || 0;
+      downloadTotal = data.total || 0;
+    } else if (data.type === 'precache-done') {
+      offlineState = 'ready';
+      if (data.total) {
+        downloadLoaded = data.total;
+        downloadTotal = data.total;
+      }
+    } else if (data.type === 'precache-idle') {
+      if (offlineState === 'unknown') offlineState = 'idle';
+    }
+  }
+
+  async function installApp() {
+    if (deferredInstallPrompt) {
+      deferredInstallPrompt.prompt();
+      await deferredInstallPrompt.userChoice;
+      deferredInstallPrompt = null;
+      canInstall = false;
+    } else if (isIosDevice) {
+      showIosHelp = true;
+    }
+  }
+
+  $: downloadPercent = downloadTotal ? Math.min(100, Math.round((downloadLoaded / downloadTotal) * 100)) : 0;
+
   const prices = ['all', '$', '$$', '$$$', '$$$$'];
   const roadmapItems = [
     'Remove closed restaurants',
@@ -88,6 +134,21 @@
 
   onMount(() => {
     isAndroidDevice = /Android/i.test(navigator.userAgent || '');
+    isIosDevice = /iPad|iPhone|iPod/i.test(navigator.userAgent || '') && !window.MSStream;
+    isStandalone =
+      window.matchMedia?.('(display-mode: standalone)').matches || navigator.standalone === true;
+
+    window.addEventListener('beforeinstallprompt', onBeforeInstallPrompt);
+    window.addEventListener('appinstalled', () => {
+      canInstall = false;
+      isStandalone = true;
+    });
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.addEventListener('message', onServiceWorkerMessage);
+      navigator.serviceWorker.ready
+        .then(() => navigator.serviceWorker.controller?.postMessage({ type: 'get-status' }))
+        .catch(() => {});
+    }
 
     const protocol = new Protocol();
     maplibregl.addProtocol('pmtiles', protocol.tile);
@@ -132,6 +193,10 @@
       stopLocationTracking();
       map?.remove();
       maplibregl.removeProtocol('pmtiles');
+      window.removeEventListener('beforeinstallprompt', onBeforeInstallPrompt);
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.removeEventListener('message', onServiceWorkerMessage);
+      }
     };
   });
 
@@ -713,7 +778,48 @@
       <span aria-hidden="true">·</span>
       <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a>
     </div>
+
+    {#if !isStandalone && (offlineState === 'downloading' || offlineState === 'ready') && !searchResults.length}
+      <div class="offline-pill" class:downloading={offlineState === 'downloading'}>
+        {#if offlineState === 'downloading'}
+          <span class="offline-status">
+            <span class="offline-spinner" aria-hidden="true"></span>
+            Saving offline map… {downloadTotal ? `${downloadPercent}%` : `${Math.round(downloadLoaded / 1048576)} MB`}
+          </span>
+          {#if downloadTotal}
+            <span class="offline-bar" aria-hidden="true"><span style={`width: ${downloadPercent}%;`}></span></span>
+          {/if}
+        {:else}
+          <span class="offline-status">
+            <span class="offline-check" aria-hidden="true">✓</span>
+            Available offline
+          </span>
+          {#if canInstall}
+            <button type="button" class="offline-action" on:click={installApp}>Install app</button>
+          {:else if isIosDevice}
+            <button type="button" class="offline-action" on:click={() => (showIosHelp = true)}>Add to Home Screen</button>
+          {/if}
+          <button type="button" class="offline-dismiss" on:click={() => (offlineState = 'hidden')} aria-label="Dismiss">×</button>
+        {/if}
+      </div>
+    {/if}
   </section>
+
+  {#if showIosHelp}
+    <div class="ios-help" role="dialog" aria-modal="true" on:click={() => (showIosHelp = false)}>
+      <div class="ios-help-card" on:click|stopPropagation>
+        <h2>Install on iPhone or iPad</h2>
+        <p>To keep the map on your home screen and use it offline:</p>
+        <ol>
+          <li>Tap the <strong>Share</strong> button in Safari (the square with an up arrow).</li>
+          <li>Scroll down and choose <strong>Add to Home Screen</strong>.</li>
+          <li>Tap <strong>Add</strong>, then open the app from your home screen.</li>
+        </ol>
+        <p class="ios-help-note">The map is already saved on this device, so it will work with no internet.</p>
+        <button type="button" on:click={() => (showIosHelp = false)}>Got it</button>
+      </div>
+    </div>
+  {/if}
 
   <aside class:open={selected} class="details-panel">
     {#if selected}
@@ -1117,6 +1223,156 @@
 
   .attribution a {
     color: #38433e;
+  }
+
+  .offline-pill {
+    position: absolute;
+    top: calc(max(12px, env(safe-area-inset-top)) + var(--topbar-height, 56px) + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 11;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: calc(100vw - 24px);
+    padding: 8px 10px 8px 14px;
+    border: 1px solid rgba(23, 32, 28, 0.14);
+    border-radius: 999px;
+    background: rgba(255, 252, 244, 0.98);
+    box-shadow: 0 10px 26px rgba(27, 31, 28, 0.16);
+    font-size: 13px;
+    font-weight: 700;
+    color: #17201c;
+    pointer-events: auto;
+  }
+
+  .offline-pill.downloading {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    border-radius: 12px;
+    padding: 10px 14px;
+  }
+
+  .offline-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+  }
+
+  .offline-check {
+    color: #2d8a5f;
+    font-weight: 900;
+  }
+
+  .offline-spinner {
+    width: 13px;
+    height: 13px;
+    border: 2px solid rgba(23, 32, 28, 0.2);
+    border-top-color: #2563eb;
+    border-radius: 50%;
+    animation: offline-spin 0.7s linear infinite;
+  }
+
+  @keyframes offline-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .offline-bar {
+    display: block;
+    height: 4px;
+    border-radius: 999px;
+    background: rgba(23, 32, 28, 0.12);
+    overflow: hidden;
+  }
+
+  .offline-bar span {
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+    background: #2563eb;
+    transition: width 200ms ease;
+  }
+
+  .offline-action {
+    padding: 6px 12px;
+    border: 0;
+    border-radius: 999px;
+    color: #fff;
+    background: #17201c;
+    font-weight: 800;
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  .offline-dismiss {
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    color: #6a5f55;
+    background: transparent;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .ios-help {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    display: grid;
+    place-items: center;
+    padding: 20px;
+    background: rgba(23, 32, 28, 0.5);
+  }
+
+  .ios-help-card {
+    width: min(360px, 100%);
+    padding: 20px 22px;
+    border-radius: 14px;
+    background: #fffdf7;
+    box-shadow: 0 24px 60px rgba(27, 31, 28, 0.3);
+  }
+
+  .ios-help-card h2 {
+    margin: 0 0 8px;
+    font-size: 18px;
+  }
+
+  .ios-help-card p {
+    margin: 0 0 10px;
+    color: #5f675f;
+    line-height: 1.4;
+    font-size: 14px;
+  }
+
+  .ios-help-card ol {
+    margin: 0 0 12px;
+    padding-left: 20px;
+    display: grid;
+    gap: 8px;
+    line-height: 1.4;
+    font-size: 14px;
+  }
+
+  .ios-help-note {
+    font-size: 13px;
+  }
+
+  .ios-help-card button {
+    width: 100%;
+    min-height: 42px;
+    border: 0;
+    border-radius: 8px;
+    color: #fff;
+    background: #17201c;
+    font-weight: 800;
+    cursor: pointer;
   }
 
   .details-panel {

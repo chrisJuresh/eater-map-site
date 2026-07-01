@@ -14,15 +14,94 @@ const PRECACHE = [...build, ...files, ...prerendered, '/'];
 
 const sw = /** @type {ServiceWorkerGlobalScope} */ (/** @type {unknown} */ (self));
 
+async function broadcast(message) {
+  const clients = await sw.clients.matchAll({ includeUncontrolled: true, type: 'window' });
+  for (const client of clients) client.postMessage(message);
+}
+
+// Precache everything with byte-level progress so the UI can show a download bar.
+async function precacheWithProgress() {
+  const cache = await caches.open(CACHE);
+  const urls = [...new Set(PRECACHE)];
+
+  // Total size up front (HEAD requests) so we can show a percentage.
+  const sizes = await Promise.all(
+    urls.map(async (url) => {
+      try {
+        const head = await fetch(url, { method: 'HEAD' });
+        return Number(head.headers.get('content-length')) || 0;
+      } catch {
+        return 0;
+      }
+    })
+  );
+  const total = sizes.reduce((a, b) => a + b, 0);
+
+  let loaded = 0;
+  let lastReport = 0;
+  const report = async (done = false) => {
+    if (done || loaded - lastReport >= 512 * 1024) {
+      lastReport = loaded;
+      await broadcast({ type: 'precache-progress', loaded, total });
+    }
+  };
+  await report(true);
+
+  for (const url of urls) {
+    try {
+      const response = await fetch(url);
+      if (response.body) {
+        const reader = response.body.getReader();
+        const chunks = [];
+        for (;;) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          chunks.push(value);
+          loaded += value.length;
+          await report();
+        }
+        const blob = new Blob(chunks);
+        const headers = new Headers();
+        const contentType = response.headers.get('content-type');
+        if (contentType) headers.set('content-type', contentType);
+        headers.set('content-length', String(blob.size));
+        await cache.put(url, new Response(blob, { status: response.status, statusText: response.statusText, headers }));
+      } else {
+        const buffer = await response.arrayBuffer();
+        loaded += buffer.byteLength;
+        await cache.put(url, new Response(buffer));
+        await report();
+      }
+    } catch {
+      // Skip an individual asset that fails; the rest still cache.
+    }
+  }
+
+  await broadcast({ type: 'precache-done', loaded, total });
+}
+
 sw.addEventListener('install', (event) => {
   event.waitUntil(
     (async () => {
-      const cache = await caches.open(CACHE);
-      // Dedupe; some entries (e.g. '/') can repeat.
-      await cache.addAll([...new Set(PRECACHE)]);
+      await precacheWithProgress();
       await sw.skipWaiting();
     })()
   );
+});
+
+sw.addEventListener('message', (event) => {
+  const data = event.data || {};
+  if (data.type === 'get-status') {
+    event.waitUntil(
+      (async () => {
+        const cache = await caches.open(CACHE);
+        // The London basemap is the last big asset; if it's cached we're offline-ready.
+        const ready = Boolean(await cache.match('/basemap/london.pmtiles'));
+        const target = event.source || (await sw.clients.matchAll({ includeUncontrolled: true, type: 'window' }))[0];
+        target?.postMessage({ type: ready ? 'precache-done' : 'precache-idle' });
+      })()
+    );
+  }
 });
 
 sw.addEventListener('activate', (event) => {
