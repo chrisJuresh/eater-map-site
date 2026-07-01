@@ -208,8 +208,24 @@
     return `${origin}${path}`;
   }
 
-  // Railway/tube lines + stations, kept steadily visible (from the handoff zoom up)
-  // so they don't pop in and out. Reused for the local and online sources.
+  // Colour-coded Tube/DLR/Overground/Elizabeth lines from the bundled GeoJSON.
+  // Always visible (its own overlay), so the tube map shows even at low zoom —
+  // Protomaps omits subway geometry from low-zoom tiles, hence the old "pop in".
+  const TUBE_SOURCE = { type: 'geojson', data: '/tube-lines.geojson' };
+  const TUBE_LAYER = {
+    id: 'tube-lines',
+    type: 'line',
+    source: 'tube',
+    layout: { 'line-join': 'round', 'line-cap': 'round' },
+    paint: {
+      'line-color': ['coalesce', ['get', 'color'], '#666666'],
+      'line-width': ['interpolate', ['linear'], ['zoom'], 6, 0.8, 10, 1.6, 13, 2.8, 16, 4.5],
+      'line-opacity': 0.9
+    }
+  };
+
+  // National-rail context (grey) + stations, from the basemap vector source. Tube
+  // itself is drawn by the colour-coded overlay above, not here.
   function transitLayers(source) {
     return [
       {
@@ -218,13 +234,13 @@
         source,
         'source-layer': 'roads',
         minzoom: BASEMAP_HANDOFF_ZOOM,
-        filter: ['==', ['get', 'kind'], 'rail'],
+        filter: ['all', ['==', ['get', 'kind'], 'rail'], ['==', ['get', 'kind_detail'], 'rail']],
         layout: { 'line-join': 'round', 'line-cap': 'round' },
         paint: {
-          'line-color': '#6f6a86',
-          'line-width': ['interpolate', ['linear'], ['zoom'], 9, 0.6, 12, 1.4, 14, 2.2, 16, 3.2],
+          'line-color': '#8a8598',
+          'line-width': ['interpolate', ['linear'], ['zoom'], 9, 0.5, 12, 1.2, 14, 1.8, 16, 2.6],
           'line-dasharray': [3, 1.5],
-          'line-opacity': 0.8
+          'line-opacity': 0.7
         }
       },
       {
@@ -293,9 +309,10 @@
         detail: {
           type: 'vector',
           url: `pmtiles://${assetUrl('/basemap/detail.pmtiles')}`
-        }
+        },
+        tube: TUBE_SOURCE
       },
-      layers: [...gbLayers, ...detailLayers, ...transitLayers('detail')]
+      layers: composeTransit([...gbLayers, ...detailLayers], 'detail')
     };
   }
 
@@ -313,10 +330,17 @@
           maxzoom: 15,
           attribution:
             '<a href="https://protomaps.com" target="_blank" rel="noreferrer">Protomaps</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a>'
-        }
+        },
+        tube: TUBE_SOURCE
       },
-      layers: [...layers('world', flavor, { lang: 'en' }), ...transitLayers('world')]
+      layers: composeTransit(layers('world', flavor, { lang: 'en' }), 'world')
     };
+  }
+
+  // Stack: basemap -> national rail (grey) -> colour-coded tube overlay -> stations.
+  function composeTransit(baseLayers, source) {
+    const [rail, stations, stationLabels] = transitLayers(source);
+    return [...baseLayers, rail, TUBE_LAYER, stations, stationLabels];
   }
 
   // Zoom out far enough (offline) that the whole covered area fits with padding,
