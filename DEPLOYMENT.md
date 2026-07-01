@@ -2,15 +2,19 @@
 
 ## Offline Basemap + PWA
 
-The app is a static, offline-first PWA (`@sveltejs/adapter-static`). `pnpm build` writes the self-contained site to `build/`. `vercel.json` points Vercel at that output directory. The offline vector basemap lives in `static/basemap/` and is built separately with `pnpm build:basemap` (see README). The `*.pmtiles` files are stored via Git LFS, so ensure LFS is available wherever the repo is cloned/built.
+The app is a static, offline-first PWA (`@sveltejs/adapter-static`). `pnpm build` writes the self-contained site to `build/`. `vercel.json` points Vercel at that output directory. The vector basemap lives in `static/basemap/` and is built separately with `pnpm build:basemap` (see README). The map uses the same Protomaps tiles online and offline (green parks, blue water, tube/rail). The `*.pmtiles` files are committed as regular Git binaries (NOT Git LFS — Vercel serves LFS pointer stubs, which breaks the deployed map).
 
 Current generated basemap sizes:
 
-- `static/basemap/london.pmtiles` (Greater London, zoom 14): ~72 MB
+- `static/basemap/detail.pmtiles` (restaurant areas, zoom 14): ~63 MB
 - `static/basemap/gb.pmtiles` (Great Britain, zoom 9): ~14 MB
 - `static/basemap/fonts/` + `sprites/`: ~2 MB
 
-Note on iOS: Safari PWAs can evict Cache Storage under memory pressure. Keeping `london.pmtiles` modest (drop `LONDON_MAXZOOM` to 13 if needed) keeps the install reliable on iOS. Android requests persistent storage automatically.
+Detail is capped at zoom 14 so `detail.pmtiles` stays under **GitHub's 100 MB per-file limit** (committed as a regular binary; zoom 15 is ~130 MB and gets rejected). Buildings are present in the tiles from zoom 11, so they still render when you zoom right in (overzoomed z14 geometry). To go higher you'd need to split the file or use a keyed tile host.
+
+The map is constrained to Great Britain (there are no tiles beyond it). Keyless global Protomaps online is not possible (`build.protomaps.com` has no CORS; `api.protomaps.com` needs a key), so worldwide roaming would require a keyed provider.
+
+Note on iOS: Safari PWAs can evict Cache Storage under memory pressure; ~63 MB is comfortable. Android requests persistent storage automatically.
 
 ## Data Build
 

@@ -6,8 +6,7 @@
   import { layers, namedFlavor } from '@protomaps/basemaps';
 
   const MAX_ZOOM = 18;
-  const MIN_ZOOM_ONLINE = 3;
-  const MIN_ZOOM_OFFLINE = 5;
+  const MIN_ZOOM = 5;
   const LOCATION_ZOOM = 14;
   const SEARCH_ZOOM = 15;
   // Zoom where coarse GB tiles hand off to the detailed restaurant-area tiles.
@@ -19,10 +18,7 @@
   const CITYMAPPER_ANDROID_PACKAGE = 'com.citymapper.app.release';
   const CITYMAPPER_ANDROID_STORE_URL = `https://play.google.com/store/apps/details?id=${CITYMAPPER_ANDROID_PACKAGE}`;
 
-  // Online: full global vector coverage (keyless). Offline: local tiles only.
-  const ONLINE_STYLE_URL = 'https://tiles.openfreemap.org/styles/positron';
-
-  // The data (and offline basemap) cover Great Britain; keep the offline view here.
+  // The data (and basemap) cover Great Britain; keep the view within it.
   const COVERAGE_BOUNDS = [
     [-5.9, 49.8],
     [1.9, 56.2]
@@ -38,7 +34,8 @@
   const MARKER_PADDING = 48;
   const MARKER_SPRITE_PADDING = 10;
   const MARKER_LAYER_OPACITY = 0.42;
-  const PRICED_MARKER_LAYER_OPACITY = 1 - (1 - MARKER_LAYER_OPACITY) / 2;
+  // The 38 priced ("38 Best London") markers stay fully opaque and on top.
+  const PRICED_MARKER_LAYER_OPACITY = 1;
   const FULL_MARKER_ZOOM = 14;
   const MID_MARKER_ZOOM = 12;
 
@@ -118,12 +115,12 @@
 
     map = new maplibregl.Map({
       container: mapEl,
-      style: online ? ONLINE_STYLE_URL : buildLocalStyle(),
+      style: buildLocalStyle(),
       center: [(LONDON_BOUNDS.minLon + LONDON_BOUNDS.maxLon) / 2, (LONDON_BOUNDS.minLat + LONDON_BOUNDS.maxLat) / 2],
       zoom: 10,
-      minZoom: online ? MIN_ZOOM_ONLINE : MIN_ZOOM_OFFLINE,
+      minZoom: MIN_ZOOM,
       maxZoom: MAX_ZOOM,
-      maxBounds: online ? undefined : COVERAGE_BOUNDS,
+      maxBounds: COVERAGE_BOUNDS,
       attributionControl: false,
       dragRotate: false,
       pitchWithRotate: false,
@@ -281,14 +278,9 @@
   }
 
   function onConnectivityChange() {
-    const next = navigator.onLine;
-    if (next === online) return;
-    online = next;
-    if (!map) return;
-    map.setMaxBounds(online ? null : COVERAGE_BOUNDS);
-    map.setMinZoom(online ? MIN_ZOOM_ONLINE : MIN_ZOOM_OFFLINE);
-    map.setStyle(online ? ONLINE_STYLE_URL : buildLocalStyle());
-    scheduleMarkerDraw();
+    // The map itself is fully local (same Protomaps tiles online or off); this only
+    // updates the connectivity indicator and whether external links will work.
+    online = navigator.onLine;
   }
 
   async function loadRestaurants() {
@@ -843,7 +835,10 @@
           {#if offlineState === 'downloading'}
             Saving {downloadPercent}%
           {:else if offlineState === 'ready'}
-            Offline ✓
+            <svg class="offline-icon" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+              <path d="M4 12.5l5 5 11-11" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            Offline
           {:else}
             Install
           {/if}
@@ -1167,6 +1162,11 @@
 
   .offline-dot.online {
     background: #2d8a5f;
+  }
+
+  .offline-icon {
+    flex: 0 0 auto;
+    margin-right: -2px;
   }
 
   .roadmap-menu {
