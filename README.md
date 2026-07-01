@@ -32,6 +32,14 @@ pnpm build:basemap
 
 This downloads the `pmtiles` CLI into `.local-tools/`, builds a region (a buffer around every restaurant) and extracts detailed tiles for just those areas (zoom 14) plus a coarse Great Britain layer (zoom 9) into `static/basemap/`, and downloads the MapLibre fonts + sprites. Tunable via `DETAIL_MAXZOOM` / `GB_MAXZOOM` env vars (higher = more detail + larger download). The `*.pmtiles` files are committed as regular Git binaries (NOT Git LFS — Vercel serves LFS pointer stubs, which breaks the deployed map).
 
+## Rebuild the Tube/Rail Overlay
+
+```powershell
+pnpm build:tube
+```
+
+Fetches London Underground + DLR + Overground + Elizabeth line geometry (with official colours) from OpenStreetMap via Overpass into `static/tube-lines.geojson`. This is drawn as an always-visible colour-coded overlay (Protomaps omits subway geometry at low zoom, so the tube map needs its own dataset).
+
 ## Rebuild Public Data
 
 ```powershell
