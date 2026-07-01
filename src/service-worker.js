@@ -95,8 +95,8 @@ sw.addEventListener('message', (event) => {
     event.waitUntil(
       (async () => {
         const cache = await caches.open(CACHE);
-        // The London basemap is the last big asset; if it's cached we're offline-ready.
-        const ready = Boolean(await cache.match('/basemap/london.pmtiles'));
+        // The detail basemap is the largest asset; if it's cached we're offline-ready.
+        const ready = Boolean(await cache.match('/basemap/detail.pmtiles'));
         const target = event.source || (await sw.clients.matchAll({ includeUncontrolled: true, type: 'window' }))[0];
         target?.postMessage({ type: ready ? 'precache-done' : 'precache-idle' });
       })()

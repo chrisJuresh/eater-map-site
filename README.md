@@ -8,7 +8,7 @@ The app is an **offline-first installable PWA**: the map (a MapLibre GL vector b
 
 - `src/`, `static/`, `package.json`, and the Svelte/Vite config files are the hosted SvelteKit app. Vercel builds from the repository root.
 - `static/data/restaurants.json` is the compact dataset used directly by the browser.
-- `static/basemap/` is the offline vector basemap: `london.pmtiles` (detailed) + `gb.pmtiles` (coarse country context) + self-hosted `fonts/` and `sprites/`. Rebuild it with `pnpm build:basemap` (see below).
+- `static/basemap/` is the offline vector basemap: `detail.pmtiles` (high detail for the areas that have restaurants) + `gb.pmtiles` (coarse country context) + `region.geojson` (the extraction region) + self-hosted `fonts/` and `sprites/`. Rebuild it with `pnpm build:basemap` (see below). When online the app switches to OpenFreeMap for full global coverage.
 - `src/service-worker.js` precaches the app shell, data, and basemap for offline use (and serves PMTiles Range requests from cache).
 - `data/eater-map-public.sqlite` is the compact SQLite export for local inspection.
 - `data-pipeline/` contains the scraper, audit scripts, source URL lists, archive CSVs, and raw downloaded scrape outputs.
@@ -30,7 +30,7 @@ The basemap tiles are extracted once from the Protomaps daily planet build (need
 pnpm build:basemap
 ```
 
-This downloads the `pmtiles` CLI into `.local-tools/`, extracts a detailed Greater London region (zoom 14) and a coarse Great Britain region (zoom 9) into `static/basemap/`, and downloads the MapLibre fonts + sprites. Tunable via `LONDON_MAXZOOM` / `GB_MAXZOOM` env vars (higher = more detail + larger download). ~97% of entries are in Greater London, which is why London gets the detailed tiles and the rest of GB gets lightweight context tiles. The `*.pmtiles` files are tracked with Git LFS.
+This downloads the `pmtiles` CLI into `.local-tools/`, builds a region (a buffer around every restaurant) and extracts detailed tiles for just those areas (zoom 14) plus a coarse Great Britain layer (zoom 9) into `static/basemap/`, and downloads the MapLibre fonts + sprites. Tunable via `DETAIL_MAXZOOM` / `GB_MAXZOOM` env vars (higher = more detail + larger download). The `*.pmtiles` files are committed as regular Git binaries (NOT Git LFS — Vercel serves LFS pointer stubs, which breaks the deployed map).
 
 ## Rebuild Public Data
 
