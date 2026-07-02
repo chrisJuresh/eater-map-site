@@ -251,19 +251,6 @@
       }
     },
     {
-      // White casing so overlapping colours stay legible over the map.
-      id: 'rail-casing',
-      type: 'line',
-      source: 'tube',
-      filter: ['==', ['get', 'base'], false],
-      layout: { 'line-join': 'round', 'line-cap': 'round' },
-      paint: {
-        'line-color': '#ffffff',
-        'line-width': ['interpolate', ['linear'], ['zoom'], 6, 2.4, 10, 3.6, 13, 5, 16, 7],
-        'line-opacity': 0.5
-      }
-    },
-    {
       // National Rail (below TfL so Overground/Tube/Elizabeth stay on top).
       id: 'rail-nr',
       type: 'line',
@@ -298,10 +285,10 @@
     source: 'tube',
     filter: ['==', ['get', 'station'], true],
     paint: {
-      'circle-radius': ['interpolate', ['linear'], ['zoom'], 5, 2.5, 9, 3.5, 12, 5, 14, 7, 16, 9],
+      'circle-radius': ['interpolate', ['linear'], ['zoom'], 5, 1.4, 9, 2, 12, 2.6, 14, 3.6, 16, 4.6],
       'circle-color': '#ffffff',
       'circle-stroke-color': '#17201c',
-      'circle-stroke-width': ['interpolate', ['linear'], ['zoom'], 5, 1, 12, 1.6, 16, 2.4]
+      'circle-stroke-width': ['interpolate', ['linear'], ['zoom'], 5, 0.8, 12, 1.3, 16, 1.8]
     }
   };
   const STATION_LABEL_LAYER = {
@@ -381,12 +368,47 @@
     };
   }
 
+  // More vibrant greens for parks/woods/grass than the muted Protomaps defaults.
+  const VIBRANT_GREEN = [
+    'case',
+    ['in', ['get', 'kind'], ['literal', ['national_park', 'park', 'cemetery', 'protected_area', 'nature_reserve', 'forest', 'golf_course']]],
+    '#8bcf87',
+    ['==', ['get', 'kind'], 'wood'],
+    '#77c47b',
+    ['in', ['get', 'kind'], ['literal', ['scrub', 'grassland', 'grass']]],
+    '#a3d9a0',
+    ['==', ['get', 'kind'], 'glacier'],
+    '#e7e7e7',
+    ['==', ['get', 'kind'], 'sand'],
+    '#e2e0d7',
+    ['in', ['get', 'kind'], ['literal', ['military', 'naval_base', 'airfield']]],
+    '#c6dcdc',
+    '#e2dfda'
+  ];
+  const PLACE_LABEL_IDS = new Set(['places_subplace', 'places_region', 'places_locality', 'places_country']);
+
+  // Make area/place names black and green spaces more vibrant.
+  function recolourBasemap(layer) {
+    const baseId = layer.id.replace(/^detail_/, '');
+    if (PLACE_LABEL_IDS.has(baseId)) {
+      return { ...layer, paint: { ...layer.paint, 'text-color': '#111111' } };
+    }
+    if (baseId === 'landuse_park') {
+      return { ...layer, paint: { ...layer.paint, 'fill-color': VIBRANT_GREEN } };
+    }
+    if (baseId === 'landuse_urban_green') {
+      return { ...layer, paint: { ...layer.paint, 'fill-color': '#8bcf87' } };
+    }
+    return layer;
+  }
+
   // Stack bottom→top: basemap fills/lines -> rail lines -> station dots ->
   // basemap labels (place names, so they stay readable over the lines) ->
   // station labels.
   function composeTransit(baseLayers) {
-    const symbols = baseLayers.filter((l) => l.type === 'symbol');
-    const nonSymbols = baseLayers.filter((l) => l.type !== 'symbol');
+    const styled = baseLayers.map(recolourBasemap);
+    const symbols = styled.filter((l) => l.type === 'symbol');
+    const nonSymbols = styled.filter((l) => l.type !== 'symbol');
     return [...nonSymbols, ...RAIL_LAYERS, STATION_DOT_LAYER, ...symbols, STATION_LABEL_LAYER];
   }
 
