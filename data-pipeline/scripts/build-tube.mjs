@@ -157,7 +157,7 @@ function resolveLine(tags, route) {
     route === 'monorail' ||
     /overground|underground|elizabeth|docklands|tramlink|\bdlr\b|transport for london|\btfl\b/.test(op);
 
-  const pick = (color, tfl) => ({ color, tfl, opacity: LOW_CONTRAST.has(color.toLowerCase()) ? 0.95 : 0.72 });
+  const pick = (color, tfl) => ({ color, tfl, opacity: LOW_CONTRAST.has(color.toLowerCase()) ? 0.85 : 0.6 });
 
   if (isTfl) {
     for (const [needle, color] of LINE_RULES) if (lineName.includes(needle)) return pick(color, true);
@@ -201,7 +201,7 @@ async function main() {
     if (t.aerialway) {
       tfl.push({
         type: 'Feature',
-        properties: { base: false, tfl: true, color: CABLE_CAR_COLOR, opacity: 0.72, line: t.name || 'IFS Cloud Cable Car' },
+        properties: { base: false, tfl: true, color: CABLE_CAR_COLOR, opacity: 0.6, line: 'IFS Cloud Cable Car' },
         geometry: { type: 'LineString', coordinates: coords }
       });
       continue;
@@ -214,24 +214,35 @@ async function main() {
     });
   }
 
+  // Merge every route relation into ONE feature per colour, drawing each physical
+  // track (OSM way) only once — otherwise the many overlapping route variants of a
+  // line stack up and the translucency reads as fully opaque.
+  const byColor = new Map();
   for (const el of routesJson.elements || []) {
     if (el.type !== 'relation') continue;
-    const name = el.tags?.name || el.tags?.ref || '';
     const line = resolveLine(el.tags || {}, el.tags?.route);
     if (!line) continue;
-    const parts = [];
+    const name = el.tags?.name || el.tags?.ref || '';
+    const label = line.tfl ? name.split(':')[0].trim() : (el.tags?.operator || name.split(':')[0].trim());
+    let group = byColor.get(line.color);
+    if (!group) {
+      group = { tfl: line.tfl, opacity: line.opacity, label, ways: new Set(), parts: [] };
+      byColor.set(line.color, group);
+    }
     for (const m of el.members || []) {
       if (m.type !== 'way' || !Array.isArray(m.geometry)) continue;
+      if (group.ways.has(m.ref)) continue; // this track already drawn for this line
+      group.ways.add(m.ref);
       const coords = m.geometry.filter(Boolean).map((p) => [round(p.lon), round(p.lat)]);
-      for (const seg of clip(coords)) parts.push(seg);
+      for (const seg of clip(coords)) group.parts.push(seg);
     }
-    if (!parts.length) continue;
-    // TfL: the line name ("Central line"). National Rail: the operator.
-    const label = line.tfl ? name.split(':')[0].trim() : (el.tags?.operator || name.split(':')[0].trim());
-    (line.tfl ? tfl : nr).push({
+  }
+  for (const [color, group] of byColor) {
+    if (!group.parts.length) continue;
+    (group.tfl ? tfl : nr).push({
       type: 'Feature',
-      properties: { base: false, tfl: line.tfl, color: line.color, opacity: line.opacity, line: label },
-      geometry: { type: 'MultiLineString', coordinates: parts }
+      properties: { base: false, tfl: group.tfl, color, opacity: group.opacity, line: group.label },
+      geometry: { type: 'MultiLineString', coordinates: group.parts }
     });
   }
 
