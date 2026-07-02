@@ -6,12 +6,17 @@ The app is an **offline-first installable PWA**: the map (a MapLibre GL vector b
 
 ## Layout
 
-- `src/`, `static/`, `package.json`, and the Svelte/Vite config files are the hosted SvelteKit app. Vercel builds from the repository root.
+- `src/`, `static/`, `package.json`, and the Svelte/Vite config files are the hosted SvelteKit app (Svelte 5 runes; see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the module map and the hand-tuned invariants). Vercel builds from the repository root.
 - `static/data/restaurants.json` is the compact dataset used directly by the browser.
-- `static/basemap/` is the offline vector basemap: `detail.pmtiles` (high detail for the areas that have restaurants) + `gb.pmtiles` (coarse country context) + `region.geojson` (the extraction region) + self-hosted `fonts/` and `sprites/`. Rebuild it with `pnpm build:basemap` (see below). When online the app switches to OpenFreeMap for full global coverage.
+- `static/basemap/` is the offline vector basemap: `detail.pmtiles` (high detail for the areas that have restaurants) + `gb.pmtiles` (coarse country context) + `region.geojson` (the extraction region) + self-hosted `fonts/` and `sprites/`. Rebuild it with `pnpm build:basemap` (see below). When online the app switches to the Protomaps API for full global coverage.
 - `src/service-worker.js` precaches the app shell, data, and basemap for offline use (and serves PMTiles Range requests from cache).
 - `data/eater-map-public.sqlite` is the compact SQLite export for local inspection.
 - `data-pipeline/` contains the scraper, audit scripts, source URL lists, archive CSVs, and raw downloaded scrape outputs.
+
+## Sharing
+
+`/?r=<restaurant id>` deep-links a restaurant and `#zoom/lat/lon` restores the
+map view — the Share button in the details panel copies these for you.
 
 ## App Commands
 
@@ -20,6 +25,7 @@ pnpm install
 pnpm dev
 pnpm build
 pnpm preview   # serve the production build (service worker + offline only run here, not in dev)
+pnpm test      # unit tests for the pure modules (links, data, geocode, url state)
 ```
 
 ## Rebuild the Offline Basemap
