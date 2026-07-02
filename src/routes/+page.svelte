@@ -876,7 +876,19 @@
       if (items.length >= 8) break;
     }
     if (!items.length) return null;
-    return { x: point.x, y: point.y, items };
+    // Flip the popup so it stays inside the map near the right/bottom edges.
+    const container = map.getContainer();
+    const w = container.clientWidth;
+    const h = container.clientHeight;
+    return {
+      x: point.x,
+      y: point.y,
+      w,
+      h,
+      flipX: point.x > w - 252,
+      flipY: point.y > h - 160,
+      items
+    };
   }
 
   function selectSearchResult(restaurant) {
@@ -1088,7 +1100,7 @@
     {#if activeLines}
       <div
         class="lines-popup"
-        style={`left: ${activeLines.x}px; top: ${activeLines.y}px;`}
+        style={`${activeLines.flipX ? `right: ${activeLines.w - activeLines.x}px;` : `left: ${activeLines.x}px;`} ${activeLines.flipY ? `bottom: ${activeLines.h - activeLines.y}px;` : `top: ${activeLines.y}px;`} transform: translate(${activeLines.flipX ? -14 : 14}px, ${activeLines.flipY ? -14 : 14}px);`}
         aria-hidden="true"
       >
         {#each activeLines.items as item}
@@ -1237,8 +1249,7 @@
   .lines-popup {
     position: absolute;
     z-index: 13;
-    transform: translate(14px, 14px);
-    max-width: 240px;
+    max-width: min(240px, calc(100vw - 20px));
     display: flex;
     flex-direction: column;
     gap: 3px;
