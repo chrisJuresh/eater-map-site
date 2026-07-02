@@ -7,9 +7,12 @@
     "dev": "vite --host 127.0.0.1",
     "build": "vite build",
     "preview": "vite preview --host 127.0.0.1",
-    "export:data": "python data-pipeline/scripts/build-public-data.py"
+    "export:data": "python data-pipeline/scripts/build-public-data.py",
+    "build:basemap": "node data-pipeline/scripts/build-basemap.mjs",
+    "build:tube": "node data-pipeline/scripts/build-tube.mjs"
   },
   "devDependencies": {
+    "@sveltejs/adapter-static": "^3.0.10",
     "@sveltejs/adapter-vercel": "^6.3.4",
     "@sveltejs/kit": "^2.68.0",
     "@sveltejs/vite-plugin-svelte": "^7.1.2",
@@ -17,7 +20,11 @@
     "vite": "^8.1.0"
   },
   "dependencies": {
+    "@protomaps/basemaps": "^5.7.2",
     "@vercel/analytics": "^2.0.1",
-    "@vercel/speed-insights": "^2.0.0"
-  }
+    "@vercel/speed-insights": "^2.0.0",
+    "maplibre-gl": "^5.24.0",
+    "pmtiles": "^4.4.1"
+  },
+  "packageManager": "pnpm@11.9.0+sha512.bd682d5d03fe525ef7c9fd6780c6884d1e756ac4c9c9fe00c538782824310dcf90e3ddc4f53835f06dfaebd5085e41855e0bcbb3b60de2ac5bbab89e5036f03b"
 }
