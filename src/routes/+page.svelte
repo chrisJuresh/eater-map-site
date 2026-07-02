@@ -236,8 +236,23 @@
   const TUBE_SOURCE = { type: 'geojson', data: '/tube-lines.geojson' };
   const LINE_WIDTH = ['interpolate', ['linear'], ['zoom'], 6, 1, 10, 2, 13, 3.2, 16, 5];
   // Parallel up/down tracks overlap when zoomed out and double the apparent
-  // opacity; fade lines out at low zoom so translucency looks consistent.
-  const ZOOM_FADE = ['interpolate', ['linear'], ['zoom'], 10, 0.58, 13, 0.82, 16, 1];
+  // opacity; fade lines out at low zoom so translucency looks consistent. The
+  // zoom interpolate must be the OUTERMOST expression (MapLibre forbids nesting a
+  // zoom curve inside another expression), with the per-feature opacity applied
+  // in each output stop.
+  const FEATURE_OPACITY = ['coalesce', ['get', 'opacity'], 0.6];
+  const LINE_OPACITY = [
+    'interpolate',
+    ['linear'],
+    ['zoom'],
+    10,
+    ['*', FEATURE_OPACITY, 0.58],
+    13,
+    ['*', FEATURE_OPACITY, 0.82],
+    16,
+    FEATURE_OPACITY
+  ];
+  const BASE_OPACITY = ['interpolate', ['linear'], ['zoom'], 10, 0.29, 16, 0.5];
   const LINE_QUERY_LAYERS = ['rail-tfl', 'rail-nr', 'rail-base'];
   const RAIL_LAYERS = [
     {
@@ -250,7 +265,7 @@
       paint: {
         'line-color': '#41476b',
         'line-width': ['interpolate', ['linear'], ['zoom'], 8, 0.4, 12, 1, 14, 1.6, 16, 2.4],
-        'line-opacity': ['*', 0.5, ZOOM_FADE]
+        'line-opacity': BASE_OPACITY
       }
     },
     {
@@ -263,7 +278,7 @@
       paint: {
         'line-color': ['coalesce', ['get', 'color'], '#666666'],
         'line-width': LINE_WIDTH,
-        'line-opacity': ['*', ['coalesce', ['get', 'opacity'], 0.6], ZOOM_FADE]
+        'line-opacity': LINE_OPACITY
       }
     },
     {
@@ -276,7 +291,7 @@
       paint: {
         'line-color': ['coalesce', ['get', 'color'], '#666666'],
         'line-width': LINE_WIDTH,
-        'line-opacity': ['*', ['coalesce', ['get', 'opacity'], 0.6], ZOOM_FADE]
+        'line-opacity': LINE_OPACITY
       }
     }
   ];
