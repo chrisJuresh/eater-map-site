@@ -253,54 +253,47 @@
     FEATURE_OPACITY
   ];
   const BASE_OPACITY = ['interpolate', ['linear'], ['zoom'], 10, 0.29, 16, 0.5];
-
-  // Lines sharing a corridor are given different perpendicular offsets (matching
-  // the `off` values baked into the GeoJSON) so they render as parallel bands
-  // instead of hiding each other. One layer per offset (line-offset is constant).
-  const RAIL_OFFSETS = [0, 2, -2, 4, -4, 6, -6];
-  function railLineLayer(off, tfl) {
-    return {
-      id: `rail-${tfl ? 'tfl' : 'nr'}-${off < 0 ? 'm' : ''}${Math.abs(off)}`,
+  const LINE_QUERY_LAYERS = ['rail-tfl', 'rail-nr', 'rail-base'];
+  const RAIL_LAYERS = [
+    {
+      // Every passenger track (navy) — complete coverage.
+      id: 'rail-base',
       type: 'line',
       source: 'tube',
-      filter: [
-        'all',
-        ['==', ['get', 'base'], false],
-        ['==', ['get', 'tfl'], tfl],
-        ['==', ['get', 'off'], off]
-      ],
+      filter: ['==', ['get', 'base'], true],
+      layout: { 'line-join': 'round', 'line-cap': 'round' },
+      paint: {
+        'line-color': '#41476b',
+        'line-width': ['interpolate', ['linear'], ['zoom'], 8, 0.4, 12, 1, 14, 1.6, 16, 2.4],
+        'line-opacity': BASE_OPACITY
+      }
+    },
+    {
+      // National Rail (below TfL so Overground/Tube/Elizabeth stay on top).
+      id: 'rail-nr',
+      type: 'line',
+      source: 'tube',
+      filter: ['all', ['==', ['get', 'base'], false], ['==', ['get', 'tfl'], false]],
       layout: { 'line-join': 'round', 'line-cap': 'round' },
       paint: {
         'line-color': ['coalesce', ['get', 'color'], '#666666'],
         'line-width': LINE_WIDTH,
-        'line-opacity': LINE_OPACITY,
-        'line-offset': off
+        'line-opacity': LINE_OPACITY
       }
-    };
-  }
-  const RAIL_BASE_LAYER = {
-    // Every passenger track (navy) — complete coverage.
-    id: 'rail-base',
-    type: 'line',
-    source: 'tube',
-    filter: ['==', ['get', 'base'], true],
-    layout: { 'line-join': 'round', 'line-cap': 'round' },
-    paint: {
-      'line-color': '#41476b',
-      'line-width': ['interpolate', ['linear'], ['zoom'], 8, 0.4, 12, 1, 14, 1.6, 16, 2.4],
-      'line-opacity': BASE_OPACITY
+    },
+    {
+      // Tube / DLR / Overground / Elizabeth / Tram / Cable car — drawn on top.
+      id: 'rail-tfl',
+      type: 'line',
+      source: 'tube',
+      filter: ['all', ['==', ['get', 'base'], false], ['==', ['get', 'tfl'], true]],
+      layout: { 'line-join': 'round', 'line-cap': 'round' },
+      paint: {
+        'line-color': ['coalesce', ['get', 'color'], '#666666'],
+        'line-width': LINE_WIDTH,
+        'line-opacity': LINE_OPACITY
+      }
     }
-  };
-  // National Rail below, TfL (Tube/DLR/Overground/Elizabeth/Tram/Cable) on top.
-  const RAIL_LAYERS = [
-    RAIL_BASE_LAYER,
-    ...RAIL_OFFSETS.map((off) => railLineLayer(off, false)),
-    ...RAIL_OFFSETS.map((off) => railLineLayer(off, true))
-  ];
-  const LINE_QUERY_LAYERS = [
-    ...RAIL_OFFSETS.map((off) => railLineLayer(off, true).id),
-    ...RAIL_OFFSETS.map((off) => railLineLayer(off, false).id),
-    'rail-base'
   ];
 
   // Station dots (bundled) — always visible, big and obvious.
