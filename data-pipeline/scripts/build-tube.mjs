@@ -184,43 +184,6 @@ function clip(coords) {
   return out.filter((s2) => s2.length >= 2);
 }
 
-// Perpendicular offsets (px) so lines sharing a corridor fan into parallel bands
-// instead of hiding each other. Assigned per colour in insertion order.
-const OFFSETS = [0, 2, -2, 4, -4, 6, -6];
-
-// A grid key for a segment, order-independent (~30 m) so a line's parallel
-// up/down tracks map to the same key and can be de-duplicated.
-function segKey(a, b) {
-  const G = 0.0003;
-  const s = (v) => Math.round(v / G);
-  const ka = `${s(a[0])}_${s(a[1])}`;
-  const kb = `${s(b[0])}_${s(b[1])}`;
-  return ka < kb ? `${ka}|${kb}` : `${kb}|${ka}`;
-}
-
-// Drop duplicate/parallel segments within a single colour so it never self-stacks
-// (same line = uniform translucency). Different colours are handled separately, so
-// they still overlap/blend.
-function dedupeParallel(lines) {
-  const seen = new Set();
-  const out = [];
-  for (const line of lines) {
-    let run = line.length ? [line[0]] : [];
-    for (let i = 1; i < line.length; i++) {
-      const key = segKey(line[i - 1], line[i]);
-      if (seen.has(key)) {
-        if (run.length >= 2) out.push(run);
-        run = [line[i]];
-      } else {
-        seen.add(key);
-        run.push(line[i]);
-      }
-    }
-    if (run.length >= 2) out.push(run);
-  }
-  return out;
-}
-
 async function main() {
   const routesJson = await overpass(ROUTES_QUERY);
   const waysJson = await overpass(WAYS_QUERY);
@@ -229,7 +192,6 @@ async function main() {
   const base = [];
   const nr = [];
   const tfl = [];
-  const baseLines = [];
 
   for (const el of waysJson.elements || []) {
     if (el.type !== 'way' || !Array.isArray(el.geometry)) continue;
@@ -239,20 +201,18 @@ async function main() {
     if (t.aerialway) {
       tfl.push({
         type: 'Feature',
-        properties: { base: false, tfl: true, off: 0, color: CABLE_CAR_COLOR, opacity: 0.6, line: 'IFS Cloud Cable Car' },
+        properties: { base: false, tfl: true, color: CABLE_CAR_COLOR, opacity: 0.6, line: 'IFS Cloud Cable Car' },
         geometry: { type: 'LineString', coordinates: coords }
       });
       continue;
     }
     if (SKIP_SERVICE.has(t.service) || SKIP_USAGE.has(t.usage)) continue;
-    baseLines.push(coords);
+    base.push({
+      type: 'Feature',
+      properties: { base: true, color: NATIONAL_RAIL_COLOR },
+      geometry: { type: 'LineString', coordinates: coords }
+    });
   }
-  // One navy feature for all tracks, parallel pairs de-duplicated.
-  base.push({
-    type: 'Feature',
-    properties: { base: true, color: NATIONAL_RAIL_COLOR },
-    geometry: { type: 'MultiLineString', coordinates: dedupeParallel(baseLines) }
-  });
 
   // Merge every route relation into ONE feature per colour, drawing each physical
   // track (OSM way) only once — otherwise the many overlapping route variants of a
@@ -266,7 +226,7 @@ async function main() {
     const label = line.tfl ? name.split(':')[0].trim() : (el.tags?.operator || name.split(':')[0].trim());
     let group = byColor.get(line.color);
     if (!group) {
-      group = { tfl: line.tfl, opacity: line.opacity, label, off: OFFSETS[byColor.size % OFFSETS.length], ways: new Set(), parts: [] };
+      group = { tfl: line.tfl, opacity: line.opacity, label, ways: new Set(), parts: [] };
       byColor.set(line.color, group);
     }
     for (const m of el.members || []) {
@@ -278,12 +238,11 @@ async function main() {
     }
   }
   for (const [color, group] of byColor) {
-    const parts = dedupeParallel(group.parts);
-    if (!parts.length) continue;
+    if (!group.parts.length) continue;
     (group.tfl ? tfl : nr).push({
       type: 'Feature',
-      properties: { base: false, tfl: group.tfl, off: group.off, color, opacity: group.opacity, line: group.label },
-      geometry: { type: 'MultiLineString', coordinates: parts }
+      properties: { base: false, tfl: group.tfl, color, opacity: group.opacity, line: group.label },
+      geometry: { type: 'MultiLineString', coordinates: group.parts }
     });
   }
 
