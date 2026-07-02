@@ -96,6 +96,11 @@
   let measuredSearchText = '';
   let isAndroidDevice = false;
 
+  // Rail-line identification popup (hover on desktop / tap on mobile).
+  let hoverLines = null; // { x, y, items:[{name,color}] }
+  let linesPopup = null;
+  $: activeLines = hoverLines || linesPopup;
+
   // Offline download / install state.
   let offlineState = 'unknown'; // 'downloading' | 'ready' | 'idle' | 'unknown'
   let downloadLoaded = 0;
@@ -160,8 +165,24 @@
     });
     map.on('click', (event) => {
       const picked = pickMarker(event.point);
-      if (picked) selectRestaurant(picked);
+      if (picked) {
+        selectRestaurant(picked);
+        linesPopup = null; // restaurant takes priority
+        return;
+      }
+      linesPopup = linesAt(event.point);
     });
+    // Desktop hover: live line identification (touch devices rely on tap above).
+    map.on('mousemove', (event) => {
+      if (pickMarker(event.point)) {
+        hoverLines = null;
+        map.getCanvas().style.cursor = 'pointer';
+        return;
+      }
+      hoverLines = linesAt(event.point);
+      map.getCanvas().style.cursor = hoverLines ? 'pointer' : '';
+    });
+    map.on('mouseout', () => (hoverLines = null));
 
     window.addEventListener('online', onConnectivityChange);
     window.addEventListener('offline', onConnectivityChange);
@@ -213,8 +234,11 @@
   // routes on top. Always visible so the whole network shows even at low zoom
   // (Protomaps omits most rail from low-zoom tiles and never colour-codes it).
   const TUBE_SOURCE = { type: 'geojson', data: '/tube-lines.geojson' };
+  const LINE_WIDTH = ['interpolate', ['linear'], ['zoom'], 6, 1, 10, 2, 13, 3.2, 16, 5];
+  const LINE_QUERY_LAYERS = ['rail-tfl', 'rail-nr', 'rail-base'];
   const RAIL_LAYERS = [
     {
+      // Every passenger track (navy) — complete coverage.
       id: 'rail-base',
       type: 'line',
       source: 'tube',
@@ -223,63 +247,79 @@
       paint: {
         'line-color': '#41476b',
         'line-width': ['interpolate', ['linear'], ['zoom'], 8, 0.4, 12, 1, 14, 1.6, 16, 2.4],
-        'line-opacity': 0.55
+        'line-opacity': 0.5
       }
     },
     {
-      id: 'tube-lines',
+      // White casing so overlapping colours stay legible over the map.
+      id: 'rail-casing',
       type: 'line',
       source: 'tube',
       filter: ['==', ['get', 'base'], false],
       layout: { 'line-join': 'round', 'line-cap': 'round' },
       paint: {
+        'line-color': '#ffffff',
+        'line-width': ['interpolate', ['linear'], ['zoom'], 6, 2.4, 10, 3.6, 13, 5, 16, 7],
+        'line-opacity': 0.5
+      }
+    },
+    {
+      // National Rail (below TfL so Overground/Tube/Elizabeth stay on top).
+      id: 'rail-nr',
+      type: 'line',
+      source: 'tube',
+      filter: ['all', ['==', ['get', 'base'], false], ['==', ['get', 'tfl'], false]],
+      layout: { 'line-join': 'round', 'line-cap': 'round' },
+      paint: {
         'line-color': ['coalesce', ['get', 'color'], '#666666'],
-        'line-width': ['interpolate', ['linear'], ['zoom'], 6, 1, 10, 1.9, 13, 3, 16, 4.8],
-        'line-opacity': 0.95
+        'line-width': LINE_WIDTH,
+        'line-opacity': ['coalesce', ['get', 'opacity'], 0.72]
+      }
+    },
+    {
+      // Tube / DLR / Overground / Elizabeth / Tram / Cable car — drawn on top.
+      id: 'rail-tfl',
+      type: 'line',
+      source: 'tube',
+      filter: ['all', ['==', ['get', 'base'], false], ['==', ['get', 'tfl'], true]],
+      layout: { 'line-join': 'round', 'line-cap': 'round' },
+      paint: {
+        'line-color': ['coalesce', ['get', 'color'], '#666666'],
+        'line-width': LINE_WIDTH,
+        'line-opacity': ['coalesce', ['get', 'opacity'], 0.72]
       }
     }
   ];
 
-  // Stations from the basemap vector source (rail lines come from RAIL_LAYERS).
-  function transitLayers(source) {
-    return [
-      {
-        id: `${source}_stations`,
-        type: 'circle',
-        source,
-        'source-layer': 'pois',
-        minzoom: 11,
-        filter: ['==', ['get', 'kind'], 'station'],
-        paint: {
-          'circle-radius': ['interpolate', ['linear'], ['zoom'], 11, 2, 15, 4.5],
-          'circle-color': '#3b3663',
-          'circle-stroke-color': '#ffffff',
-          'circle-stroke-width': 1.4
-        }
-      },
-      {
-        id: `${source}_station_labels`,
-        type: 'symbol',
-        source,
-        'source-layer': 'pois',
-        minzoom: 13,
-        filter: ['==', ['get', 'kind'], 'station'],
-        layout: {
-          'text-field': ['coalesce', ['get', 'name:en'], ['get', 'name']],
-          'text-font': ['Noto Sans Regular'],
-          'text-size': 10,
-          'text-offset': [0, 0.9],
-          'text-anchor': 'top',
-          'text-optional': true
-        },
-        paint: {
-          'text-color': '#3b3663',
-          'text-halo-color': '#ffffff',
-          'text-halo-width': 1.2
-        }
-      }
-    ];
-  }
+  // Station dots (bundled) — always visible, big and obvious.
+  const STATION_DOT_LAYER = {
+    id: 'rail-stations',
+    type: 'circle',
+    source: 'tube',
+    filter: ['==', ['get', 'station'], true],
+    paint: {
+      'circle-radius': ['interpolate', ['linear'], ['zoom'], 5, 2.5, 9, 3.5, 12, 5, 14, 7, 16, 9],
+      'circle-color': '#ffffff',
+      'circle-stroke-color': '#17201c',
+      'circle-stroke-width': ['interpolate', ['linear'], ['zoom'], 5, 1, 12, 1.6, 16, 2.4]
+    }
+  };
+  const STATION_LABEL_LAYER = {
+    id: 'rail-station-labels',
+    type: 'symbol',
+    source: 'tube',
+    minzoom: 13,
+    filter: ['==', ['get', 'station'], true],
+    layout: {
+      'text-field': ['get', 'name'],
+      'text-font': ['Noto Sans Medium'],
+      'text-size': 11,
+      'text-offset': [0, 0.9],
+      'text-anchor': 'top',
+      'text-optional': true
+    },
+    paint: { 'text-color': '#17201c', 'text-halo-color': '#ffffff', 'text-halo-width': 1.6 }
+  };
 
   function buildLocalStyle() {
     const flavor = namedFlavor('light');
@@ -312,7 +352,11 @@
         },
         tube: TUBE_SOURCE
       },
-      layers: composeTransit([...gbLayers, ...detailLayers], 'detail')
+      // Drop the opaque background layer so undownloaded voids stay transparent
+      // and reveal the "offline" watermark on the map container behind the canvas.
+      layers: composeTransit(
+        [...gbLayers, ...detailLayers].filter((l) => !/(^|_)background$/.test(l.id))
+      )
     };
   }
 
@@ -333,13 +377,17 @@
         },
         tube: TUBE_SOURCE
       },
-      layers: composeTransit(layers('world', flavor, { lang: 'en' }), 'world')
+      layers: composeTransit(layers('world', flavor, { lang: 'en' }))
     };
   }
 
-  // Stack: basemap -> navy rail base -> colour-coded lines -> stations.
-  function composeTransit(baseLayers, source) {
-    return [...baseLayers, ...RAIL_LAYERS, ...transitLayers(source)];
+  // Stack bottom→top: basemap fills/lines -> rail lines -> station dots ->
+  // basemap labels (place names, so they stay readable over the lines) ->
+  // station labels.
+  function composeTransit(baseLayers) {
+    const symbols = baseLayers.filter((l) => l.type === 'symbol');
+    const nonSymbols = baseLayers.filter((l) => l.type !== 'symbol');
+    return [...nonSymbols, ...RAIL_LAYERS, STATION_DOT_LAYER, ...symbols, STATION_LABEL_LAYER];
   }
 
   // Zoom out far enough (offline) that the whole covered area fits with padding,
@@ -786,6 +834,29 @@
     selected = restaurant;
   }
 
+  // Rail/tube lines under a screen point, deduped by name (for the popup).
+  function linesAt(point) {
+    if (!map) return null;
+    const availableLayers = LINE_QUERY_LAYERS.filter((id) => map.getLayer(id));
+    if (!availableLayers.length) return null;
+    const box = [
+      [point.x - 6, point.y - 6],
+      [point.x + 6, point.y + 6]
+    ];
+    const features = map.queryRenderedFeatures(box, { layers: availableLayers });
+    const seen = new Set();
+    const items = [];
+    for (const feature of features) {
+      const name = feature.properties.line || 'National Rail';
+      if (seen.has(name)) continue;
+      seen.add(name);
+      items.push({ name, color: feature.properties.color || '#41476b' });
+      if (items.length >= 8) break;
+    }
+    if (!items.length) return null;
+    return { x: point.x, y: point.y, items };
+  }
+
   function selectSearchResult(restaurant) {
     selected = restaurant;
     mapWasInteractedWith = true;
@@ -891,7 +962,7 @@
 </svelte:head>
 
 <main class="app-shell">
-  <section class="map" style={`--topbar-height: ${topbarHeight}px; --mobile-search-visible-results: ${MOBILE_SEARCH_VISIBLE_RESULTS};`}>
+  <section class="map" class:offline={!online} style={`--topbar-height: ${topbarHeight}px; --mobile-search-visible-results: ${MOBILE_SEARCH_VISIBLE_RESULTS};`}>
     <div class="map-canvas" bind:this={mapEl} role="application" aria-label="Restaurant map"></div>
     <canvas class="marker-layer" bind:this={markerCanvas} aria-hidden="true"></canvas>
 
@@ -991,6 +1062,21 @@
       <span aria-hidden="true">·</span>
       <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a>
     </div>
+
+    {#if activeLines}
+      <div
+        class="lines-popup"
+        style={`left: ${activeLines.x}px; top: ${activeLines.y}px;`}
+        aria-hidden="true"
+      >
+        {#each activeLines.items as item}
+          <span class="line-chip">
+            <span class="line-swatch" style={`background: ${item.color};`}></span>
+            {item.name}
+          </span>
+        {/each}
+      </div>
+    {/if}
   </section>
 
   <aside class:open={selected} class="details-panel">
@@ -1115,9 +1201,51 @@
     background: #d8dfd4;
   }
 
+  /* Offline: undownloaded areas are transparent (no basemap background layer),
+     revealing this "offline" watermark on the container behind the map canvas. */
+  .map.offline {
+    background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='150'%20height='96'%3E%3Ctext%20x='6'%20y='54'%20font-family='sans-serif'%20font-size='17'%20fill='%23aab0a6'%20transform='rotate(-18%206%2054)'%3Eoffline%3C/text%3E%3C/svg%3E");
+  }
+
   .map-canvas {
     position: absolute;
     inset: 0;
+  }
+
+  .lines-popup {
+    position: absolute;
+    z-index: 13;
+    transform: translate(14px, 14px);
+    max-width: 240px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 7px 9px;
+    border-radius: 8px;
+    background: rgba(255, 252, 244, 0.98);
+    border: 1px solid rgba(23, 32, 28, 0.14);
+    box-shadow: 0 8px 22px rgba(27, 31, 28, 0.18);
+    pointer-events: none;
+    font-size: 12px;
+    font-weight: 700;
+    color: #17201c;
+  }
+
+  .line-chip {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .line-swatch {
+    flex: 0 0 auto;
+    width: 14px;
+    height: 4px;
+    border-radius: 2px;
+    box-shadow: 0 0 0 1px rgba(23, 32, 28, 0.15);
   }
 
   .marker-layer {
