@@ -235,6 +235,9 @@
   // (Protomaps omits most rail from low-zoom tiles and never colour-codes it).
   const TUBE_SOURCE = { type: 'geojson', data: '/tube-lines.geojson' };
   const LINE_WIDTH = ['interpolate', ['linear'], ['zoom'], 6, 1, 10, 2, 13, 3.2, 16, 5];
+  // Parallel up/down tracks overlap when zoomed out and double the apparent
+  // opacity; fade lines out at low zoom so translucency looks consistent.
+  const ZOOM_FADE = ['interpolate', ['linear'], ['zoom'], 10, 0.58, 13, 0.82, 16, 1];
   const LINE_QUERY_LAYERS = ['rail-tfl', 'rail-nr', 'rail-base'];
   const RAIL_LAYERS = [
     {
@@ -247,7 +250,7 @@
       paint: {
         'line-color': '#41476b',
         'line-width': ['interpolate', ['linear'], ['zoom'], 8, 0.4, 12, 1, 14, 1.6, 16, 2.4],
-        'line-opacity': 0.5
+        'line-opacity': ['*', 0.5, ZOOM_FADE]
       }
     },
     {
@@ -260,7 +263,7 @@
       paint: {
         'line-color': ['coalesce', ['get', 'color'], '#666666'],
         'line-width': LINE_WIDTH,
-        'line-opacity': ['coalesce', ['get', 'opacity'], 0.72]
+        'line-opacity': ['*', ['coalesce', ['get', 'opacity'], 0.6], ZOOM_FADE]
       }
     },
     {
@@ -273,7 +276,7 @@
       paint: {
         'line-color': ['coalesce', ['get', 'color'], '#666666'],
         'line-width': LINE_WIDTH,
-        'line-opacity': ['coalesce', ['get', 'opacity'], 0.72]
+        'line-opacity': ['*', ['coalesce', ['get', 'opacity'], 0.6], ZOOM_FADE]
       }
     }
   ];
@@ -899,6 +902,63 @@
     map?.flyTo({ center: [restaurant.lon, restaurant.lat], zoom: Math.max(map.getZoom(), SEARCH_ZOOM) });
   }
 
+  // Enter / search icon: geocode the typed place or address and fly there
+  // (online). Offline, fall back to the top matching restaurant.
+  async function goToSearch() {
+    const q = query.trim();
+    if (!q) return;
+    if (navigator.onLine) {
+      try {
+        const place = await geocodePlace(q);
+        if (place) {
+          flyToPlace(place);
+          return;
+        }
+      } catch {
+        // fall through to the restaurant fallback
+      }
+    }
+    if (searchResults.length) selectSearchResult(searchResults[0]);
+  }
+
+  async function geocodePlace(q) {
+    const params = new URLSearchParams({
+      format: 'jsonv2',
+      limit: '1',
+      countrycodes: 'gb',
+      'accept-language': 'en',
+      viewbox: '-0.62,51.75,0.35,51.25', // bias toward London
+      q
+    });
+    const response = await fetch(`https://nominatim.openstreetmap.org/search?${params}`, {
+      headers: { Accept: 'application/json' }
+    });
+    if (!response.ok) throw new Error(`Geocode failed with ${response.status}`);
+    const data = await response.json();
+    return Array.isArray(data) && data.length ? data[0] : null;
+  }
+
+  function flyToPlace(place) {
+    if (!map) return;
+    mapWasInteractedWith = true;
+    homeViewApplied = true;
+    const bbox = place.boundingbox;
+    if (Array.isArray(bbox) && bbox.length === 4) {
+      const [south, north, west, east] = bbox.map(Number);
+      if ([south, north, west, east].every(Number.isFinite)) {
+        map.fitBounds(
+          [
+            [west, south],
+            [east, north]
+          ],
+          { maxZoom: 16, padding: 80, duration: 800 }
+        );
+        return;
+      }
+    }
+    map.flyTo({ center: [Number(place.lon), Number(place.lat)], zoom: 16 });
+  }
+
   function closeDetails() {
     selected = null;
   }
@@ -1010,10 +1070,23 @@
       <label class="search">
         <span>Search</span>
         <div class="search-field">
-          <input bind:value={query} type="search" placeholder="Restaurant, area, guide" autocomplete="off" />
+          <input
+            bind:value={query}
+            type="search"
+            placeholder="Restaurant, place or address"
+            autocomplete="off"
+            enterkeyhint="search"
+            on:keydown={(event) => event.key === 'Enter' && goToSearch()}
+          />
           {#if searchText}
             <output class="search-count" aria-live="polite">{filteredRestaurants.length.toLocaleString()}</output>
           {/if}
+          <button class="search-go" type="button" on:click={goToSearch} aria-label="Go to place" title="Go to place">
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+              <circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2" />
+              <line x1="15.5" y1="15.5" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+          </button>
         </div>
       </label>
       <button class="reset-button" type="button" on:click={resetMap}>Reset</button>
@@ -1339,11 +1412,28 @@
   }
 
   .search-field {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
+    display: flex;
     align-items: center;
     gap: 8px;
     min-width: 0;
+  }
+
+  .search-field input {
+    flex: 1 1 auto;
+  }
+
+  .search-go {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    color: #fff;
+    background: #17201c;
+    cursor: pointer;
   }
 
   .search input {
