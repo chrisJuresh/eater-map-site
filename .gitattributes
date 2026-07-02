@@ -1,2 +1,5 @@
 data-pipeline/raw-downloads/01_maps/eater_maps.sqlite filter=lfs diff=lfs merge=lfs -text
 data-pipeline/raw-downloads/01_maps/review/restaurant_entries.csv filter=lfs diff=lfs merge=lfs -text
+# Basemap tiles are committed as regular binaries (not LFS): Vercel serves them
+# directly, whereas LFS pointer files break the deployed map. Both are <100 MB.
+static/basemap/*.pmtiles -text

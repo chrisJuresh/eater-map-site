@@ -16,6 +16,11 @@ dev-server*.log
 *.sqlite-shm
 *.sqlite-wal
 
+# Local env (Protomaps API key etc.) — set VITE_PROTOMAPS_KEY here / in Vercel
+.env
+.env.local
+.env.*.local
+
 # Local Codex/agent state
 .agents/
 .codex/
