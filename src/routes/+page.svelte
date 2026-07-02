@@ -1,71 +1,88 @@
 <script>
   import { onMount, tick } from 'svelte';
+  import maplibregl from 'maplibre-gl';
+  import 'maplibre-gl/dist/maplibre-gl.css';
+  import { Protocol } from 'pmtiles';
+  import { layers, namedFlavor } from '@protomaps/basemaps';
 
-  const TILE_SIZE = 256;
-  const MIN_ZOOM_FLOOR = 3;
-  const MAX_ZOOM = 19;
+  const MAX_ZOOM = 18;
+  const MIN_ZOOM_ONLINE = 2;
+  const MIN_ZOOM_OFFLINE_FLOOR = 4;
   const LOCATION_ZOOM = 14;
-  const DEFAULT_CENTER = { lat: 51.5074, lon: -0.1278 };
-  const DEFAULT_ZOOM = 9;
-  const LONDON_FALLBACK_BOUNDS = {
-    minLat: 51.2868,
-    maxLat: 51.6919,
-    minLon: -0.5103,
-    maxLon: 0.334
-  };
+  const SEARCH_ZOOM = 15;
+  // Zoom where coarse GB tiles hand off to the detailed restaurant-area tiles.
+  const BASEMAP_HANDOFF_ZOOM = 9;
   const SEARCH_LIMIT = 80;
-  const MARKER_PADDING = 48;
-  const VIEW_FIT_PADDING = 48;
   const HOME_VIEW_PADDING = 32;
-  const MARKER_SPRITE_PADDING = 10;
-  const MARKER_LAYER_OPACITY = 0.42;
-  const PRICED_MARKER_LAYER_OPACITY = 1 - (1 - MARKER_LAYER_OPACITY) / 2;
-  const WHEEL_ZOOM_PIXEL_SENSITIVITY = 0.0035;
-  const WHEEL_ZOOM_LINE_SENSITIVITY = 0.12;
-  const WHEEL_ZOOM_PAGE_SENSITIVITY = 0.8;
-  const MAX_WHEEL_ZOOM_DELTA = 0.65;
-  const FULL_MARKER_ZOOM = 14;
-  const MID_MARKER_ZOOM = 12;
   const DESCRIPTION_VISIBLE_LINES = 4;
   const MOBILE_SEARCH_VISIBLE_RESULTS = 4;
   const CITYMAPPER_ANDROID_PACKAGE = 'com.citymapper.app.release';
   const CITYMAPPER_ANDROID_STORE_URL = `https://play.google.com/store/apps/details?id=${CITYMAPPER_ANDROID_PACKAGE}`;
 
+  // Online: full global Protomaps detail via the API key. This key is
+  // domain-restricted (CORS-locked to *.chrisj.uk), so it is safe to ship in the
+  // client bundle — it only works from our own origins. Override via the
+  // VITE_PROTOMAPS_KEY env var (e.g. a rotated key) in .env / Vercel if desired.
+  const PROTOMAPS_KEY = import.meta.env.VITE_PROTOMAPS_KEY || 'db63a88f9891fd92';
+  const ONLINE_TILE_URL = PROTOMAPS_KEY
+    ? `https://api.protomaps.com/tiles/v4/{z}/{x}/{y}.mvt?key=${PROTOMAPS_KEY}`
+    : '';
+
+  // Offline pan limit (GB + margin) so you can zoom out to the whole country with
+  // padding but not wander into empty space. GB_FIT_BOUNDS is the data extent used
+  // to compute how far out you can zoom so every restaurant stays in view.
+  const OFFLINE_MAX_BOUNDS = [
+    [-8.5, 48.6],
+    [4.5, 57.6]
+  ];
+  const GB_FIT_BOUNDS = [
+    [-5.55, 50.08],
+    [1.4, 55.97]
+  ];
+  const LONDON_BOUNDS = {
+    minLat: 51.2868,
+    maxLat: 51.6919,
+    minLon: -0.5103,
+    maxLon: 0.334
+  };
+
+  // Canvas marker rendering constants (kept from the original renderer).
+  const MARKER_PADDING = 48;
+  const MARKER_SPRITE_PADDING = 10;
+  const MARKER_LAYER_OPACITY = 0.42;
+  // The 38 priced ("38 Best London") markers stay fully opaque and on top.
+  const PRICED_MARKER_LAYER_OPACITY = 1;
+  const FULL_MARKER_ZOOM = 14;
+  const MID_MARKER_ZOOM = 12;
+
   let mapEl;
-  let topbarEl;
   let markerCanvas;
+  let topbarEl;
+  let map;
+  let mapReady = false;
+  let online = true;
+
   let restaurants = [];
+  let restaurantById = new Map();
   let stats = null;
   let loading = true;
   let loadError = '';
-  let width = 0;
-  let height = 0;
   let topbarHeight = 56;
-  let minZoom = 5;
-  let center = DEFAULT_CENTER;
-  let zoom = DEFAULT_ZOOM;
   let selected = null;
   let query = '';
   let priceFilter = 'all';
-  let activePointers = new Map();
-  let activePointer = null;
-  let dragStart = null;
-  let dragMoved = false;
-  let pinchStart = null;
-  let resizeObserver;
-  let markerHitState = { hits: [] };
-  let markerSpriteCache = new Map();
-  let markerLayerCanvas;
   let visibleMarkerCount = 0;
-  let markerDrawFrame = 0;
-  let panFrame = 0;
-  let pendingCenter = null;
-  let lastMarkerPick = null;
   let userLocation = null;
   let locationStatus = '';
   let locationWatchId = null;
   let homeViewApplied = false;
   let mapWasInteractedWith = false;
+  let lastMarkerPick = null;
+  let resizeObserver;
+  let markerDrawFrame = 0;
+  let markerSpriteCache = new Map();
+  let markerLayerCanvas;
+
   let descriptionEl;
   let descriptionHasMore = false;
   let descriptionCanScrollDown = false;
@@ -78,6 +95,16 @@
   let searchResultsMeasureToken = 0;
   let measuredSearchText = '';
   let isAndroidDevice = false;
+
+  // Offline download / install state.
+  let offlineState = 'unknown'; // 'downloading' | 'ready' | 'idle' | 'unknown'
+  let downloadLoaded = 0;
+  let downloadTotal = 0;
+  let deferredInstallPrompt = null;
+  let canInstall = false;
+  let isIosDevice = false;
+  let isStandalone = false;
+  let showInstallHelp = false;
 
   const prices = ['all', '$', '$$', '$$$', '$$$$'];
   const roadmapItems = [
@@ -96,18 +123,256 @@
 
   onMount(() => {
     isAndroidDevice = /Android/i.test(navigator.userAgent || '');
-    resizeObserver = new ResizeObserver(updateSize);
+    isIosDevice = /iPad|iPhone|iPod/i.test(navigator.userAgent || '') && !window.MSStream;
+    isStandalone = window.matchMedia?.('(display-mode: standalone)').matches || navigator.standalone === true;
+    online = navigator.onLine;
+
+    const protocol = new Protocol();
+    maplibregl.addProtocol('pmtiles', protocol.tile);
+
+    const startOnline = online && Boolean(ONLINE_TILE_URL);
+    map = new maplibregl.Map({
+      container: mapEl,
+      style: startOnline ? buildOnlineStyle() : buildLocalStyle(),
+      center: [(LONDON_BOUNDS.minLon + LONDON_BOUNDS.maxLon) / 2, (LONDON_BOUNDS.minLat + LONDON_BOUNDS.maxLat) / 2],
+      zoom: 10,
+      minZoom: startOnline ? MIN_ZOOM_ONLINE : MIN_ZOOM_OFFLINE_FLOOR,
+      maxZoom: MAX_ZOOM,
+      maxBounds: startOnline ? undefined : OFFLINE_MAX_BOUNDS,
+      attributionControl: false,
+      dragRotate: false,
+      pitchWithRotate: false,
+      renderWorldCopies: false
+    });
+    map.touchZoomRotate.disableRotation();
+
+    map.on('error', (event) => console.error('MapLibre error:', event.error?.message || event.error));
+    map.on('load', () => {
+      mapReady = true;
+      if (!startOnline) updateOfflineMinZoom();
+      applyFallbackHomeView();
+      scheduleMarkerDraw();
+    });
+    map.on('styledata', scheduleMarkerDraw);
+    map.on('move', scheduleMarkerDraw);
+    map.on('moveend', scheduleMarkerDraw);
+    map.on('movestart', (event) => {
+      if (event.originalEvent) mapWasInteractedWith = true;
+    });
+    map.on('click', (event) => {
+      const picked = pickMarker(event.point);
+      if (picked) selectRestaurant(picked);
+    });
+
+    window.addEventListener('online', onConnectivityChange);
+    window.addEventListener('offline', onConnectivityChange);
+    window.addEventListener('beforeinstallprompt', onBeforeInstallPrompt);
+    window.addEventListener('appinstalled', () => {
+      canInstall = false;
+      isStandalone = true;
+    });
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.addEventListener('message', onServiceWorkerMessage);
+      navigator.serviceWorker.ready
+        .then(() => navigator.serviceWorker.controller?.postMessage({ type: 'get-status' }))
+        .catch(() => {});
+    }
+
+    resizeObserver = new ResizeObserver(() => {
+      map?.resize();
+      if (topbarEl) topbarHeight = Math.ceil(topbarEl.getBoundingClientRect().height);
+      updateSearchResultsScrollState();
+      if (!(online && ONLINE_TILE_URL)) updateOfflineMinZoom();
+      scheduleMarkerDraw();
+    });
     if (mapEl) resizeObserver.observe(mapEl);
     if (topbarEl) resizeObserver.observe(topbarEl);
-    updateSize();
+    if (topbarEl) topbarHeight = Math.ceil(topbarEl.getBoundingClientRect().height);
+
     loadRestaurants();
     startLocationTracking();
 
     return () => {
       resizeObserver?.disconnect();
       stopLocationTracking();
+      window.removeEventListener('online', onConnectivityChange);
+      window.removeEventListener('offline', onConnectivityChange);
+      window.removeEventListener('beforeinstallprompt', onBeforeInstallPrompt);
+      if ('serviceWorker' in navigator) navigator.serviceWorker.removeEventListener('message', onServiceWorkerMessage);
+      map?.remove();
+      maplibregl.removeProtocol('pmtiles');
     };
   });
+
+  function assetUrl(path) {
+    const origin = typeof location !== 'undefined' ? location.origin : '';
+    return `${origin}${path}`;
+  }
+
+  // All rail from the bundled GeoJSON: a navy base of every passenger track
+  // (complete coverage), plus colour-coded Tube/DLR/Overground/Elizabeth/rail
+  // routes on top. Always visible so the whole network shows even at low zoom
+  // (Protomaps omits most rail from low-zoom tiles and never colour-codes it).
+  const TUBE_SOURCE = { type: 'geojson', data: '/tube-lines.geojson' };
+  const RAIL_LAYERS = [
+    {
+      id: 'rail-base',
+      type: 'line',
+      source: 'tube',
+      filter: ['==', ['get', 'base'], true],
+      layout: { 'line-join': 'round', 'line-cap': 'round' },
+      paint: {
+        'line-color': '#41476b',
+        'line-width': ['interpolate', ['linear'], ['zoom'], 8, 0.4, 12, 1, 14, 1.6, 16, 2.4],
+        'line-opacity': 0.55
+      }
+    },
+    {
+      id: 'tube-lines',
+      type: 'line',
+      source: 'tube',
+      filter: ['==', ['get', 'base'], false],
+      layout: { 'line-join': 'round', 'line-cap': 'round' },
+      paint: {
+        'line-color': ['coalesce', ['get', 'color'], '#666666'],
+        'line-width': ['interpolate', ['linear'], ['zoom'], 6, 1, 10, 1.9, 13, 3, 16, 4.8],
+        'line-opacity': 0.95
+      }
+    }
+  ];
+
+  // Stations from the basemap vector source (rail lines come from RAIL_LAYERS).
+  function transitLayers(source) {
+    return [
+      {
+        id: `${source}_stations`,
+        type: 'circle',
+        source,
+        'source-layer': 'pois',
+        minzoom: 11,
+        filter: ['==', ['get', 'kind'], 'station'],
+        paint: {
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 11, 2, 15, 4.5],
+          'circle-color': '#3b3663',
+          'circle-stroke-color': '#ffffff',
+          'circle-stroke-width': 1.4
+        }
+      },
+      {
+        id: `${source}_station_labels`,
+        type: 'symbol',
+        source,
+        'source-layer': 'pois',
+        minzoom: 13,
+        filter: ['==', ['get', 'kind'], 'station'],
+        layout: {
+          'text-field': ['coalesce', ['get', 'name:en'], ['get', 'name']],
+          'text-font': ['Noto Sans Regular'],
+          'text-size': 10,
+          'text-offset': [0, 0.9],
+          'text-anchor': 'top',
+          'text-optional': true
+        },
+        paint: {
+          'text-color': '#3b3663',
+          'text-halo-color': '#ffffff',
+          'text-halo-width': 1.2
+        }
+      }
+    ];
+  }
+
+  function buildLocalStyle() {
+    const flavor = namedFlavor('light');
+    // Coarse whole-country tiles below the handoff zoom; detailed restaurant-area
+    // tiles at/above it. Namespacing keeps the two layer sets' ids unique.
+    const gbLayers = layers('gb', flavor, { lang: 'en' }).map((layer) => ({
+      ...layer,
+      maxzoom: BASEMAP_HANDOFF_ZOOM
+    }));
+    const detailLayers = layers('detail', flavor, { lang: 'en' }).map((layer) => ({
+      ...layer,
+      id: `detail_${layer.id}`,
+      minzoom: Math.max(layer.minzoom ?? 0, BASEMAP_HANDOFF_ZOOM)
+    }));
+
+    return {
+      version: 8,
+      glyphs: assetUrl('/basemap/fonts/{fontstack}/{range}.pbf'),
+      sprite: assetUrl('/basemap/sprites/light'),
+      sources: {
+        gb: {
+          type: 'vector',
+          url: `pmtiles://${assetUrl('/basemap/gb.pmtiles')}`,
+          attribution:
+            '<a href="https://protomaps.com" target="_blank" rel="noreferrer">Protomaps</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a>'
+        },
+        detail: {
+          type: 'vector',
+          url: `pmtiles://${assetUrl('/basemap/detail.pmtiles')}`
+        },
+        tube: TUBE_SOURCE
+      },
+      layers: composeTransit([...gbLayers, ...detailLayers], 'detail')
+    };
+  }
+
+  // Online: full global Protomaps (all cities, all labels, max zoom) via the API.
+  function buildOnlineStyle() {
+    const flavor = namedFlavor('light');
+    return {
+      version: 8,
+      glyphs: assetUrl('/basemap/fonts/{fontstack}/{range}.pbf'),
+      sprite: assetUrl('/basemap/sprites/light'),
+      sources: {
+        world: {
+          type: 'vector',
+          tiles: [ONLINE_TILE_URL],
+          maxzoom: 15,
+          attribution:
+            '<a href="https://protomaps.com" target="_blank" rel="noreferrer">Protomaps</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a>'
+        },
+        tube: TUBE_SOURCE
+      },
+      layers: composeTransit(layers('world', flavor, { lang: 'en' }), 'world')
+    };
+  }
+
+  // Stack: basemap -> navy rail base -> colour-coded lines -> stations.
+  function composeTransit(baseLayers, source) {
+    return [...baseLayers, ...RAIL_LAYERS, ...transitLayers(source)];
+  }
+
+  // Zoom out far enough (offline) that the whole covered area fits with padding,
+  // computed for the current viewport so it works on desktop and mobile.
+  function updateOfflineMinZoom() {
+    if (!map) return;
+    const camera = map.cameraForBounds(GB_FIT_BOUNDS, { padding: 24 });
+    if (camera && Number.isFinite(camera.zoom)) {
+      map.setMinZoom(Math.max(MIN_ZOOM_OFFLINE_FLOOR - 1, camera.zoom - 0.25));
+    }
+  }
+
+  function applyBasemap() {
+    if (!map) return;
+    if (online && ONLINE_TILE_URL) {
+      map.setMaxBounds(null);
+      map.setMinZoom(MIN_ZOOM_ONLINE);
+      map.setStyle(buildOnlineStyle());
+    } else {
+      map.setStyle(buildLocalStyle());
+      map.setMaxBounds(OFFLINE_MAX_BOUNDS);
+      updateOfflineMinZoom();
+    }
+    scheduleMarkerDraw();
+  }
+
+  function onConnectivityChange() {
+    const next = navigator.onLine;
+    if (next === online) return;
+    online = next;
+    applyBasemap();
+  }
 
   async function loadRestaurants() {
     try {
@@ -115,8 +380,10 @@
       if (!response.ok) throw new Error(`Data request failed with ${response.status}`);
       const payload = await response.json();
       restaurants = annotateMarkers(payload.restaurants || []);
+      restaurantById = new Map(restaurants.map((restaurant) => [restaurant.id, restaurant]));
       stats = payload.stats || null;
       applyFallbackHomeView();
+      scheduleMarkerDraw();
     } catch (error) {
       loadError = error instanceof Error ? error.message : String(error);
     } finally {
@@ -124,132 +391,25 @@
     }
   }
 
-  $: searchText = query.trim().toLowerCase();
-  $: filteredRestaurants = restaurants.filter((restaurant) => {
-    if (priceFilter !== 'all' && restaurant.priceRange !== priceFilter) return false;
-    if (!searchText) return true;
-    return restaurant.searchText.includes(searchText);
-  });
-  $: projectedCenter = project(center.lat, center.lon, zoom);
-  $: topLeft = {
-    x: projectedCenter.x - width / 2,
-    y: projectedCenter.y - height / 2
-  };
-  $: visibleTiles = getVisibleTiles(topLeft, width, height, zoom);
-  $: fallbackTiles = getFallbackTiles(topLeft, width, height, zoom);
-  $: searchResults = searchText ? filteredRestaurants.slice(0, SEARCH_LIMIT) : [];
-  $: selectedGoogleMapsUrl = selected ? getGoogleMapsUrl(selected) : '';
-  $: selectedCitymapperUrl = selected ? getCitymapperUrl(selected, userLocation, isAndroidDevice) : '';
-  $: totalCount = stats?.entryCount || restaurants.length;
-  $: minZoom = getMinimumZoom(stats?.bounds);
-  $: if (zoom < minZoom) zoom = minZoom;
-  $: {
-    searchText;
-    searchResults.length;
-    scheduleSearchResultsMeasure();
-  }
-  $: {
-    selected?.id;
-    selected?.description;
-    width;
-    height;
-    scheduleDescriptionMeasure();
-  }
-  $: scheduleMarkerDraw(filteredRestaurants, topLeft, width, height, zoom, selected?.id, userLocation);
-
-  function scheduleDescriptionMeasure() {
-    const selectedRestaurantId = selected?.id || '';
-    const token = ++descriptionMeasureToken;
-    tick().then(() => {
-      if (token !== descriptionMeasureToken) return;
-      if (descriptionEl && selectedRestaurantId !== measuredDescriptionRestaurantId) {
-        descriptionEl.scrollTop = 0;
-        measuredDescriptionRestaurantId = selectedRestaurantId;
-      }
-      updateDescriptionScrollState();
-    });
-  }
-
-  function updateDescriptionScrollState() {
-    if (!descriptionEl) {
-      descriptionHasMore = false;
-      descriptionCanScrollDown = false;
-      descriptionScrollbar = { top: 0, height: 100 };
-      measuredDescriptionRestaurantId = '';
-      return;
-    }
-
-    const maxScroll = Math.max(0, descriptionEl.scrollHeight - descriptionEl.clientHeight);
-    descriptionHasMore = maxScroll > 1;
-    descriptionCanScrollDown = maxScroll - descriptionEl.scrollTop > 1;
-    const thumbHeight = descriptionHasMore ? clamp((descriptionEl.clientHeight / descriptionEl.scrollHeight) * 100, 18, 100) : 100;
-    const thumbTop = descriptionHasMore && maxScroll ? (descriptionEl.scrollTop / maxScroll) * (100 - thumbHeight) : 0;
-    descriptionScrollbar = { top: thumbTop, height: thumbHeight };
-  }
-
-  function scheduleSearchResultsMeasure() {
-    const token = ++searchResultsMeasureToken;
-    tick().then(() => {
-      if (token !== searchResultsMeasureToken) return;
-      if (searchResultsEl && searchText !== measuredSearchText) {
-        searchResultsEl.scrollTop = 0;
-        measuredSearchText = searchText;
-      }
-      updateSearchResultsScrollState();
-    });
-  }
-
-  function updateSearchResultsScrollState() {
-    if (!searchResultsEl) {
-      searchResultsHasMore = false;
-      searchResultsScrollbar = { top: 0, height: 100 };
-      measuredSearchText = '';
-      return;
-    }
-
-    const maxScroll = Math.max(0, searchResultsEl.scrollHeight - searchResultsEl.clientHeight);
-    searchResultsHasMore = maxScroll > 1;
-    const thumbHeight = searchResultsHasMore ? clamp((searchResultsEl.clientHeight / searchResultsEl.scrollHeight) * 100, 18, 100) : 100;
-    const thumbTop = searchResultsHasMore && maxScroll ? (searchResultsEl.scrollTop / maxScroll) * (100 - thumbHeight) : 0;
-    searchResultsScrollbar = { top: thumbTop, height: thumbHeight };
-  }
-
   function annotateMarkers(items) {
     const duplicateCounts = new Map();
     const duplicateSeen = new Map();
-
     for (const item of items) {
       const key = `${Number(item.lat).toFixed(6)},${Number(item.lon).toFixed(6)}`;
       duplicateCounts.set(key, (duplicateCounts.get(key) || 0) + 1);
     }
-
     return items.map((item) => {
       const key = `${Number(item.lat).toFixed(6)},${Number(item.lon).toFixed(6)}`;
       const duplicateIndex = duplicateSeen.get(key) || 0;
       duplicateSeen.set(key, duplicateIndex + 1);
       const offset = markerOffset(duplicateIndex, duplicateCounts.get(key) || 1);
-      const lat = Number(item.lat);
-      const lon = Number(item.lon);
-      const basePoint = project(lat, lon, 0);
       return {
         ...item,
-        lat,
-        lon,
-        duplicateCount: duplicateCounts.get(key) || 1,
-        duplicateIndex,
+        lat: Number(item.lat),
+        lon: Number(item.lon),
         offsetX: offset.x,
         offsetY: offset.y,
-        mapX: basePoint.x,
-        mapY: basePoint.y,
-        searchText: [
-          item.name,
-          item.address,
-          item.pageTitle,
-          item.description,
-          item.priceRange,
-          item.openFor,
-          item.bestFor
-        ]
+        searchText: [item.name, item.address, item.pageTitle, item.description, item.priceRange, item.openFor, item.bestFor]
           .filter(Boolean)
           .join(' ')
           .toLowerCase()
@@ -262,177 +422,115 @@
     const ring = Math.floor(index / 8) + 1;
     const angle = ((index % 8) / 8) * Math.PI * 2;
     const radius = Math.min(24, 6 + ring * 5);
-    return {
-      x: Math.cos(angle) * radius,
-      y: Math.sin(angle) * radius
-    };
+    return { x: Math.cos(angle) * radius, y: Math.sin(angle) * radius };
   }
 
-  function updateSize() {
-    if (mapEl) {
-      const rect = mapEl.getBoundingClientRect();
-      width = rect.width;
-      height = rect.height;
-    }
-    if (topbarEl) {
-      topbarHeight = Math.ceil(topbarEl.getBoundingClientRect().height);
-    }
-    updateSearchResultsScrollState();
-    applyFallbackHomeView();
+  $: searchText = query.trim().toLowerCase();
+  $: filteredRestaurants = restaurants.filter((restaurant) => {
+    if (priceFilter !== 'all' && restaurant.priceRange !== priceFilter) return false;
+    if (!searchText) return true;
+    return restaurant.searchText.includes(searchText);
+  });
+  $: searchResults = searchText ? filteredRestaurants.slice(0, SEARCH_LIMIT) : [];
+  $: selectedGoogleMapsUrl = selected ? getGoogleMapsUrl(selected) : '';
+  $: selectedCitymapperUrl = selected ? getCitymapperUrl(selected, userLocation, isAndroidDevice) : '';
+  $: totalCount = stats?.entryCount || restaurants.length;
+  $: downloadPercent = downloadTotal ? Math.min(100, Math.round((downloadLoaded / downloadTotal) * 100)) : 0;
+  $: {
+    filteredRestaurants;
+    selected;
+    userLocation;
+    if (mapReady) scheduleMarkerDraw();
+  }
+  $: {
+    searchText;
+    searchResults.length;
+    scheduleSearchResultsMeasure();
+  }
+  $: {
+    selected?.id;
+    selected?.description;
+    scheduleDescriptionMeasure();
   }
 
-  function clamp(value, min, max) {
-    return Math.min(max, Math.max(min, value));
-  }
+  // ---- Canvas marker overlay -------------------------------------------------
 
-  function project(lat, lon, z) {
-    const sin = Math.sin((clamp(lat, -85.05112878, 85.05112878) * Math.PI) / 180);
-    const scale = TILE_SIZE * 2 ** z;
-    return {
-      x: ((lon + 180) / 360) * scale,
-      y: (0.5 - Math.log((1 + sin) / (1 - sin)) / (4 * Math.PI)) * scale
-    };
-  }
-
-  function unproject(x, y, z) {
-    const scale = TILE_SIZE * 2 ** z;
-    const lon = (x / scale) * 360 - 180;
-    const n = Math.PI - (2 * Math.PI * y) / scale;
-    const lat = (180 / Math.PI) * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n)));
-    return {
-      lat: clamp(lat, -85.05112878, 85.05112878),
-      lon: clamp(lon, -180, 180)
-    };
-  }
-
-  function hasCoordinates(restaurant) {
-    return Number.isFinite(restaurant?.lat) && Number.isFinite(restaurant?.lon);
-  }
-
-  function getGoogleMapsUrl(restaurant) {
-    if (restaurant?.googleMapsUrl) return restaurant.googleMapsUrl;
-    if (!hasCoordinates(restaurant)) return '';
-    const query = [restaurant.name, restaurant.address].filter(Boolean).join(', ') || `${restaurant.lat},${restaurant.lon}`;
-    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
-  }
-
-  function getCitymapperUrl(restaurant, location = null, useAndroidIntent = false) {
-    if (!hasCoordinates(restaurant)) return '';
-    const params = new URLSearchParams({
-      endcoord: `${restaurant.lat},${restaurant.lon}`,
-      endname: restaurant.name || restaurant.address || 'Restaurant'
+  function scheduleMarkerDraw() {
+    if (!markerCanvas || !map) return;
+    if (markerDrawFrame) return;
+    markerDrawFrame = requestAnimationFrame(() => {
+      markerDrawFrame = 0;
+      drawMarkers();
     });
-    if (hasCoordinates(location)) {
-      params.set('startcoord', `${location.lat},${location.lon}`);
-      params.set('startname', 'Current Location');
-    }
-    const query = params.toString();
-    if (!useAndroidIntent) return `https://citymapper.com/directions?${query}`;
-    return `intent://directions?${query}#Intent;scheme=citymapper;package=${CITYMAPPER_ANDROID_PACKAGE};S.browser_fallback_url=${encodeURIComponent(CITYMAPPER_ANDROID_STORE_URL)};end`;
   }
 
-  function getFitZoom(bounds, padding = VIEW_FIT_PADDING, maxZoom = MAX_ZOOM, minZoomLimit = MIN_ZOOM_FLOOR) {
-    if (!bounds || !width || !height) return;
-    const availableWidth = Math.max(1, width - padding * 2);
-    const availableHeight = Math.max(1, height - padding * 2);
-    for (let z = maxZoom; z >= minZoomLimit; z -= 1) {
-      const northwest = project(bounds.maxLat, bounds.minLon, z);
-      const southeast = project(bounds.minLat, bounds.maxLon, z);
-      if (
-        Math.abs(southeast.x - northwest.x) <= availableWidth &&
-        Math.abs(southeast.y - northwest.y) <= availableHeight
-      ) {
-        return z;
-      }
-    }
-    return minZoomLimit;
-  }
+  function drawMarkers() {
+    if (!map || !markerCanvas || !mapEl) return;
+    const width = mapEl.clientWidth;
+    const height = mapEl.clientHeight;
+    if (!width || !height) return;
 
-  function getMinimumZoom(bounds) {
-    return getFitZoom(bounds, VIEW_FIT_PADDING, MAX_ZOOM, MIN_ZOOM_FLOOR) || 5;
-  }
+    const dpr = Math.max(1, window.devicePixelRatio || 1);
+    const targetWidth = Math.round(width * dpr);
+    const targetHeight = Math.round(height * dpr);
+    if (markerCanvas.width !== targetWidth) markerCanvas.width = targetWidth;
+    if (markerCanvas.height !== targetHeight) markerCanvas.height = targetHeight;
+    markerCanvas.style.width = `${width}px`;
+    markerCanvas.style.height = `${height}px`;
 
-  function getTileZoom(z) {
-    return clamp(Math.floor(z), MIN_ZOOM_FLOOR, MAX_ZOOM);
-  }
+    const ctx = markerCanvas.getContext('2d');
+    if (!ctx) return;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, width, height);
 
-  function fitBounds(bounds, options = {}) {
-    if (!bounds || !width || !height) return false;
-    const padding = options.padding ?? VIEW_FIT_PADDING;
-    const maxZoom = options.maxZoom ?? MAX_ZOOM;
-    const centerLat = (bounds.minLat + bounds.maxLat) / 2;
-    const centerLon = (bounds.minLon + bounds.maxLon) / 2;
-    center = { lat: centerLat, lon: centerLon };
-    zoom = clamp(getFitZoom(bounds, padding, maxZoom, minZoom), minZoom, maxZoom);
-    return true;
-  }
-
-  function applyFallbackHomeView() {
-    if (homeViewApplied || userLocation) return;
-    if (fitBounds(LONDON_FALLBACK_BOUNDS, { padding: HOME_VIEW_PADDING, maxZoom: 11 })) {
-      homeViewApplied = true;
-    }
-  }
-
-  function getTileLevelTiles(origin, viewportWidth, viewportHeight, displayZoom, tileZoom, keyPrefix = '') {
-    if (!viewportWidth || !viewportHeight) return [];
-    const tileSize = TILE_SIZE * 2 ** (displayZoom - tileZoom);
-    const scaleTiles = 2 ** tileZoom;
-    const minX = Math.floor(origin.x / tileSize) - 1;
-    const maxX = Math.floor((origin.x + viewportWidth) / tileSize) + 1;
-    const minY = Math.floor(origin.y / tileSize) - 1;
-    const maxY = Math.floor((origin.y + viewportHeight) / tileSize) + 1;
-    const tiles = [];
-    for (let x = minX; x <= maxX; x += 1) {
-      for (let y = minY; y <= maxY; y += 1) {
-        if (y < 0 || y >= scaleTiles) continue;
-        const wrappedX = ((x % scaleTiles) + scaleTiles) % scaleTiles;
-        tiles.push({
-          key: `${keyPrefix}${tileZoom}-${x}-${y}`,
-          url: `https://tile.openstreetmap.org/${tileZoom}/${wrappedX}/${y}.png`,
-          left: x * tileSize - origin.x,
-          top: y * tileSize - origin.y,
-          size: tileSize
-        });
-      }
-    }
-    return tiles;
-  }
-
-  function getVisibleTiles(origin, viewportWidth, viewportHeight, z) {
-    const tileZoom = getTileZoom(z);
-    return getTileLevelTiles(origin, viewportWidth, viewportHeight, z, tileZoom);
-  }
-
-  function getFallbackTiles(origin, viewportWidth, viewportHeight, z) {
-    if (!viewportWidth || !viewportHeight) return [];
-    const tileZoom = getTileZoom(z);
-    if (tileZoom <= MIN_ZOOM_FLOOR) return [];
-    const tiles = [];
-    const lowestFallbackZoom = Math.max(MIN_ZOOM_FLOOR, tileZoom - 2);
-    for (let fallbackZoom = lowestFallbackZoom; fallbackZoom < tileZoom; fallbackZoom += 1) {
-      tiles.push(...getTileLevelTiles(origin, viewportWidth, viewportHeight, z, fallbackZoom, 'fallback-'));
-    }
-    return tiles;
-  }
-
-  function getVisibleMarkerData(items, origin, viewportWidth, viewportHeight, z) {
-    if (!viewportWidth || !viewportHeight) return [];
-    const scale = 2 ** z;
+    const z = map.getZoom();
+    const selectedId = selected?.id;
     const markers = [];
-    for (const restaurant of items) {
-      const x = restaurant.mapX * scale - origin.x + restaurant.offsetX;
-      const y = restaurant.mapY * scale - origin.y + restaurant.offsetY;
-      if (
-        x >= -MARKER_PADDING &&
-        x <= viewportWidth + MARKER_PADDING &&
-        y >= -MARKER_PADDING &&
-        y <= viewportHeight + MARKER_PADDING
-      ) {
-        markers.push({ restaurant, x, y });
-      }
+    for (const restaurant of filteredRestaurants) {
+      const point = map.project([restaurant.lon, restaurant.lat]);
+      const x = point.x + restaurant.offsetX;
+      const y = point.y + restaurant.offsetY;
+      if (x < -MARKER_PADDING || x > width + MARKER_PADDING || y < -MARKER_PADDING || y > height + MARKER_PADDING) continue;
+      markers.push({ restaurant, x, y });
     }
-    return markers;
+    if (visibleMarkerCount !== markers.length) visibleMarkerCount = markers.length;
+
+    if (!markerLayerCanvas) markerLayerCanvas = document.createElement('canvas');
+    if (markerLayerCanvas.width !== targetWidth) markerLayerCanvas.width = targetWidth;
+    if (markerLayerCanvas.height !== targetHeight) markerLayerCanvas.height = targetHeight;
+    const layerCtx = markerLayerCanvas.getContext('2d');
+    if (!layerCtx) return;
+    layerCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    const regularMarkers = [];
+    const pricedMarkers = [];
+    let selectedMarker = null;
+    for (const marker of markers) {
+      if (marker.restaurant.id === selectedId) {
+        selectedMarker = marker;
+        continue;
+      }
+      if (marker.restaurant.priceRange) pricedMarkers.push(marker);
+      else regularMarkers.push(marker);
+    }
+
+    // Composite each group at a flat opacity so overlapping markers do not darken.
+    layerCtx.clearRect(0, 0, width, height);
+    for (const marker of regularMarkers) drawMarker(layerCtx, marker, false, z);
+    ctx.save();
+    ctx.globalAlpha = MARKER_LAYER_OPACITY;
+    ctx.drawImage(markerLayerCanvas, 0, 0, width, height);
+    ctx.restore();
+
+    layerCtx.clearRect(0, 0, width, height);
+    for (const marker of pricedMarkers) drawMarker(layerCtx, marker, false, z);
+    ctx.save();
+    ctx.globalAlpha = PRICED_MARKER_LAYER_OPACITY;
+    ctx.drawImage(markerLayerCanvas, 0, 0, width, height);
+    ctx.restore();
+
+    if (selectedMarker) drawMarker(ctx, selectedMarker, true, z);
+    drawUserLocation(ctx, userLocation, z);
   }
 
   function markerColor(priceRange) {
@@ -449,111 +547,12 @@
 
   function markerDetail(z, active) {
     if (active || z >= FULL_MARKER_ZOOM) {
-      return {
-        key: 'full',
-        radius: active ? 17 : 12,
-        strokeWidth: active ? 3 : 2,
-        shadowBlur: active ? 14 : 8,
-        shadowOffsetY: active ? 4 : 3,
-        showPrice: true
-      };
+      return { key: 'full', radius: active ? 17 : 12, strokeWidth: active ? 3 : 2, shadowBlur: active ? 14 : 8, shadowOffsetY: active ? 4 : 3, showPrice: true };
     }
-
     if (z >= MID_MARKER_ZOOM) {
-      return {
-        key: 'mid',
-        radius: 7,
-        strokeWidth: 1.5,
-        shadowBlur: 4,
-        shadowOffsetY: 2,
-        showPrice: false
-      };
+      return { key: 'mid', radius: 7, strokeWidth: 1.5, shadowBlur: 4, shadowOffsetY: 2, showPrice: false };
     }
-
-    return {
-      key: 'small',
-      radius: 4.5,
-      strokeWidth: 1,
-      shadowBlur: 2,
-      shadowOffsetY: 1,
-      showPrice: false
-    };
-  }
-
-  function scheduleMarkerDraw(items, origin, viewportWidth, viewportHeight, z, selectedId, location) {
-    if (!markerCanvas || !viewportWidth || !viewportHeight) return;
-    if (markerDrawFrame) cancelAnimationFrame(markerDrawFrame);
-    markerDrawFrame = requestAnimationFrame(() => {
-      markerDrawFrame = 0;
-      drawMarkers(items, origin, viewportWidth, viewportHeight, z, selectedId, location);
-    });
-  }
-
-  function drawMarkers(items, origin, viewportWidth, viewportHeight, z, selectedId, location) {
-    const canvas = markerCanvas;
-    if (!canvas) return;
-    const dpr = Math.max(1, window.devicePixelRatio || 1);
-    const targetWidth = Math.max(1, Math.round(viewportWidth * dpr));
-    const targetHeight = Math.max(1, Math.round(viewportHeight * dpr));
-    if (canvas.width !== targetWidth) canvas.width = targetWidth;
-    if (canvas.height !== targetHeight) canvas.height = targetHeight;
-    canvas.style.width = `${viewportWidth}px`;
-    canvas.style.height = `${viewportHeight}px`;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.clearRect(0, 0, viewportWidth, viewportHeight);
-
-    const markers = getVisibleMarkerData(items, origin, viewportWidth, viewportHeight, z);
-    if (visibleMarkerCount !== markers.length) visibleMarkerCount = markers.length;
-    markerHitState.hits = markers.map((marker) => ({
-      id: marker.restaurant.id,
-      x: marker.x,
-      y: marker.y,
-      radius: marker.restaurant.id === selectedId ? 17 : 13,
-      restaurant: marker.restaurant
-    }));
-
-    const selectedMarker = selectedId ? markers.find((marker) => marker.restaurant.id === selectedId) : null;
-    if (!markerLayerCanvas) markerLayerCanvas = document.createElement('canvas');
-    if (markerLayerCanvas.width !== targetWidth) markerLayerCanvas.width = targetWidth;
-    if (markerLayerCanvas.height !== targetHeight) markerLayerCanvas.height = targetHeight;
-    const layerCtx = markerLayerCanvas.getContext('2d');
-    if (!layerCtx) return;
-    layerCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    layerCtx.clearRect(0, 0, viewportWidth, viewportHeight);
-
-    const regularMarkers = [];
-    const pricedMarkers = [];
-    for (const marker of markers) {
-      if (marker.restaurant.id === selectedId) continue;
-      if (marker.restaurant.priceRange) {
-        pricedMarkers.push(marker);
-      } else {
-        regularMarkers.push(marker);
-      }
-    }
-
-    for (const marker of regularMarkers) {
-      drawMarker(layerCtx, marker, false, z);
-    }
-    ctx.save();
-    ctx.globalAlpha = MARKER_LAYER_OPACITY;
-    ctx.drawImage(markerLayerCanvas, 0, 0, viewportWidth, viewportHeight);
-    ctx.restore();
-
-    layerCtx.clearRect(0, 0, viewportWidth, viewportHeight);
-    for (const marker of pricedMarkers) {
-      drawMarker(layerCtx, marker, false, z);
-    }
-    ctx.save();
-    ctx.globalAlpha = PRICED_MARKER_LAYER_OPACITY;
-    ctx.drawImage(markerLayerCanvas, 0, 0, viewportWidth, viewportHeight);
-    ctx.restore();
-
-    if (selectedMarker) drawMarker(ctx, selectedMarker, true, z);
-    drawUserLocation(ctx, location, origin, viewportWidth, viewportHeight, z);
+    return { key: 'small', radius: 4.5, strokeWidth: 1, shadowBlur: 2, shadowOffsetY: 1, showPrice: false };
   }
 
   function drawMarker(ctx, marker, active, z) {
@@ -603,16 +602,13 @@
     return sprite;
   }
 
-  function drawUserLocation(ctx, location, origin, viewportWidth, viewportHeight, z) {
-    if (!location) return;
-    const point = project(location.lat, location.lon, z);
-    const x = point.x - origin.x;
-    const y = point.y - origin.y;
-    if (x < -100 || x > viewportWidth + 100 || y < -100 || y > viewportHeight + 100) return;
+  function drawUserLocation(ctx, location, z) {
+    if (!location || !hasCoordinates(location)) return;
+    const point = map.project([location.lon, location.lat]);
+    const x = point.x;
+    const y = point.y;
 
-    const accuracyRadius = location.accuracy
-      ? clamp(location.accuracy / metersPerPixel(location.lat, z), 10, 90)
-      : 0;
+    const accuracyRadius = location.accuracy ? clamp(location.accuracy / metersPerPixel(location.lat, z), 10, 90) : 0;
 
     ctx.save();
     if (accuracyRadius) {
@@ -624,7 +620,6 @@
       ctx.strokeStyle = 'rgba(37, 99, 235, 0.28)';
       ctx.stroke();
     }
-
     ctx.shadowColor = 'rgba(27, 31, 28, 0.28)';
     ctx.shadowBlur = 8;
     ctx.shadowOffsetY = 3;
@@ -643,252 +638,149 @@
     return (156543.03392 * Math.cos((lat * Math.PI) / 180)) / 2 ** z;
   }
 
-  function isMapChrome(target) {
-    return Boolean(target?.closest?.('.topbar, .zoom-controls, .price-controls, .results-shell, .results-panel, .attribution'));
-  }
-
-  function pickMarker(clientX, clientY) {
-    if (!mapEl) return null;
-    const rect = mapEl.getBoundingClientRect();
-    const x = clientX - rect.left;
-    const y = clientY - rect.top;
+  function pickMarker(point) {
+    if (!map) return null;
+    const selectedId = selected?.id;
     const candidates = [];
-    for (const hit of markerHitState.hits) {
-      const dx = x - hit.x;
-      const dy = y - hit.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-      if (distance <= hit.radius + 10) {
-        candidates.push({ ...hit, distance });
-      }
+    for (const restaurant of filteredRestaurants) {
+      const projected = map.project([restaurant.lon, restaurant.lat]);
+      const x = projected.x + restaurant.offsetX;
+      const y = projected.y + restaurant.offsetY;
+      const distance = Math.hypot(point.x - x, point.y - y);
+      const radius = restaurant.id === selectedId ? 17 : 13;
+      if (distance <= radius + 8) candidates.push({ restaurant, distance });
     }
     if (!candidates.length) {
       lastMarkerPick = null;
       return null;
     }
-
     candidates.sort((a, b) => {
       const distanceDifference = a.distance - b.distance;
       if (Math.abs(distanceDifference) > 4) return distanceDifference;
-      return markerPriority(b.restaurant) - markerPriority(a.restaurant) || distanceDifference || String(a.id).localeCompare(String(b.id));
+      return (
+        markerPriority(b.restaurant) - markerPriority(a.restaurant) ||
+        distanceDifference ||
+        String(a.restaurant.id).localeCompare(String(b.restaurant.id))
+      );
     });
-    const key = candidates.map((candidate) => candidate.id).join('|');
+    const key = candidates.map((candidate) => candidate.restaurant.id).join('|');
     const repeatedPick =
-      lastMarkerPick &&
-      lastMarkerPick.key === key &&
-      Math.abs(lastMarkerPick.x - clientX) <= 18 &&
-      Math.abs(lastMarkerPick.y - clientY) <= 18;
+      lastMarkerPick && lastMarkerPick.key === key && Math.abs(lastMarkerPick.x - point.x) <= 18 && Math.abs(lastMarkerPick.y - point.y) <= 18;
     const index = repeatedPick ? (lastMarkerPick.index + 1) % candidates.length : 0;
-    lastMarkerPick = { key, index, x: clientX, y: clientY };
+    lastMarkerPick = { key, index, x: point.x, y: point.y };
     return candidates[index].restaurant;
   }
 
-  function setCenterRaf(nextCenter) {
-    pendingCenter = nextCenter;
-    if (panFrame) return;
-    panFrame = requestAnimationFrame(() => {
-      panFrame = 0;
-      if (pendingCenter) {
-        center = pendingCenter;
-        pendingCenter = null;
+  // ---- Details / search panels (unchanged behaviour) -------------------------
+
+  function scheduleDescriptionMeasure() {
+    const selectedRestaurantId = selected?.id || '';
+    const token = ++descriptionMeasureToken;
+    tick().then(() => {
+      if (token !== descriptionMeasureToken) return;
+      if (descriptionEl && selectedRestaurantId !== measuredDescriptionRestaurantId) {
+        descriptionEl.scrollTop = 0;
+        measuredDescriptionRestaurantId = selectedRestaurantId;
       }
+      updateDescriptionScrollState();
     });
   }
 
-  function flushPendingCenter() {
-    if (!pendingCenter) return;
-    if (panFrame) {
-      cancelAnimationFrame(panFrame);
-      panFrame = 0;
+  function updateDescriptionScrollState() {
+    if (!descriptionEl) {
+      descriptionHasMore = false;
+      descriptionCanScrollDown = false;
+      descriptionScrollbar = { top: 0, height: 100 };
+      measuredDescriptionRestaurantId = '';
+      return;
     }
-    center = pendingCenter;
-    pendingCenter = null;
+    const maxScroll = Math.max(0, descriptionEl.scrollHeight - descriptionEl.clientHeight);
+    descriptionHasMore = maxScroll > 1;
+    descriptionCanScrollDown = maxScroll - descriptionEl.scrollTop > 1;
+    const thumbHeight = descriptionHasMore ? clamp((descriptionEl.clientHeight / descriptionEl.scrollHeight) * 100, 18, 100) : 100;
+    const thumbTop = descriptionHasMore && maxScroll ? (descriptionEl.scrollTop / maxScroll) * (100 - thumbHeight) : 0;
+    descriptionScrollbar = { top: thumbTop, height: thumbHeight };
   }
 
-  function setLocationView(location) {
-    if (!location) return;
-    center = { lat: location.lat, lon: location.lon };
-    zoom = clamp(LOCATION_ZOOM, minZoom, MAX_ZOOM);
+  function scheduleSearchResultsMeasure() {
+    const token = ++searchResultsMeasureToken;
+    tick().then(() => {
+      if (token !== searchResultsMeasureToken) return;
+      if (searchResultsEl && searchText !== measuredSearchText) {
+        searchResultsEl.scrollTop = 0;
+        measuredSearchText = searchText;
+      }
+      updateSearchResultsScrollState();
+    });
+  }
+
+  function updateSearchResultsScrollState() {
+    if (!searchResultsEl) {
+      searchResultsHasMore = false;
+      searchResultsScrollbar = { top: 0, height: 100 };
+      measuredSearchText = '';
+      return;
+    }
+    const maxScroll = Math.max(0, searchResultsEl.scrollHeight - searchResultsEl.clientHeight);
+    searchResultsHasMore = maxScroll > 1;
+    const thumbHeight = searchResultsHasMore ? clamp((searchResultsEl.clientHeight / searchResultsEl.scrollHeight) * 100, 18, 100) : 100;
+    const thumbTop = searchResultsHasMore && maxScroll ? (searchResultsEl.scrollTop / maxScroll) * (100 - thumbHeight) : 0;
+    searchResultsScrollbar = { top: thumbTop, height: thumbHeight };
+  }
+
+  function clamp(value, min, max) {
+    return Math.min(max, Math.max(min, value));
+  }
+
+  function hasCoordinates(restaurant) {
+    return Number.isFinite(restaurant?.lat) && Number.isFinite(restaurant?.lon);
+  }
+
+  function getGoogleMapsUrl(restaurant) {
+    if (restaurant?.googleMapsUrl) return restaurant.googleMapsUrl;
+    if (!hasCoordinates(restaurant)) return '';
+    const query = [restaurant.name, restaurant.address].filter(Boolean).join(', ') || `${restaurant.lat},${restaurant.lon}`;
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+  }
+
+  function getCitymapperUrl(restaurant, location = null, useAndroidIntent = false) {
+    if (!hasCoordinates(restaurant)) return '';
+    const params = new URLSearchParams({
+      endcoord: `${restaurant.lat},${restaurant.lon}`,
+      endname: restaurant.name || restaurant.address || 'Restaurant'
+    });
+    if (hasCoordinates(location)) {
+      params.set('startcoord', `${location.lat},${location.lon}`);
+      params.set('startname', 'Current Location');
+    }
+    const query = params.toString();
+    if (!useAndroidIntent) return `https://citymapper.com/directions?${query}`;
+    return `intent://directions?${query}#Intent;scheme=citymapper;package=${CITYMAPPER_ANDROID_PACKAGE};S.browser_fallback_url=${encodeURIComponent(CITYMAPPER_ANDROID_STORE_URL)};end`;
+  }
+
+  // ---- View helpers ----------------------------------------------------------
+
+  function applyFallbackHomeView() {
+    if (!mapReady || homeViewApplied || userLocation) return;
+    map.fitBounds(
+      [
+        [LONDON_BOUNDS.minLon, LONDON_BOUNDS.minLat],
+        [LONDON_BOUNDS.maxLon, LONDON_BOUNDS.maxLat]
+      ],
+      { padding: HOME_VIEW_PADDING, maxZoom: 11, animate: false }
+    );
     homeViewApplied = true;
   }
 
-  function eventPoint(event) {
-    return { x: event.clientX, y: event.clientY };
-  }
-
-  function pointerDistance(a, b) {
-    return Math.hypot(a.x - b.x, a.y - b.y);
-  }
-
-  function pointerMidpoint(a, b) {
-    return {
-      x: (a.x + b.x) / 2,
-      y: (a.y + b.y) / 2
-    };
-  }
-
-  function firstTwoPointers() {
-    return [...activePointers.values()].slice(0, 2);
-  }
-
-  function startPinch() {
-    const [first, second] = firstTwoPointers();
-    if (!first || !second) return;
-    flushPendingCenter();
-    const midpoint = pointerMidpoint(first, second);
-    pinchStart = {
-      distance: pointerDistance(first, second),
-      midpoint,
-      zoom,
-      anchorGeo: geoAtClient(midpoint.x, midpoint.y)
-    };
-    activePointer = null;
-    dragStart = null;
-    dragMoved = true;
-  }
-
-  function updatePinch() {
-    const [first, second] = firstTwoPointers();
-    if (!first || !second) return;
-    if (!pinchStart) startPinch();
-    if (!pinchStart) return;
-
-    const distance = pointerDistance(first, second);
-    const midpoint = pointerMidpoint(first, second);
-    const nextZoom = clamp(pinchStart.zoom + Math.log2(Math.max(1, distance) / Math.max(1, pinchStart.distance)), minZoom, MAX_ZOOM);
-    setZoomAtClient(midpoint.x, midpoint.y, nextZoom, pinchStart.anchorGeo);
-  }
-
-  function onPointerDown(event) {
-    if (isMapChrome(event.target)) return;
-    if (event.button !== undefined && event.button !== 0) return;
-    mapWasInteractedWith = true;
-    activePointers.set(event.pointerId, eventPoint(event));
-    mapEl?.setPointerCapture?.(event.pointerId);
-    if (activePointers.size >= 2) {
-      flushPendingCenter();
-      startPinch();
-      return;
-    }
-    activePointer = event.pointerId;
-    dragMoved = false;
-    dragStart = {
-      x: event.clientX,
-      y: event.clientY,
-      centerPx: project(center.lat, center.lon, zoom)
-    };
-  }
-
-  function onPointerMove(event) {
-    if (activePointers.has(event.pointerId)) {
-      activePointers.set(event.pointerId, eventPoint(event));
-    }
-    if (activePointers.size >= 2) {
-      updatePinch();
-      return;
-    }
-    if (activePointer !== event.pointerId || !dragStart) return;
-    const dx = event.clientX - dragStart.x;
-    const dy = event.clientY - dragStart.y;
-    if (Math.abs(dx) + Math.abs(dy) > 3) dragMoved = true;
-    setCenterRaf(unproject(dragStart.centerPx.x - dx, dragStart.centerPx.y - dy, zoom));
-  }
-
-  function onPointerUp(event) {
-    const wasPinching = Boolean(pinchStart) || activePointers.size >= 2;
-    activePointers.delete(event.pointerId);
-    mapEl?.releasePointerCapture?.(event.pointerId);
-
-    if (wasPinching) {
-      flushPendingCenter();
-      pinchStart = null;
-      const remainingPointer = activePointers.entries().next().value;
-      if (remainingPointer) {
-        activePointer = remainingPointer[0];
-        dragStart = {
-          x: remainingPointer[1].x,
-          y: remainingPointer[1].y,
-          centerPx: project(center.lat, center.lon, zoom)
-        };
-        dragMoved = true;
-      } else {
-        activePointer = null;
-        dragStart = null;
-      }
-      return;
-    }
-
-    if (activePointer !== event.pointerId) return;
-    flushPendingCenter();
-    if (!dragMoved && !isMapChrome(event.target)) {
-      const picked = pickMarker(event.clientX, event.clientY);
-      if (picked) selectRestaurant(picked);
-    }
-    activePointer = null;
-    dragStart = null;
-  }
-
-  function onWheel(event) {
-    if (isMapChrome(event.target)) return;
-    event.preventDefault();
-    if (!event.deltaY) return;
-    mapWasInteractedWith = true;
-    flushPendingCenter();
-    zoomAt(event.clientX, event.clientY, getWheelZoomDelta(event));
-    if (dragStart && activePointer !== null) {
-      const pointer = activePointers.get(activePointer) || eventPoint(event);
-      dragStart = {
-        x: pointer.x,
-        y: pointer.y,
-        centerPx: project(center.lat, center.lon, zoom)
-      };
-      dragMoved = true;
-    }
-  }
-
-  function getWheelZoomDelta(event) {
-    const sensitivity =
-      event.deltaMode === 1
-        ? WHEEL_ZOOM_LINE_SENSITIVITY
-        : event.deltaMode === 2
-          ? WHEEL_ZOOM_PAGE_SENSITIVITY
-          : WHEEL_ZOOM_PIXEL_SENSITIVITY;
-    return clamp(-event.deltaY * sensitivity, -MAX_WHEEL_ZOOM_DELTA, MAX_WHEEL_ZOOM_DELTA);
-  }
-
-  function geoAtClient(clientX, clientY) {
-    if (!mapEl) return center;
-    const rect = mapEl.getBoundingClientRect();
-    const currentCenter = project(center.lat, center.lon, zoom);
-    const currentTopLeft = {
-      x: currentCenter.x - width / 2,
-      y: currentCenter.y - height / 2
-    };
-    return unproject(currentTopLeft.x + clientX - rect.left, currentTopLeft.y + clientY - rect.top, zoom);
-  }
-
-  function setZoomAtClient(clientX, clientY, nextZoom, anchorGeo = null) {
-    if (!mapEl) return;
-    const clampedZoom = clamp(nextZoom, minZoom, MAX_ZOOM);
-    if (clampedZoom === zoom && !anchorGeo) return;
-    const rect = mapEl.getBoundingClientRect();
-    const anchor = anchorGeo || geoAtClient(clientX, clientY);
-    const afterPoint = project(anchor.lat, anchor.lon, clampedZoom);
-    const nextTopLeft = {
-      x: afterPoint.x - (clientX - rect.left),
-      y: afterPoint.y - (clientY - rect.top)
-    };
-    center = unproject(nextTopLeft.x + width / 2, nextTopLeft.y + height / 2, clampedZoom);
-    zoom = clampedZoom;
-  }
-
-  function zoomAt(clientX, clientY, delta) {
-    const nextZoom = clamp(zoom + delta, minZoom, MAX_ZOOM);
-    if (nextZoom === zoom) return;
-    setZoomAtClient(clientX, clientY, nextZoom);
+  function setLocationView(location) {
+    if (!location || !mapReady) return;
+    map.flyTo({ center: [location.lon, location.lat], zoom: clamp(LOCATION_ZOOM, map.getMinZoom(), MAX_ZOOM) });
+    homeViewApplied = true;
   }
 
   function zoomButton(delta) {
-    zoomAt(width / 2 + (mapEl?.getBoundingClientRect().left || 0), height / 2 + (mapEl?.getBoundingClientRect().top || 0), delta);
+    if (!map) return;
+    map.easeTo({ zoom: clamp(map.getZoom() + delta, map.getMinZoom(), MAX_ZOOM), duration: 200 });
   }
 
   function selectRestaurant(restaurant) {
@@ -898,9 +790,9 @@
   function selectSearchResult(restaurant) {
     selected = restaurant;
     mapWasInteractedWith = true;
-    if (!Number.isFinite(restaurant?.lat) || !Number.isFinite(restaurant?.lon)) return;
-    center = { lat: restaurant.lat, lon: restaurant.lon };
+    if (!hasCoordinates(restaurant)) return;
     homeViewApplied = true;
+    map?.flyTo({ center: [restaurant.lon, restaurant.lat], zoom: Math.max(map.getZoom(), SEARCH_ZOOM) });
   }
 
   function closeDetails() {
@@ -908,16 +800,16 @@
   }
 
   function resetMap() {
+    selected = null;
+    query = '';
+    priceFilter = 'all';
+    lastMarkerPick = null;
     if (userLocation) {
       setLocationView(userLocation);
     } else {
       homeViewApplied = false;
       applyFallbackHomeView();
     }
-    selected = null;
-    query = '';
-    priceFilter = 'all';
-    lastMarkerPick = null;
   }
 
   function startLocationTracking(options = {}) {
@@ -925,12 +817,8 @@
       locationStatus = 'Location unavailable';
       return;
     }
-    if (userLocation) {
-      setLocationView(userLocation);
-    }
-    if (options.restart && locationWatchId !== null) {
-      stopLocationTracking();
-    }
+    if (userLocation) setLocationView(userLocation);
+    if (options.restart && locationWatchId !== null) stopLocationTracking();
     if (locationWatchId !== null) return;
 
     locationStatus = 'Locating';
@@ -943,20 +831,15 @@
           accuracy: position.coords.accuracy
         };
         locationStatus = 'Live location on';
-        if (firstLocation && (!mapWasInteractedWith || options.restart)) {
-          setLocationView(userLocation);
-        }
+        if (firstLocation && (!mapWasInteractedWith || options.restart)) setLocationView(userLocation);
+        scheduleMarkerDraw();
       },
       (error) => {
         locationStatus = error.message || 'Location unavailable';
         stopLocationTracking();
         applyFallbackHomeView();
       },
-      {
-        enableHighAccuracy: true,
-        maximumAge: 10000,
-        timeout: 15000
-      }
+      { enableHighAccuracy: true, maximumAge: 10000, timeout: 15000 }
     );
   }
 
@@ -965,50 +848,52 @@
     navigator.geolocation.clearWatch(locationWatchId);
     locationWatchId = null;
   }
+
+  // ---- Offline download / install -------------------------------------------
+
+  function onBeforeInstallPrompt(event) {
+    event.preventDefault();
+    deferredInstallPrompt = event;
+    canInstall = true;
+  }
+
+  function onServiceWorkerMessage(event) {
+    const data = event.data || {};
+    if (data.type === 'precache-progress') {
+      offlineState = data.loaded >= data.total && data.total > 0 ? 'ready' : 'downloading';
+      downloadLoaded = data.loaded || 0;
+      downloadTotal = data.total || 0;
+    } else if (data.type === 'precache-done') {
+      offlineState = 'ready';
+      if (data.total) {
+        downloadLoaded = data.total;
+        downloadTotal = data.total;
+      }
+    } else if (data.type === 'precache-idle') {
+      if (offlineState === 'unknown') offlineState = 'idle';
+    }
+  }
+
+  async function onOfflineButton() {
+    if (deferredInstallPrompt) {
+      deferredInstallPrompt.prompt();
+      await deferredInstallPrompt.userChoice;
+      deferredInstallPrompt = null;
+      canInstall = false;
+      return;
+    }
+    showInstallHelp = true;
+  }
 </script>
 
 <svelte:head>
   <title>Eater Restaurant Map</title>
-  <meta
-    name="description"
-    content="Full map of restaurants featured in Eater map guides."
-  />
+  <meta name="description" content="Full map of restaurants featured in Eater map guides. Works offline." />
 </svelte:head>
 
 <main class="app-shell">
-  <section
-    class="map"
-    bind:this={mapEl}
-    on:pointerdown={onPointerDown}
-    on:pointermove={onPointerMove}
-    on:pointerup={onPointerUp}
-    on:pointercancel={onPointerUp}
-    on:wheel={onWheel}
-    style={`--topbar-height: ${topbarHeight}px; --mobile-search-visible-results: ${MOBILE_SEARCH_VISIBLE_RESULTS};`}
-    role="application"
-    aria-label="Restaurant map"
-  >
-    <div class="tile-layer" aria-hidden="true">
-      {#each fallbackTiles as tile (tile.key)}
-        <img
-          class="tile tile-fallback"
-          src={tile.url}
-          alt=""
-          draggable="false"
-          style={`width: ${tile.size}px; height: ${tile.size}px; transform: translate3d(${tile.left}px, ${tile.top}px, 0);`}
-        />
-      {/each}
-      {#each visibleTiles as tile (tile.key)}
-        <img
-          class="tile"
-          src={tile.url}
-          alt=""
-          draggable="false"
-          style={`width: ${tile.size}px; height: ${tile.size}px; transform: translate3d(${tile.left}px, ${tile.top}px, 0);`}
-        />
-      {/each}
-    </div>
-
+  <section class="map" style={`--topbar-height: ${topbarHeight}px; --mobile-search-visible-results: ${MOBILE_SEARCH_VISIBLE_RESULTS};`}>
+    <div class="map-canvas" bind:this={mapEl} role="application" aria-label="Restaurant map"></div>
     <canvas class="marker-layer" bind:this={markerCanvas} aria-hidden="true"></canvas>
 
     {#if loading}
@@ -1023,21 +908,33 @@
         <div class="search-field">
           <input bind:value={query} type="search" placeholder="Restaurant, area, guide" autocomplete="off" />
           {#if searchText}
-            <output class="search-count" aria-live="polite">
-              {filteredRestaurants.length.toLocaleString()}
-            </output>
+            <output class="search-count" aria-live="polite">{filteredRestaurants.length.toLocaleString()}</output>
           {/if}
         </div>
       </label>
       <button class="reset-button" type="button" on:click={resetMap}>Reset</button>
-      <details class="roadmap-menu">
-        <summary>Roadmap</summary>
-        <ul>
-          {#each roadmapItems as item}
-            <li>{item}</li>
-          {/each}
-        </ul>
-      </details>
+      {#if !isStandalone}
+        <button
+          class="offline-button"
+          class:downloading={offlineState === 'downloading'}
+          class:ready={offlineState === 'ready'}
+          type="button"
+          on:click={onOfflineButton}
+          title={offlineState === 'downloading' ? `Saving offline map (${downloadPercent}%)` : 'Available offline — tap to install'}
+        >
+          <span class="offline-dot" class:online={online}></span>
+          {#if offlineState === 'downloading'}
+            Saving {downloadPercent}%
+          {:else if offlineState === 'ready'}
+            Offline
+            <svg class="offline-icon" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+              <path d="M4 12.5l5 5 11-11" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          {:else}
+            Install
+          {/if}
+        </button>
+      {/if}
     </div>
 
     <div class="zoom-controls" aria-label="Zoom controls">
@@ -1081,7 +978,18 @@
       </div>
     {/if}
 
+    <details class="roadmap-menu">
+      <summary>Roadmap</summary>
+      <ul>
+        {#each roadmapItems as item}
+          <li>{item}</li>
+        {/each}
+      </ul>
+    </details>
+
     <div class="attribution">
+      <a href="https://protomaps.com" target="_blank" rel="noreferrer">Protomaps</a>
+      <span aria-hidden="true">·</span>
       <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a>
     </div>
   </section>
@@ -1117,24 +1025,12 @@
       {/if}
 
       <dl class="facts">
-        {#if selected.bestFor}
-          <div><dt>Best For</dt><dd>{selected.bestFor}</dd></div>
-        {/if}
-        {#if selected.mustTryDish}
-          <div><dt>Must Try</dt><dd>{selected.mustTryDish}</dd></div>
-        {/if}
-        {#if selected.knowBeforeYouGo}
-          <div><dt>Know First</dt><dd>{selected.knowBeforeYouGo}</dd></div>
-        {/if}
-        {#if selected.outdoorSeating}
-          <div><dt>Outdoor</dt><dd>{selected.outdoorSeating}</dd></div>
-        {/if}
-        {#if selected.additionalLocationNotes}
-          <div><dt>More Locations</dt><dd>{selected.additionalLocationNotes}</dd></div>
-        {/if}
-        {#if selected.phone}
-          <div><dt>Phone</dt><dd><a href={`tel:${selected.phone}`}>{selected.phone}</a></dd></div>
-        {/if}
+        {#if selected.bestFor}<div><dt>Best For</dt><dd>{selected.bestFor}</dd></div>{/if}
+        {#if selected.mustTryDish}<div><dt>Must Try</dt><dd>{selected.mustTryDish}</dd></div>{/if}
+        {#if selected.knowBeforeYouGo}<div><dt>Know First</dt><dd>{selected.knowBeforeYouGo}</dd></div>{/if}
+        {#if selected.outdoorSeating}<div><dt>Outdoor</dt><dd>{selected.outdoorSeating}</dd></div>{/if}
+        {#if selected.additionalLocationNotes}<div><dt>More Locations</dt><dd>{selected.additionalLocationNotes}</dd></div>{/if}
+        {#if selected.phone}<div><dt>Phone</dt><dd><a href={`tel:${selected.phone}`}>{selected.phone}</a></dd></div>{/if}
       </dl>
 
       <div class="actions">
@@ -1145,11 +1041,7 @@
           </a>
         {/if}
         {#if selectedCitymapperUrl}
-          <a
-            class="citymapper-action"
-            href={selectedCitymapperUrl}
-            aria-label={`Open mobile directions to ${selected.name} in Citymapper`}
-          >
+          <a class="citymapper-action" href={selectedCitymapperUrl} aria-label={`Open mobile directions to ${selected.name} in Citymapper`}>
             Citymapper
           </a>
         {/if}
@@ -1167,6 +1059,27 @@
   </aside>
 </main>
 
+{#if showInstallHelp}
+  <div class="install-help" role="dialog" aria-modal="true" on:click={() => (showInstallHelp = false)}>
+    <div class="install-help-card" on:click|stopPropagation>
+      <h2>Install for offline use</h2>
+      {#if isIosDevice}
+        <ol>
+          <li>Tap the <strong>Share</strong> button in Safari (square with an up arrow).</li>
+          <li>Choose <strong>Add to Home Screen</strong>, then <strong>Add</strong>.</li>
+        </ol>
+      {:else}
+        <ol>
+          <li>Open your browser menu (⋮ or ≡).</li>
+          <li>Choose <strong>Install app</strong> or <strong>Add to Home Screen</strong>.</li>
+        </ol>
+      {/if}
+      <p class="install-help-note">The map is already saved on this device{offlineState === 'ready' ? '' : ' (finishing download…)'}, so it works with no internet.</p>
+      <button type="button" on:click={() => (showInstallHelp = false)}>Got it</button>
+    </div>
+  </div>
+{/if}
+
 <style>
   :global(*) {
     box-sizing: border-box;
@@ -1177,8 +1090,7 @@
     margin: 0;
     min-height: 100%;
     overflow: hidden;
-    font-family:
-      Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     color: #17201c;
     background: #f5f2ea;
   }
@@ -1201,33 +1113,26 @@
     min-width: 0;
     height: 100%;
     overflow: hidden;
-    touch-action: none;
     background: #d8dfd4;
-    cursor: grab;
   }
 
-  .map:active {
-    cursor: grabbing;
-  }
-
-  .tile-layer,
-  .marker-layer {
+  .map-canvas {
     position: absolute;
     inset: 0;
   }
 
   .marker-layer {
+    position: absolute;
+    inset: 0;
     z-index: 2;
     pointer-events: none;
   }
 
-  .tile {
-    position: absolute;
-    width: 256px;
-    height: 256px;
-    user-select: none;
-    will-change: transform;
-    backface-visibility: hidden;
+  :global(.maplibregl-ctrl-top-right),
+  :global(.maplibregl-ctrl-bottom-left),
+  :global(.maplibregl-ctrl-bottom-right),
+  :global(.maplibregl-ctrl-top-left) {
+    display: none;
   }
 
   .topbar {
@@ -1244,6 +1149,7 @@
 
   .search,
   .reset-button,
+  .offline-button,
   .roadmap-menu,
   .zoom-controls,
   .price-controls,
@@ -1303,6 +1209,7 @@
   }
 
   .reset-button,
+  .offline-button,
   .zoom-controls button,
   .price-controls button {
     border: 1px solid rgba(23, 32, 28, 0.14);
@@ -1319,15 +1226,52 @@
     font-weight: 700;
   }
 
-  .roadmap-menu {
-    position: relative;
+  .offline-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     min-width: 96px;
+    height: 48px;
+    padding: 0 12px;
+    border-radius: 8px;
+    font-weight: 800;
+    white-space: nowrap;
+    justify-content: center;
+  }
+
+  .offline-button.ready {
+    color: #1f6b45;
+  }
+
+  .offline-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #b9b1a3;
+    flex: 0 0 auto;
+  }
+
+  .offline-dot.online {
+    background: #2d8a5f;
+  }
+
+  .offline-icon {
+    flex: 0 0 auto;
+    margin-left: -1px;
+  }
+
+  .roadmap-menu {
+    position: absolute;
+    right: 12px;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    min-width: 96px;
+    z-index: 9;
     color: #17201c;
   }
 
   .roadmap-menu summary {
     display: grid;
-    height: 48px;
+    height: 40px;
     place-items: center;
     padding: 0 12px;
     border: 1px solid rgba(23, 32, 28, 0.14);
@@ -1350,8 +1294,8 @@
 
   .roadmap-menu ul {
     position: absolute;
-    top: 56px;
     right: 0;
+    bottom: 48px;
     display: grid;
     gap: 7px;
     width: min(320px, calc(100vw - 24px));
@@ -1387,14 +1331,14 @@
     font-weight: 800;
   }
 
-  .zoom-controls button.active {
-    color: #fff;
-    background: #2563eb;
-  }
-
   .zoom-controls .location-button {
     font-size: 12px;
     letter-spacing: 0;
+  }
+
+  .zoom-controls .location-button.active {
+    color: #fff;
+    background: #2563eb;
   }
 
   .price-controls {
@@ -1486,9 +1430,11 @@
 
   .attribution {
     position: absolute;
-    right: 10px;
+    right: 118px;
     bottom: 8px;
     z-index: 8;
+    display: flex;
+    gap: 5px;
     padding: 3px 6px;
     border-radius: 5px;
     background: rgba(255, 252, 244, 0.82);
@@ -1642,6 +1588,56 @@
 
   .empty-panel p:last-child {
     color: #5f675f;
+  }
+
+  .install-help {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    display: grid;
+    place-items: center;
+    padding: 20px;
+    background: rgba(23, 32, 28, 0.5);
+  }
+
+  .install-help-card {
+    width: min(360px, 100%);
+    padding: 20px 22px;
+    border-radius: 14px;
+    background: #fffdf7;
+    box-shadow: 0 24px 60px rgba(27, 31, 28, 0.3);
+  }
+
+  .install-help-card h2 {
+    margin: 0 0 12px;
+    font-size: 18px;
+  }
+
+  .install-help-card ol {
+    margin: 0 0 12px;
+    padding-left: 20px;
+    display: grid;
+    gap: 8px;
+    line-height: 1.4;
+    font-size: 14px;
+  }
+
+  .install-help-note {
+    margin: 0 0 14px;
+    color: #5f675f;
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
+  .install-help-card button {
+    width: 100%;
+    min-height: 42px;
+    border: 0;
+    border-radius: 8px;
+    color: #fff;
+    background: #17201c;
+    font-weight: 800;
+    cursor: pointer;
   }
 
   @media (max-width: 820px) {
@@ -1810,14 +1806,11 @@
     }
 
     .topbar {
-      grid-template-columns: minmax(0, 1fr) 58px 88px;
+      grid-template-columns: minmax(0, 1fr) 58px auto;
     }
 
-    .roadmap-menu {
-      min-width: 88px;
-    }
-
-    .roadmap-menu summary {
+    .offline-button {
+      min-width: 84px;
       padding: 0 8px;
       font-size: 13px;
     }
@@ -1879,9 +1872,18 @@
       top: 98px;
     }
 
+    .roadmap-menu {
+      min-width: 84px;
+    }
+
+    .roadmap-menu summary {
+      padding: 0 8px;
+      font-size: 13px;
+    }
+
     .price-controls {
-      right: 12px;
       overflow-x: auto;
+      max-width: calc(100vw - 24px);
       padding-bottom: 2px;
     }
   }
