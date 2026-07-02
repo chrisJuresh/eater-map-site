@@ -1,196 +1,80 @@
 <script>
-  import { onMount, tick } from 'svelte';
-  import maplibregl from 'maplibre-gl';
-  import 'maplibre-gl/dist/maplibre-gl.css';
-  import { Protocol } from 'pmtiles';
-  import { layers, namedFlavor } from '@protomaps/basemaps';
+  import { onMount } from 'svelte';
+  import { replaceState } from '$app/navigation';
+  import { MOBILE_SEARCH_VISIBLE_RESULTS } from '$lib/constants.js';
+  import { loadRestaurants } from '$lib/data.js';
+  import { geocodePlace } from '$lib/geocode.js';
+  import { buildAppUrl, parseUrlState, serializeView } from '$lib/urlState.js';
+  import { AppState } from '$lib/state.svelte.js';
+  import MapView from '$lib/map/MapView.svelte';
+  import TopBar from '$lib/ui/TopBar.svelte';
+  import SearchResults from '$lib/ui/SearchResults.svelte';
+  import ZoomControls from '$lib/ui/ZoomControls.svelte';
+  import PriceFilter from '$lib/ui/PriceFilter.svelte';
+  import LinesPopup from '$lib/ui/LinesPopup.svelte';
+  import RoadmapMenu from '$lib/ui/RoadmapMenu.svelte';
+  import Sidebar from '$lib/ui/Sidebar.svelte';
+  import InstallHelp from '$lib/ui/InstallHelp.svelte';
 
-  const MAX_ZOOM = 18;
-  const MIN_ZOOM_ONLINE = 2;
-  const MIN_ZOOM_OFFLINE_FLOOR = 4;
-  const LOCATION_ZOOM = 14;
-  const SEARCH_ZOOM = 15;
-  // Zoom where coarse GB tiles hand off to the detailed restaurant-area tiles.
-  const BASEMAP_HANDOFF_ZOOM = 9;
-  const SEARCH_LIMIT = 80;
-  const HOME_VIEW_PADDING = 32;
-  const DESCRIPTION_VISIBLE_LINES = 4;
-  const MOBILE_SEARCH_VISIBLE_RESULTS = 4;
-  const CITYMAPPER_ANDROID_PACKAGE = 'com.citymapper.app.release';
-  const CITYMAPPER_ANDROID_STORE_URL = `https://play.google.com/store/apps/details?id=${CITYMAPPER_ANDROID_PACKAGE}`;
+  const app = new AppState();
+  let mapView;
 
-  // Online: full global Protomaps detail via the API key. This key is
-  // domain-restricted (CORS-locked to *.chrisj.uk), so it is safe to ship in the
-  // client bundle — it only works from our own origins. Override via the
-  // VITE_PROTOMAPS_KEY env var (e.g. a rotated key) in .env / Vercel if desired.
-  const PROTOMAPS_KEY = import.meta.env.VITE_PROTOMAPS_KEY || 'db63a88f9891fd92';
-  const ONLINE_TILE_URL = PROTOMAPS_KEY
-    ? `https://api.protomaps.com/tiles/v4/{z}/{x}/{y}.mvt?key=${PROTOMAPS_KEY}`
-    : '';
-
-  // Offline pan limit (GB + margin) so you can zoom out to the whole country with
-  // padding but not wander into empty space. GB_FIT_BOUNDS is the data extent used
-  // to compute how far out you can zoom so every restaurant stays in view.
-  const OFFLINE_MAX_BOUNDS = [
-    [-8.5, 48.6],
-    [4.5, 57.6]
-  ];
-  const GB_FIT_BOUNDS = [
-    [-5.55, 50.08],
-    [1.4, 55.97]
-  ];
-  const LONDON_BOUNDS = {
-    minLat: 51.2868,
-    maxLat: 51.6919,
-    minLon: -0.5103,
-    maxLon: 0.334
-  };
-
-  // Canvas marker rendering constants (kept from the original renderer).
-  const MARKER_PADDING = 48;
-  const MARKER_SPRITE_PADDING = 10;
-  const MARKER_LAYER_OPACITY = 0.42;
-  // The 38 priced ("38 Best London") markers stay fully opaque and on top.
-  const PRICED_MARKER_LAYER_OPACITY = 1;
-  const FULL_MARKER_ZOOM = 14;
-  const MID_MARKER_ZOOM = 12;
-
-  let mapEl;
-  let markerCanvas;
-  let topbarEl;
-  let map;
-  let mapReady = false;
-  let online = true;
-
-  let restaurants = [];
-  let restaurantById = new Map();
-  let stats = null;
-  let loading = true;
-  let loadError = '';
-  let topbarHeight = 56;
-  let selected = null;
-  let query = '';
-  let priceFilter = 'all';
-  let visibleMarkerCount = 0;
-  let userLocation = null;
-  let locationStatus = '';
-  let locationWatchId = null;
-  let homeViewApplied = false;
-  let mapWasInteractedWith = false;
-  let lastMarkerPick = null;
-  let resizeObserver;
-  let markerDrawFrame = 0;
-  let markerSpriteCache = new Map();
-  let markerLayerCanvas;
-
-  let descriptionEl;
-  let descriptionHasMore = false;
-  let descriptionCanScrollDown = false;
-  let descriptionScrollbar = { top: 0, height: 100 };
-  let descriptionMeasureToken = 0;
-  let measuredDescriptionRestaurantId = '';
-  let searchResultsEl;
-  let searchResultsHasMore = false;
-  let searchResultsScrollbar = { top: 0, height: 100 };
-  let searchResultsMeasureToken = 0;
-  let measuredSearchText = '';
-  let isAndroidDevice = false;
-
-  // Rail-line identification popup (hover on desktop / tap on mobile).
-  let hoverLines = null; // { x, y, items:[{name,color}] }
-  let linesPopup = null;
-  $: activeLines = hoverLines || linesPopup;
-
-  // Offline download / install state.
-  let offlineState = 'unknown'; // 'downloading' | 'ready' | 'idle' | 'unknown'
-  let downloadLoaded = 0;
-  let downloadTotal = 0;
+  // Deep link (?r=<id> and #zoom/lat/lon) — parsed before the map is created so a
+  // shared view/restaurant wins over the automatic home view. Client-only app
+  // (ssr=false), but guard anyway.
+  const urlState = typeof window !== 'undefined' ? parseUrlState(window.location.href) : { restaurantId: null, view: null };
+  let viewHash = urlState.view ? serializeView(urlState.view.zoom, urlState.view.lat, urlState.view.lon) : '';
+  let pendingRestaurantId = urlState.restaurantId;
   let deferredInstallPrompt = null;
-  let canInstall = false;
-  let isIosDevice = false;
-  let isStandalone = false;
-  let showInstallHelp = false;
 
-  const prices = ['all', '$', '$$', '$$$', '$$$$'];
-  const roadmapItems = [
-    'Remove closed restaurants',
-    'Add opening times',
-    'Add rating information',
-    'Add Google Maps cuisine categories',
-    'Add Google Maps descriptions',
-    'Validate existing data against Google Maps',
-    'Use Google Maps price ranges',
-    'Add other countries',
-    'Expand to a larger database',
-    'Deduplicate restaurants'
-  ];
+  if (typeof navigator !== 'undefined') {
+    app.isAndroid = /Android/i.test(navigator.userAgent || '');
+    app.isIos = /iPad|iPhone|iPod/i.test(navigator.userAgent || '') && !window.MSStream;
+    app.isStandalone = window.matchMedia?.('(display-mode: standalone)').matches || navigator.standalone === true;
+    app.online = navigator.onLine;
+  }
 
   onMount(() => {
-    isAndroidDevice = /Android/i.test(navigator.userAgent || '');
-    isIosDevice = /iPad|iPhone|iPod/i.test(navigator.userAgent || '') && !window.MSStream;
-    isStandalone = window.matchMedia?.('(display-mode: standalone)').matches || navigator.standalone === true;
-    online = navigator.onLine;
-
-    const protocol = new Protocol();
-    maplibregl.addProtocol('pmtiles', protocol.tile);
-
-    const startOnline = online && Boolean(ONLINE_TILE_URL);
-    map = new maplibregl.Map({
-      container: mapEl,
-      style: startOnline ? buildOnlineStyle() : buildLocalStyle(),
-      center: [(LONDON_BOUNDS.minLon + LONDON_BOUNDS.maxLon) / 2, (LONDON_BOUNDS.minLat + LONDON_BOUNDS.maxLat) / 2],
-      zoom: 10,
-      minZoom: startOnline ? MIN_ZOOM_ONLINE : MIN_ZOOM_OFFLINE_FLOOR,
-      maxZoom: MAX_ZOOM,
-      maxBounds: startOnline ? undefined : OFFLINE_MAX_BOUNDS,
-      attributionControl: false,
-      dragRotate: false,
-      pitchWithRotate: false,
-      renderWorldCopies: false
-    });
-    map.touchZoomRotate.disableRotation();
-
-    map.on('error', (event) => console.error('MapLibre error:', event.error?.message || event.error));
-    map.on('load', () => {
-      mapReady = true;
-      if (!startOnline) updateOfflineMinZoom();
-      applyFallbackHomeView();
-      scheduleMarkerDraw();
-    });
-    map.on('styledata', scheduleMarkerDraw);
-    map.on('move', scheduleMarkerDraw);
-    map.on('moveend', scheduleMarkerDraw);
-    map.on('movestart', (event) => {
-      if (event.originalEvent) mapWasInteractedWith = true;
-    });
-    map.on('click', (event) => {
-      const picked = pickMarker(event.point);
-      if (picked) {
-        selectRestaurant(picked);
-        linesPopup = null; // restaurant takes priority
-        return;
+    const onConnectivityChange = () => (app.online = navigator.onLine);
+    const onBeforeInstallPrompt = (event) => {
+      event.preventDefault();
+      deferredInstallPrompt = event;
+      app.canInstall = true;
+    };
+    const onAppInstalled = () => {
+      app.canInstall = false;
+      app.isStandalone = true;
+    };
+    const onServiceWorkerMessage = (event) => {
+      const data = event.data || {};
+      if (data.type === 'precache-progress') {
+        app.offlineState = data.loaded >= data.total && data.total > 0 ? 'ready' : 'downloading';
+        app.downloadLoaded = data.loaded || 0;
+        app.downloadTotal = data.total || 0;
+      } else if (data.type === 'precache-done') {
+        app.offlineState = 'ready';
+        if (data.total) {
+          app.downloadLoaded = data.total;
+          app.downloadTotal = data.total;
+        }
+      } else if (data.type === 'precache-idle') {
+        if (app.offlineState === 'unknown') app.offlineState = 'idle';
       }
-      linesPopup = linesAt(event.point);
-    });
-    // Desktop hover: live line identification (touch devices rely on tap above).
-    map.on('mousemove', (event) => {
-      if (pickMarker(event.point)) {
-        hoverLines = null;
-        map.getCanvas().style.cursor = 'pointer';
-        return;
-      }
-      hoverLines = linesAt(event.point);
-      map.getCanvas().style.cursor = hoverLines ? 'pointer' : '';
-    });
-    map.on('mouseout', () => (hoverLines = null));
+    };
+    const onKeyDown = (event) => {
+      if (event.key !== 'Escape') return;
+      if (app.showInstallHelp) app.showInstallHelp = false;
+      else if (app.linesPopup || app.hoverLines) {
+        app.linesPopup = null;
+        app.hoverLines = null;
+      } else if (app.selected) app.closeDetails();
+    };
 
     window.addEventListener('online', onConnectivityChange);
     window.addEventListener('offline', onConnectivityChange);
     window.addEventListener('beforeinstallprompt', onBeforeInstallPrompt);
-    window.addEventListener('appinstalled', () => {
-      canInstall = false;
-      isStandalone = true;
-    });
+    window.addEventListener('appinstalled', onAppInstalled);
+    window.addEventListener('keydown', onKeyDown);
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.addEventListener('message', onServiceWorkerMessage);
       navigator.serviceWorker.ready
@@ -198,870 +82,107 @@
         .catch(() => {});
     }
 
-    resizeObserver = new ResizeObserver(() => {
-      map?.resize();
-      if (topbarEl) topbarHeight = Math.ceil(topbarEl.getBoundingClientRect().height);
-      updateSearchResultsScrollState();
-      if (!(online && ONLINE_TILE_URL)) updateOfflineMinZoom();
-      scheduleMarkerDraw();
-    });
-    if (mapEl) resizeObserver.observe(mapEl);
-    if (topbarEl) resizeObserver.observe(topbarEl);
-    if (topbarEl) topbarHeight = Math.ceil(topbarEl.getBoundingClientRect().height);
-
-    loadRestaurants();
-    startLocationTracking();
+    load();
 
     return () => {
-      resizeObserver?.disconnect();
-      stopLocationTracking();
       window.removeEventListener('online', onConnectivityChange);
       window.removeEventListener('offline', onConnectivityChange);
       window.removeEventListener('beforeinstallprompt', onBeforeInstallPrompt);
+      window.removeEventListener('appinstalled', onAppInstalled);
+      window.removeEventListener('keydown', onKeyDown);
       if ('serviceWorker' in navigator) navigator.serviceWorker.removeEventListener('message', onServiceWorkerMessage);
-      map?.remove();
-      maplibregl.removeProtocol('pmtiles');
     };
   });
 
-  function assetUrl(path) {
-    const origin = typeof location !== 'undefined' ? location.origin : '';
-    return `${origin}${path}`;
-  }
-
-  // All rail from the bundled GeoJSON: a navy base of every passenger track
-  // (complete coverage), plus colour-coded Tube/DLR/Overground/Elizabeth/rail
-  // routes on top. Always visible so the whole network shows even at low zoom
-  // (Protomaps omits most rail from low-zoom tiles and never colour-codes it).
-  const TUBE_SOURCE = { type: 'geojson', data: '/tube-lines.geojson' };
-  const LINE_WIDTH = ['interpolate', ['linear'], ['zoom'], 6, 1, 10, 2, 13, 3.2, 16, 5];
-  // Parallel up/down tracks overlap when zoomed out and double the apparent
-  // opacity; fade lines out at low zoom so translucency looks consistent. The
-  // zoom interpolate must be the OUTERMOST expression (MapLibre forbids nesting a
-  // zoom curve inside another expression), with the per-feature opacity applied
-  // in each output stop.
-  const FEATURE_OPACITY = ['coalesce', ['get', 'opacity'], 0.6];
-  const LINE_OPACITY = [
-    'interpolate',
-    ['linear'],
-    ['zoom'],
-    10,
-    ['*', FEATURE_OPACITY, 0.58],
-    13,
-    ['*', FEATURE_OPACITY, 0.82],
-    16,
-    FEATURE_OPACITY
-  ];
-  const BASE_OPACITY = ['interpolate', ['linear'], ['zoom'], 10, 0.29, 16, 0.5];
-  const LINE_QUERY_LAYERS = ['rail-tfl', 'rail-nr', 'rail-base'];
-  const RAIL_LAYERS = [
-    {
-      // Every passenger track (navy) — complete coverage.
-      id: 'rail-base',
-      type: 'line',
-      source: 'tube',
-      filter: ['==', ['get', 'base'], true],
-      layout: { 'line-join': 'round', 'line-cap': 'round' },
-      paint: {
-        'line-color': '#41476b',
-        'line-width': ['interpolate', ['linear'], ['zoom'], 8, 0.4, 12, 1, 14, 1.6, 16, 2.4],
-        'line-opacity': BASE_OPACITY
-      }
-    },
-    {
-      // National Rail (below TfL so Overground/Tube/Elizabeth stay on top).
-      id: 'rail-nr',
-      type: 'line',
-      source: 'tube',
-      filter: ['all', ['==', ['get', 'base'], false], ['==', ['get', 'tfl'], false]],
-      layout: { 'line-join': 'round', 'line-cap': 'round' },
-      paint: {
-        'line-color': ['coalesce', ['get', 'color'], '#666666'],
-        'line-width': LINE_WIDTH,
-        'line-opacity': LINE_OPACITY
-      }
-    },
-    {
-      // Tube / DLR / Overground / Elizabeth / Tram / Cable car — drawn on top.
-      id: 'rail-tfl',
-      type: 'line',
-      source: 'tube',
-      filter: ['all', ['==', ['get', 'base'], false], ['==', ['get', 'tfl'], true]],
-      layout: { 'line-join': 'round', 'line-cap': 'round' },
-      paint: {
-        'line-color': ['coalesce', ['get', 'color'], '#666666'],
-        'line-width': LINE_WIDTH,
-        'line-opacity': LINE_OPACITY
-      }
-    }
-  ];
-
-  // Station dots (bundled) — always visible, big and obvious.
-  const STATION_DOT_LAYER = {
-    id: 'rail-stations',
-    type: 'circle',
-    source: 'tube',
-    filter: ['==', ['get', 'station'], true],
-    paint: {
-      'circle-radius': ['interpolate', ['linear'], ['zoom'], 5, 1.4, 9, 2, 12, 2.6, 14, 3.6, 16, 4.6],
-      'circle-color': '#ffffff',
-      'circle-stroke-color': '#17201c',
-      'circle-stroke-width': ['interpolate', ['linear'], ['zoom'], 5, 0.8, 12, 1.3, 16, 1.8]
-    }
-  };
-  const STATION_LABEL_LAYER = {
-    id: 'rail-station-labels',
-    type: 'symbol',
-    source: 'tube',
-    minzoom: 13,
-    filter: ['==', ['get', 'station'], true],
-    layout: {
-      'text-field': ['get', 'name'],
-      'text-font': ['Noto Sans Medium'],
-      'text-size': 11,
-      'text-offset': [0, 0.9],
-      'text-anchor': 'top',
-      'text-optional': true
-    },
-    paint: { 'text-color': '#17201c', 'text-halo-color': '#ffffff', 'text-halo-width': 1.6 }
-  };
-
-  function buildLocalStyle() {
-    const flavor = namedFlavor('light');
-    // Coarse whole-country tiles below the handoff zoom; detailed restaurant-area
-    // tiles at/above it. Namespacing keeps the two layer sets' ids unique.
-    const gbLayers = layers('gb', flavor, { lang: 'en' }).map((layer) => ({
-      ...layer,
-      maxzoom: BASEMAP_HANDOFF_ZOOM
-    }));
-    const detailLayers = layers('detail', flavor, { lang: 'en' }).map((layer) => ({
-      ...layer,
-      id: `detail_${layer.id}`,
-      minzoom: Math.max(layer.minzoom ?? 0, BASEMAP_HANDOFF_ZOOM)
-    }));
-
-    return {
-      version: 8,
-      glyphs: assetUrl('/basemap/fonts/{fontstack}/{range}.pbf'),
-      sprite: assetUrl('/basemap/sprites/light'),
-      sources: {
-        gb: {
-          type: 'vector',
-          url: `pmtiles://${assetUrl('/basemap/gb.pmtiles')}`,
-          attribution:
-            '<a href="https://protomaps.com" target="_blank" rel="noreferrer">Protomaps</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a>'
-        },
-        detail: {
-          type: 'vector',
-          url: `pmtiles://${assetUrl('/basemap/detail.pmtiles')}`
-        },
-        tube: TUBE_SOURCE
-      },
-      // Drop the opaque background layer so undownloaded voids stay transparent
-      // and reveal the "offline" watermark on the map container behind the canvas.
-      layers: composeTransit(
-        [...gbLayers, ...detailLayers].filter((l) => !/(^|_)background$/.test(l.id))
-      )
-    };
-  }
-
-  // Online: full global Protomaps (all cities, all labels, max zoom) via the API.
-  function buildOnlineStyle() {
-    const flavor = namedFlavor('light');
-    return {
-      version: 8,
-      glyphs: assetUrl('/basemap/fonts/{fontstack}/{range}.pbf'),
-      sprite: assetUrl('/basemap/sprites/light'),
-      sources: {
-        world: {
-          type: 'vector',
-          tiles: [ONLINE_TILE_URL],
-          maxzoom: 15,
-          attribution:
-            '<a href="https://protomaps.com" target="_blank" rel="noreferrer">Protomaps</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a>'
-        },
-        tube: TUBE_SOURCE
-      },
-      layers: composeTransit(layers('world', flavor, { lang: 'en' }))
-    };
-  }
-
-  // More vibrant greens for parks/woods/grass than the muted Protomaps defaults.
-  const VIBRANT_GREEN = [
-    'case',
-    ['in', ['get', 'kind'], ['literal', ['national_park', 'park', 'cemetery', 'protected_area', 'nature_reserve', 'forest', 'golf_course']]],
-    '#8bcf87',
-    ['==', ['get', 'kind'], 'wood'],
-    '#77c47b',
-    ['in', ['get', 'kind'], ['literal', ['scrub', 'grassland', 'grass']]],
-    '#a3d9a0',
-    ['==', ['get', 'kind'], 'glacier'],
-    '#e7e7e7',
-    ['==', ['get', 'kind'], 'sand'],
-    '#e2e0d7',
-    ['in', ['get', 'kind'], ['literal', ['military', 'naval_base', 'airfield']]],
-    '#c6dcdc',
-    '#e2dfda'
-  ];
-  const PLACE_LABEL_IDS = new Set(['places_subplace', 'places_region', 'places_locality', 'places_country']);
-
-  // Make area/place names black and green spaces more vibrant.
-  function recolourBasemap(layer) {
-    const baseId = layer.id.replace(/^detail_/, '');
-    if (PLACE_LABEL_IDS.has(baseId)) {
-      return { ...layer, paint: { ...layer.paint, 'text-color': '#111111' } };
-    }
-    if (baseId === 'landuse_park') {
-      return { ...layer, paint: { ...layer.paint, 'fill-color': VIBRANT_GREEN } };
-    }
-    if (baseId === 'landuse_urban_green') {
-      return { ...layer, paint: { ...layer.paint, 'fill-color': '#8bcf87' } };
-    }
-    return layer;
-  }
-
-  // Stack bottom→top: basemap fills/lines -> rail lines -> station dots ->
-  // basemap labels (place names, so they stay readable over the lines) ->
-  // station labels.
-  function composeTransit(baseLayers) {
-    const styled = baseLayers.map(recolourBasemap);
-    const symbols = styled.filter((l) => l.type === 'symbol');
-    const nonSymbols = styled.filter((l) => l.type !== 'symbol');
-    return [...nonSymbols, ...RAIL_LAYERS, STATION_DOT_LAYER, ...symbols, STATION_LABEL_LAYER];
-  }
-
-  // Zoom out far enough (offline) that the whole covered area fits with padding,
-  // computed for the current viewport so it works on desktop and mobile.
-  function updateOfflineMinZoom() {
-    if (!map) return;
-    const camera = map.cameraForBounds(GB_FIT_BOUNDS, { padding: 24 });
-    if (camera && Number.isFinite(camera.zoom)) {
-      map.setMinZoom(Math.max(MIN_ZOOM_OFFLINE_FLOOR - 1, camera.zoom - 0.25));
-    }
-  }
-
-  function applyBasemap() {
-    if (!map) return;
-    if (online && ONLINE_TILE_URL) {
-      map.setMaxBounds(null);
-      map.setMinZoom(MIN_ZOOM_ONLINE);
-      map.setStyle(buildOnlineStyle());
-    } else {
-      map.setStyle(buildLocalStyle());
-      map.setMaxBounds(OFFLINE_MAX_BOUNDS);
-      updateOfflineMinZoom();
-    }
-    scheduleMarkerDraw();
-  }
-
-  function onConnectivityChange() {
-    const next = navigator.onLine;
-    if (next === online) return;
-    online = next;
-    applyBasemap();
-  }
-
-  async function loadRestaurants() {
+  async function load() {
     try {
-      const response = await fetch('/data/restaurants.json');
-      if (!response.ok) throw new Error(`Data request failed with ${response.status}`);
-      const payload = await response.json();
-      restaurants = annotateMarkers(payload.restaurants || []);
-      restaurantById = new Map(restaurants.map((restaurant) => [restaurant.id, restaurant]));
-      stats = payload.stats || null;
-      applyFallbackHomeView();
-      scheduleMarkerDraw();
+      const { restaurants, stats } = await loadRestaurants();
+      app.setRestaurants(restaurants, stats);
+      mapView?.applyFallbackHomeView();
+      if (pendingRestaurantId) {
+        const restaurant = app.byId.get(pendingRestaurantId);
+        pendingRestaurantId = null;
+        if (restaurant) {
+          app.select(restaurant);
+          // A shared view hash wins; otherwise jump straight to the restaurant.
+          if (!urlState.view) mapView?.flyToRestaurant(restaurant, { jump: true });
+        } else {
+          writeUrl(); // unknown id — drop it from the URL
+        }
+      }
     } catch (error) {
-      loadError = error instanceof Error ? error.message : String(error);
+      app.loadError = error instanceof Error ? error.message : String(error);
     } finally {
-      loading = false;
+      app.loading = false;
     }
   }
 
-  function annotateMarkers(items) {
-    const duplicateCounts = new Map();
-    const duplicateSeen = new Map();
-    for (const item of items) {
-      const key = `${Number(item.lat).toFixed(6)},${Number(item.lon).toFixed(6)}`;
-      duplicateCounts.set(key, (duplicateCounts.get(key) || 0) + 1);
+  // ---- URL sync (replaceState — no history spam, works offline) -----------------
+  function writeUrl() {
+    try {
+      // pendingRestaurantId keeps a shared ?r= alive while the data is still
+      // loading (the home-view moveend fires before the 4 MB fetch resolves).
+      replaceState(buildAppUrl({ restaurantId: app.selected?.id ?? pendingRestaurantId ?? null, viewHash }), {});
+    } catch {
+      // router not ready yet — the next moveend/selection will retry
     }
-    return items.map((item) => {
-      const key = `${Number(item.lat).toFixed(6)},${Number(item.lon).toFixed(6)}`;
-      const duplicateIndex = duplicateSeen.get(key) || 0;
-      duplicateSeen.set(key, duplicateIndex + 1);
-      const offset = markerOffset(duplicateIndex, duplicateCounts.get(key) || 1);
-      return {
-        ...item,
-        lat: Number(item.lat),
-        lon: Number(item.lon),
-        offsetX: offset.x,
-        offsetY: offset.y,
-        searchText: [item.name, item.address, item.pageTitle, item.description, item.priceRange, item.openFor, item.bestFor]
-          .filter(Boolean)
-          .join(' ')
-          .toLowerCase()
-      };
-    });
   }
 
-  function markerOffset(index, count) {
-    if (count <= 1) return { x: 0, y: 0 };
-    const ring = Math.floor(index / 8) + 1;
-    const angle = ((index % 8) / 8) * Math.PI * 2;
-    const radius = Math.min(24, 6 + ring * 5);
-    return { x: Math.cos(angle) * radius, y: Math.sin(angle) * radius };
-  }
-
-  $: searchText = query.trim().toLowerCase();
-  $: filteredRestaurants = restaurants.filter((restaurant) => {
-    if (priceFilter !== 'all' && restaurant.priceRange !== priceFilter) return false;
-    if (!searchText) return true;
-    return restaurant.searchText.includes(searchText);
+  $effect(() => {
+    app.selected;
+    writeUrl();
   });
-  $: searchResults = searchText ? filteredRestaurants.slice(0, SEARCH_LIMIT) : [];
-  $: selectedGoogleMapsUrl = selected ? getGoogleMapsUrl(selected) : '';
-  $: selectedCitymapperUrl = selected ? getCitymapperUrl(selected, userLocation, isAndroidDevice) : '';
-  $: totalCount = stats?.entryCount || restaurants.length;
-  $: downloadPercent = downloadTotal ? Math.min(100, Math.round((downloadLoaded / downloadTotal) * 100)) : 0;
-  $: {
-    filteredRestaurants;
-    selected;
-    userLocation;
-    if (mapReady) scheduleMarkerDraw();
-  }
-  $: {
-    searchText;
-    searchResults.length;
-    scheduleSearchResultsMeasure();
-  }
-  $: {
-    selected?.id;
-    selected?.description;
-    scheduleDescriptionMeasure();
+
+  function onViewChange({ zoom, lat, lon }) {
+    viewHash = serializeView(zoom, lat, lon);
+    writeUrl();
   }
 
-  // ---- Canvas marker overlay -------------------------------------------------
-
-  function scheduleMarkerDraw() {
-    if (!markerCanvas || !map) return;
-    if (markerDrawFrame) return;
-    markerDrawFrame = requestAnimationFrame(() => {
-      markerDrawFrame = 0;
-      drawMarkers();
-    });
+  // ---- Actions -------------------------------------------------------------------
+  function selectFromSearch(restaurant) {
+    app.select(restaurant);
+    mapView?.flyToRestaurant(restaurant);
   }
 
-  function drawMarkers() {
-    if (!map || !markerCanvas || !mapEl) return;
-    const width = mapEl.clientWidth;
-    const height = mapEl.clientHeight;
-    if (!width || !height) return;
-
-    const dpr = Math.max(1, window.devicePixelRatio || 1);
-    const targetWidth = Math.round(width * dpr);
-    const targetHeight = Math.round(height * dpr);
-    if (markerCanvas.width !== targetWidth) markerCanvas.width = targetWidth;
-    if (markerCanvas.height !== targetHeight) markerCanvas.height = targetHeight;
-    markerCanvas.style.width = `${width}px`;
-    markerCanvas.style.height = `${height}px`;
-
-    const ctx = markerCanvas.getContext('2d');
-    if (!ctx) return;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.clearRect(0, 0, width, height);
-
-    const z = map.getZoom();
-    const selectedId = selected?.id;
-    const markers = [];
-    for (const restaurant of filteredRestaurants) {
-      const point = map.project([restaurant.lon, restaurant.lat]);
-      const x = point.x + restaurant.offsetX;
-      const y = point.y + restaurant.offsetY;
-      if (x < -MARKER_PADDING || x > width + MARKER_PADDING || y < -MARKER_PADDING || y > height + MARKER_PADDING) continue;
-      markers.push({ restaurant, x, y });
-    }
-    if (visibleMarkerCount !== markers.length) visibleMarkerCount = markers.length;
-
-    if (!markerLayerCanvas) markerLayerCanvas = document.createElement('canvas');
-    if (markerLayerCanvas.width !== targetWidth) markerLayerCanvas.width = targetWidth;
-    if (markerLayerCanvas.height !== targetHeight) markerLayerCanvas.height = targetHeight;
-    const layerCtx = markerLayerCanvas.getContext('2d');
-    if (!layerCtx) return;
-    layerCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-    const regularMarkers = [];
-    const pricedMarkers = [];
-    let selectedMarker = null;
-    for (const marker of markers) {
-      if (marker.restaurant.id === selectedId) {
-        selectedMarker = marker;
-        continue;
-      }
-      if (marker.restaurant.priceRange) pricedMarkers.push(marker);
-      else regularMarkers.push(marker);
-    }
-
-    // Composite each group at a flat opacity so overlapping markers do not darken.
-    layerCtx.clearRect(0, 0, width, height);
-    for (const marker of regularMarkers) drawMarker(layerCtx, marker, false, z);
-    ctx.save();
-    ctx.globalAlpha = MARKER_LAYER_OPACITY;
-    ctx.drawImage(markerLayerCanvas, 0, 0, width, height);
-    ctx.restore();
-
-    layerCtx.clearRect(0, 0, width, height);
-    for (const marker of pricedMarkers) drawMarker(layerCtx, marker, false, z);
-    ctx.save();
-    ctx.globalAlpha = PRICED_MARKER_LAYER_OPACITY;
-    ctx.drawImage(markerLayerCanvas, 0, 0, width, height);
-    ctx.restore();
-
-    if (selectedMarker) drawMarker(ctx, selectedMarker, true, z);
-    drawUserLocation(ctx, userLocation, z);
-  }
-
-  function markerColor(priceRange) {
-    if (priceRange === '$') return '#2d8a5f';
-    if (priceRange === '$$') return '#2770a7';
-    if (priceRange === '$$$') return '#7f52a1';
-    if (priceRange === '$$$$') return '#252a31';
-    return '#d43d2f';
-  }
-
-  function markerPriority(restaurant) {
-    return restaurant?.priceRange ? 1 : 0;
-  }
-
-  function markerDetail(z, active) {
-    if (active || z >= FULL_MARKER_ZOOM) {
-      return { key: 'full', radius: active ? 17 : 12, strokeWidth: active ? 3 : 2, shadowBlur: active ? 14 : 8, shadowOffsetY: active ? 4 : 3, showPrice: true };
-    }
-    if (z >= MID_MARKER_ZOOM) {
-      return { key: 'mid', radius: 7, strokeWidth: 1.5, shadowBlur: 4, shadowOffsetY: 2, showPrice: false };
-    }
-    return { key: 'small', radius: 4.5, strokeWidth: 1, shadowBlur: 2, shadowOffsetY: 1, showPrice: false };
-  }
-
-  function drawMarker(ctx, marker, active, z) {
-    const sprite = getMarkerSprite(marker.restaurant.priceRange, active, z);
-    ctx.drawImage(sprite.canvas, marker.x - sprite.size / 2, marker.y - sprite.size / 2, sprite.size, sprite.size);
-  }
-
-  function getMarkerSprite(priceRange, active, z) {
-    const dpr = Math.max(1, window.devicePixelRatio || 1);
-    const normalizedPrice = priceRange || 'none';
-    const detail = markerDetail(z, active);
-    const key = `${normalizedPrice}-${active ? 'active' : detail.key}-${dpr}`;
-    const cached = markerSpriteCache.get(key);
-    if (cached) return cached;
-
-    const radius = detail.radius;
-    const size = (radius + MARKER_SPRITE_PADDING) * 2;
-    const canvas = document.createElement('canvas');
-    canvas.width = Math.ceil(size * dpr);
-    canvas.height = Math.ceil(size * dpr);
-    const ctx = canvas.getContext('2d');
-    const center = size / 2;
-
-    ctx.scale(dpr, dpr);
-    ctx.shadowColor = active ? 'rgba(27, 31, 28, 0.42)' : 'rgba(27, 31, 28, 0.26)';
-    ctx.shadowBlur = detail.shadowBlur;
-    ctx.shadowOffsetY = detail.shadowOffsetY;
-    ctx.beginPath();
-    ctx.arc(center, center, radius, 0, Math.PI * 2);
-    ctx.fillStyle = markerColor(priceRange);
-    ctx.fill();
-    ctx.shadowColor = 'transparent';
-    ctx.lineWidth = detail.strokeWidth;
-    ctx.strokeStyle = active ? 'rgba(255, 255, 255, 0.86)' : '#ffffff';
-    ctx.stroke();
-
-    if (priceRange && detail.showPrice) {
-      ctx.fillStyle = active ? 'rgba(255, 255, 255, 0.95)' : '#ffffff';
-      ctx.font = `800 ${priceRange.length >= 4 ? 7 : 8}px Inter, system-ui, sans-serif`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(priceRange, center, center + 0.5);
-    }
-
-    const sprite = { canvas, size };
-    markerSpriteCache.set(key, sprite);
-    return sprite;
-  }
-
-  function drawUserLocation(ctx, location, z) {
-    if (!location || !hasCoordinates(location)) return;
-    const point = map.project([location.lon, location.lat]);
-    const x = point.x;
-    const y = point.y;
-
-    const accuracyRadius = location.accuracy ? clamp(location.accuracy / metersPerPixel(location.lat, z), 10, 90) : 0;
-
-    ctx.save();
-    if (accuracyRadius) {
-      ctx.beginPath();
-      ctx.arc(x, y, accuracyRadius, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(37, 99, 235, 0.16)';
-      ctx.fill();
-      ctx.lineWidth = 1;
-      ctx.strokeStyle = 'rgba(37, 99, 235, 0.28)';
-      ctx.stroke();
-    }
-    ctx.shadowColor = 'rgba(27, 31, 28, 0.28)';
-    ctx.shadowBlur = 8;
-    ctx.shadowOffsetY = 3;
-    ctx.beginPath();
-    ctx.arc(x, y, 8, 0, Math.PI * 2);
-    ctx.fillStyle = '#2563eb';
-    ctx.fill();
-    ctx.shadowColor = 'transparent';
-    ctx.lineWidth = 3;
-    ctx.strokeStyle = '#ffffff';
-    ctx.stroke();
-    ctx.restore();
-  }
-
-  function metersPerPixel(lat, z) {
-    return (156543.03392 * Math.cos((lat * Math.PI) / 180)) / 2 ** z;
-  }
-
-  function pickMarker(point) {
-    if (!map) return null;
-    const selectedId = selected?.id;
-    const candidates = [];
-    for (const restaurant of filteredRestaurants) {
-      const projected = map.project([restaurant.lon, restaurant.lat]);
-      const x = projected.x + restaurant.offsetX;
-      const y = projected.y + restaurant.offsetY;
-      const distance = Math.hypot(point.x - x, point.y - y);
-      const radius = restaurant.id === selectedId ? 17 : 13;
-      if (distance <= radius + 8) candidates.push({ restaurant, distance });
-    }
-    if (!candidates.length) {
-      lastMarkerPick = null;
-      return null;
-    }
-    candidates.sort((a, b) => {
-      const distanceDifference = a.distance - b.distance;
-      if (Math.abs(distanceDifference) > 4) return distanceDifference;
-      return (
-        markerPriority(b.restaurant) - markerPriority(a.restaurant) ||
-        distanceDifference ||
-        String(a.restaurant.id).localeCompare(String(b.restaurant.id))
-      );
-    });
-    const key = candidates.map((candidate) => candidate.restaurant.id).join('|');
-    const repeatedPick =
-      lastMarkerPick && lastMarkerPick.key === key && Math.abs(lastMarkerPick.x - point.x) <= 18 && Math.abs(lastMarkerPick.y - point.y) <= 18;
-    const index = repeatedPick ? (lastMarkerPick.index + 1) % candidates.length : 0;
-    lastMarkerPick = { key, index, x: point.x, y: point.y };
-    return candidates[index].restaurant;
-  }
-
-  // ---- Details / search panels (unchanged behaviour) -------------------------
-
-  function scheduleDescriptionMeasure() {
-    const selectedRestaurantId = selected?.id || '';
-    const token = ++descriptionMeasureToken;
-    tick().then(() => {
-      if (token !== descriptionMeasureToken) return;
-      if (descriptionEl && selectedRestaurantId !== measuredDescriptionRestaurantId) {
-        descriptionEl.scrollTop = 0;
-        measuredDescriptionRestaurantId = selectedRestaurantId;
-      }
-      updateDescriptionScrollState();
-    });
-  }
-
-  function updateDescriptionScrollState() {
-    if (!descriptionEl) {
-      descriptionHasMore = false;
-      descriptionCanScrollDown = false;
-      descriptionScrollbar = { top: 0, height: 100 };
-      measuredDescriptionRestaurantId = '';
-      return;
-    }
-    const maxScroll = Math.max(0, descriptionEl.scrollHeight - descriptionEl.clientHeight);
-    descriptionHasMore = maxScroll > 1;
-    descriptionCanScrollDown = maxScroll - descriptionEl.scrollTop > 1;
-    const thumbHeight = descriptionHasMore ? clamp((descriptionEl.clientHeight / descriptionEl.scrollHeight) * 100, 18, 100) : 100;
-    const thumbTop = descriptionHasMore && maxScroll ? (descriptionEl.scrollTop / maxScroll) * (100 - thumbHeight) : 0;
-    descriptionScrollbar = { top: thumbTop, height: thumbHeight };
-  }
-
-  function scheduleSearchResultsMeasure() {
-    const token = ++searchResultsMeasureToken;
-    tick().then(() => {
-      if (token !== searchResultsMeasureToken) return;
-      if (searchResultsEl && searchText !== measuredSearchText) {
-        searchResultsEl.scrollTop = 0;
-        measuredSearchText = searchText;
-      }
-      updateSearchResultsScrollState();
-    });
-  }
-
-  function updateSearchResultsScrollState() {
-    if (!searchResultsEl) {
-      searchResultsHasMore = false;
-      searchResultsScrollbar = { top: 0, height: 100 };
-      measuredSearchText = '';
-      return;
-    }
-    const maxScroll = Math.max(0, searchResultsEl.scrollHeight - searchResultsEl.clientHeight);
-    searchResultsHasMore = maxScroll > 1;
-    const thumbHeight = searchResultsHasMore ? clamp((searchResultsEl.clientHeight / searchResultsEl.scrollHeight) * 100, 18, 100) : 100;
-    const thumbTop = searchResultsHasMore && maxScroll ? (searchResultsEl.scrollTop / maxScroll) * (100 - thumbHeight) : 0;
-    searchResultsScrollbar = { top: thumbTop, height: thumbHeight };
-  }
-
-  function clamp(value, min, max) {
-    return Math.min(max, Math.max(min, value));
-  }
-
-  function hasCoordinates(restaurant) {
-    return Number.isFinite(restaurant?.lat) && Number.isFinite(restaurant?.lon);
-  }
-
-  function getGoogleMapsUrl(restaurant) {
-    if (restaurant?.googleMapsUrl) return restaurant.googleMapsUrl;
-    if (!hasCoordinates(restaurant)) return '';
-    const query = [restaurant.name, restaurant.address].filter(Boolean).join(', ') || `${restaurant.lat},${restaurant.lon}`;
-    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
-  }
-
-  function getCitymapperUrl(restaurant, location = null, useAndroidIntent = false) {
-    if (!hasCoordinates(restaurant)) return '';
-    const params = new URLSearchParams({
-      endcoord: `${restaurant.lat},${restaurant.lon}`,
-      endname: restaurant.name || restaurant.address || 'Restaurant'
-    });
-    if (hasCoordinates(location)) {
-      params.set('startcoord', `${location.lat},${location.lon}`);
-      params.set('startname', 'Current Location');
-    }
-    const query = params.toString();
-    if (!useAndroidIntent) return `https://citymapper.com/directions?${query}`;
-    return `intent://directions?${query}#Intent;scheme=citymapper;package=${CITYMAPPER_ANDROID_PACKAGE};S.browser_fallback_url=${encodeURIComponent(CITYMAPPER_ANDROID_STORE_URL)};end`;
-  }
-
-  // ---- View helpers ----------------------------------------------------------
-
-  function applyFallbackHomeView() {
-    if (!mapReady || homeViewApplied || userLocation) return;
-    map.fitBounds(
-      [
-        [LONDON_BOUNDS.minLon, LONDON_BOUNDS.minLat],
-        [LONDON_BOUNDS.maxLon, LONDON_BOUNDS.maxLat]
-      ],
-      { padding: HOME_VIEW_PADDING, maxZoom: 11, animate: false }
-    );
-    homeViewApplied = true;
-  }
-
-  function setLocationView(location) {
-    if (!location || !mapReady) return;
-    map.flyTo({ center: [location.lon, location.lat], zoom: clamp(LOCATION_ZOOM, map.getMinZoom(), MAX_ZOOM) });
-    homeViewApplied = true;
-  }
-
-  function zoomButton(delta) {
-    if (!map) return;
-    map.easeTo({ zoom: clamp(map.getZoom() + delta, map.getMinZoom(), MAX_ZOOM), duration: 200 });
-  }
-
-  function selectRestaurant(restaurant) {
-    selected = restaurant;
-  }
-
-  // Rail/tube lines under a screen point, deduped by name (for the popup).
-  function linesAt(point) {
-    if (!map) return null;
-    const availableLayers = LINE_QUERY_LAYERS.filter((id) => map.getLayer(id));
-    if (!availableLayers.length) return null;
-    const box = [
-      [point.x - 6, point.y - 6],
-      [point.x + 6, point.y + 6]
-    ];
-    const features = map.queryRenderedFeatures(box, { layers: availableLayers });
-    const seen = new Set();
-    const items = [];
-    for (const feature of features) {
-      const name = feature.properties.line || 'National Rail';
-      if (seen.has(name)) continue;
-      seen.add(name);
-      items.push({ name, color: feature.properties.color || '#41476b' });
-      if (items.length >= 8) break;
-    }
-    if (!items.length) return null;
-    // Flip the popup so it stays inside the map near the right/bottom edges.
-    const container = map.getContainer();
-    const w = container.clientWidth;
-    const h = container.clientHeight;
-    return {
-      x: point.x,
-      y: point.y,
-      w,
-      h,
-      flipX: point.x > w - 252,
-      flipY: point.y > h - 160,
-      items
-    };
-  }
-
-  function selectSearchResult(restaurant) {
-    selected = restaurant;
-    mapWasInteractedWith = true;
-    if (!hasCoordinates(restaurant)) return;
-    homeViewApplied = true;
-    map?.flyTo({ center: [restaurant.lon, restaurant.lat], zoom: Math.max(map.getZoom(), SEARCH_ZOOM) });
+  function selectFromList(restaurant) {
+    app.select(restaurant);
   }
 
   // Enter / search icon: geocode the typed place or address and fly there
   // (online). Offline, fall back to the top matching restaurant.
   async function goToSearch() {
-    const q = query.trim();
+    const q = app.query.trim();
     if (!q) return;
     if (navigator.onLine) {
       try {
         const place = await geocodePlace(q);
         if (place) {
-          flyToPlace(place);
+          mapView?.flyToPlace(place);
           return;
         }
       } catch {
         // fall through to the restaurant fallback
       }
     }
-    if (searchResults.length) selectSearchResult(searchResults[0]);
+    if (app.searchResults.length) selectFromSearch(app.searchResults[0]);
   }
 
-  async function geocodePlace(q) {
-    const params = new URLSearchParams({
-      format: 'jsonv2',
-      limit: '1',
-      countrycodes: 'gb',
-      'accept-language': 'en',
-      viewbox: '-0.62,51.75,0.35,51.25', // bias toward London
-      q
-    });
-    const response = await fetch(`https://nominatim.openstreetmap.org/search?${params}`, {
-      headers: { Accept: 'application/json' }
-    });
-    if (!response.ok) throw new Error(`Geocode failed with ${response.status}`);
-    const data = await response.json();
-    return Array.isArray(data) && data.length ? data[0] : null;
+  function reset() {
+    app.closeDetails();
+    app.query = '';
+    app.priceFilter = 'all';
+    mapView?.resetView();
   }
 
-  function flyToPlace(place) {
-    if (!map) return;
-    mapWasInteractedWith = true;
-    homeViewApplied = true;
-    const bbox = place.boundingbox;
-    if (Array.isArray(bbox) && bbox.length === 4) {
-      const [south, north, west, east] = bbox.map(Number);
-      if ([south, north, west, east].every(Number.isFinite)) {
-        map.fitBounds(
-          [
-            [west, south],
-            [east, north]
-          ],
-          { maxZoom: 16, padding: 80, duration: 800 }
-        );
-        return;
-      }
-    }
-    map.flyTo({ center: [Number(place.lon), Number(place.lat)], zoom: 16 });
-  }
-
-  function closeDetails() {
-    selected = null;
-  }
-
-  function resetMap() {
-    selected = null;
-    query = '';
-    priceFilter = 'all';
-    lastMarkerPick = null;
-    if (userLocation) {
-      setLocationView(userLocation);
-    } else {
-      homeViewApplied = false;
-      applyFallbackHomeView();
-    }
-  }
-
-  function startLocationTracking(options = {}) {
-    if (!navigator.geolocation) {
-      locationStatus = 'Location unavailable';
-      return;
-    }
-    if (userLocation) setLocationView(userLocation);
-    if (options.restart && locationWatchId !== null) stopLocationTracking();
-    if (locationWatchId !== null) return;
-
-    locationStatus = 'Locating';
-    locationWatchId = navigator.geolocation.watchPosition(
-      (position) => {
-        const firstLocation = !userLocation;
-        userLocation = {
-          lat: position.coords.latitude,
-          lon: position.coords.longitude,
-          accuracy: position.coords.accuracy
-        };
-        locationStatus = 'Live location on';
-        if (firstLocation && (!mapWasInteractedWith || options.restart)) setLocationView(userLocation);
-        scheduleMarkerDraw();
-      },
-      (error) => {
-        locationStatus = error.message || 'Location unavailable';
-        stopLocationTracking();
-        applyFallbackHomeView();
-      },
-      { enableHighAccuracy: true, maximumAge: 10000, timeout: 15000 }
-    );
-  }
-
-  function stopLocationTracking() {
-    if (locationWatchId === null || !navigator.geolocation) return;
-    navigator.geolocation.clearWatch(locationWatchId);
-    locationWatchId = null;
-  }
-
-  // ---- Offline download / install -------------------------------------------
-
-  function onBeforeInstallPrompt(event) {
-    event.preventDefault();
-    deferredInstallPrompt = event;
-    canInstall = true;
-  }
-
-  function onServiceWorkerMessage(event) {
-    const data = event.data || {};
-    if (data.type === 'precache-progress') {
-      offlineState = data.loaded >= data.total && data.total > 0 ? 'ready' : 'downloading';
-      downloadLoaded = data.loaded || 0;
-      downloadTotal = data.total || 0;
-    } else if (data.type === 'precache-done') {
-      offlineState = 'ready';
-      if (data.total) {
-        downloadLoaded = data.total;
-        downloadTotal = data.total;
-      }
-    } else if (data.type === 'precache-idle') {
-      if (offlineState === 'unknown') offlineState = 'idle';
-    }
-  }
-
-  async function onOfflineButton() {
+  async function install() {
     if (deferredInstallPrompt) {
       deferredInstallPrompt.prompt();
       await deferredInstallPrompt.userChoice;
       deferredInstallPrompt = null;
-      canInstall = false;
+      app.canInstall = false;
       return;
     }
-    showInstallHelp = true;
+    app.showInstallHelp = true;
   }
 </script>
 
@@ -1071,242 +192,39 @@
 </svelte:head>
 
 <main class="app-shell">
-  <section class="map" class:offline={!online} style={`--topbar-height: ${topbarHeight}px; --mobile-search-visible-results: ${MOBILE_SEARCH_VISIBLE_RESULTS};`}>
-    <div class="map-canvas" bind:this={mapEl} role="application" aria-label="Restaurant map"></div>
-    <canvas class="marker-layer" bind:this={markerCanvas} aria-hidden="true"></canvas>
+  <section
+    class="map"
+    class:offline={!app.online}
+    style={`--topbar-height: ${app.topbarHeight}px; --mobile-search-visible-results: ${MOBILE_SEARCH_VISIBLE_RESULTS};`}
+  >
+    <MapView bind:this={mapView} {app} initialView={urlState.view} {onViewChange} />
 
-    {#if loading}
+    {#if app.loading}
       <div class="state-pill">Loading</div>
-    {:else if loadError}
-      <div class="state-pill error">{loadError}</div>
+    {:else if app.loadError}
+      <div class="state-pill error">{app.loadError}</div>
     {/if}
 
-    <div class="topbar" bind:this={topbarEl}>
-      <label class="search">
-        <span>Search</span>
-        <div class="search-field">
-          <input
-            bind:value={query}
-            type="search"
-            placeholder="Restaurant, place or address"
-            autocomplete="off"
-            enterkeyhint="search"
-            on:keydown={(event) => event.key === 'Enter' && goToSearch()}
-          />
-          {#if searchText}
-            <output class="search-count" aria-live="polite">{filteredRestaurants.length.toLocaleString()}</output>
-          {/if}
-          <button class="search-go" type="button" on:click={goToSearch} aria-label="Go to place" title="Go to place">
-            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-              <circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2" />
-              <line x1="15.5" y1="15.5" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-            </svg>
-          </button>
-        </div>
-      </label>
-      <button class="reset-button" type="button" on:click={resetMap}>Reset</button>
-      {#if !isStandalone}
-        <button
-          class="offline-button"
-          class:downloading={offlineState === 'downloading'}
-          class:ready={offlineState === 'ready'}
-          type="button"
-          on:click={onOfflineButton}
-          title={offlineState === 'downloading' ? `Saving offline map (${downloadPercent}%)` : 'Available offline — tap to install'}
-        >
-          <span class="offline-dot" class:online={online}></span>
-          {#if offlineState === 'downloading'}
-            Saving {downloadPercent}%
-          {:else if offlineState === 'ready'}
-            Offline
-            <svg class="offline-icon" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
-              <path d="M4 12.5l5 5 11-11" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          {:else}
-            Install
-          {/if}
-        </button>
-      {/if}
-    </div>
-
-    <div class="zoom-controls" aria-label="Zoom controls">
-      <button type="button" on:click={() => zoomButton(1)} aria-label="Zoom in">+</button>
-      <button type="button" on:click={() => zoomButton(-1)} aria-label="Zoom out">-</button>
-      <button
-        class="location-button"
-        class:active={Boolean(userLocation)}
-        type="button"
-        on:click={() => startLocationTracking({ restart: true })}
-        aria-label="Show current location"
-        title={locationStatus || 'Show current location'}
-      >
-        Loc
-      </button>
-    </div>
-
-    <div class="price-controls" aria-label="Price filter">
-      {#each prices as price}
-        <button type="button" class:active={priceFilter === price} on:click={() => (priceFilter = price)}>
-          {price === 'all' ? 'All' : price}
-        </button>
-      {/each}
-    </div>
-
-    {#if searchResults.length}
-      <div class="results-shell">
-        <div class="results-panel" bind:this={searchResultsEl} on:scroll={updateSearchResultsScrollState}>
-          {#each searchResults as result (result.id)}
-            <button type="button" on:click={() => selectSearchResult(result)}>
-              <strong>{result.name}</strong>
-              <span>{result.address}</span>
-            </button>
-          {/each}
-        </div>
-        {#if searchResultsHasMore}
-          <div class="search-results-scrollbar" aria-hidden="true">
-            <span style={`top: ${searchResultsScrollbar.top}%; height: ${searchResultsScrollbar.height}%;`}></span>
-          </div>
-        {/if}
-      </div>
-    {/if}
-
-    <details class="roadmap-menu">
-      <summary>Roadmap</summary>
-      <ul>
-        {#each roadmapItems as item}
-          <li>{item}</li>
-        {/each}
-      </ul>
-    </details>
+    <TopBar {app} onGoToSearch={goToSearch} onReset={reset} onInstall={install} />
+    <SearchResults {app} onSelect={selectFromSearch} onGoToSearch={goToSearch} />
+    <ZoomControls {app} onZoom={(d) => mapView?.zoomBy(d)} onLocate={() => mapView?.locate({ restart: true })} />
+    <PriceFilter {app} />
+    <RoadmapMenu />
+    <LinesPopup {app} />
 
     <div class="attribution">
       <a href="https://protomaps.com" target="_blank" rel="noreferrer">Protomaps</a>
       <span aria-hidden="true">·</span>
       <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a>
     </div>
-
-    {#if activeLines}
-      <div
-        class="lines-popup"
-        style={`${activeLines.flipX ? `right: ${activeLines.w - activeLines.x}px;` : `left: ${activeLines.x}px;`} ${activeLines.flipY ? `bottom: ${activeLines.h - activeLines.y}px;` : `top: ${activeLines.y}px;`} transform: translate(${activeLines.flipX ? -14 : 14}px, ${activeLines.flipY ? -14 : 14}px);`}
-        aria-hidden="true"
-      >
-        {#each activeLines.items as item}
-          <span class="line-chip">
-            <span class="line-swatch" style={`background: ${item.color};`}></span>
-            {item.name}
-          </span>
-        {/each}
-      </div>
-    {/if}
   </section>
 
-  <aside class:open={selected} class="details-panel">
-    {#if selected}
-      <button class="close-button" type="button" on:click={closeDetails} aria-label="Close">x</button>
-      <p class="eyebrow">{selected.pageTitle}</p>
-      <h1>{selected.name}</h1>
-      <div class="meta-row">
-        {#if selected.priceRange}<span>{selected.priceRange}</span>{/if}
-        {#if selected.openFor}<span>{selected.openFor}</span>{/if}
-        {#if selected.bookingProvider}<span>{selected.bookingProvider}</span>{/if}
-      </div>
-      <p class="address">{selected.address}</p>
-
-      {#if selected.description}
-        <div
-          class:can-scroll-down={descriptionCanScrollDown}
-          class:has-more={descriptionHasMore}
-          class="description-shell"
-          style={`--description-visible-lines: ${DESCRIPTION_VISIBLE_LINES};`}
-        >
-          <p class="description" bind:this={descriptionEl} on:scroll={updateDescriptionScrollState}>
-            {selected.description}
-          </p>
-          {#if descriptionHasMore}
-            <span class="description-scrollbar" aria-hidden="true">
-              <span style={`top: ${descriptionScrollbar.top}%; height: ${descriptionScrollbar.height}%;`}></span>
-            </span>
-          {/if}
-        </div>
-      {/if}
-
-      <dl class="facts">
-        {#if selected.bestFor}<div><dt>Best For</dt><dd>{selected.bestFor}</dd></div>{/if}
-        {#if selected.mustTryDish}<div><dt>Must Try</dt><dd>{selected.mustTryDish}</dd></div>{/if}
-        {#if selected.knowBeforeYouGo}<div><dt>Know First</dt><dd>{selected.knowBeforeYouGo}</dd></div>{/if}
-        {#if selected.outdoorSeating}<div><dt>Outdoor</dt><dd>{selected.outdoorSeating}</dd></div>{/if}
-        {#if selected.additionalLocationNotes}<div><dt>More Locations</dt><dd>{selected.additionalLocationNotes}</dd></div>{/if}
-        {#if selected.phone}<div><dt>Phone</dt><dd><a href={`tel:${selected.phone}`}>{selected.phone}</a></dd></div>{/if}
-      </dl>
-
-      <div class="actions">
-        {#if selectedGoogleMapsUrl}
-          <a href={selectedGoogleMapsUrl} target="_blank" rel="noreferrer" aria-label={`Open ${selected.name} in Google Maps`}>
-            <span class="action-label-full">Google Maps</span>
-            <span class="action-label-short">Google</span>
-          </a>
-        {/if}
-        {#if selectedCitymapperUrl}
-          <a class="citymapper-action" href={selectedCitymapperUrl} aria-label={`Open mobile directions to ${selected.name} in Citymapper`}>
-            Citymapper
-          </a>
-        {/if}
-        {#if selected.websiteUrl}<a href={selected.websiteUrl} target="_blank" rel="noreferrer">Website</a>{/if}
-        {#if selected.bookingUrl}<a href={selected.bookingUrl} target="_blank" rel="noreferrer">Book</a>{/if}
-        {#if selected.entryUrl}<a href={selected.entryUrl} target="_blank" rel="noreferrer">Eater</a>{/if}
-      </div>
-    {:else}
-      <div class="empty-panel">
-        <p class="eyebrow">Eater Maps</p>
-        <h1>{totalCount.toLocaleString()} entries</h1>
-        <p>{visibleMarkerCount.toLocaleString()} visible on this view</p>
-      </div>
-    {/if}
-  </aside>
+  <Sidebar {app} onSelectFromList={selectFromList} />
 </main>
 
-{#if showInstallHelp}
-  <div class="install-help" role="dialog" aria-modal="true" on:click={() => (showInstallHelp = false)}>
-    <div class="install-help-card" on:click|stopPropagation>
-      <h2>Install for offline use</h2>
-      {#if isIosDevice}
-        <ol>
-          <li>Tap the <strong>Share</strong> button in Safari (square with an up arrow).</li>
-          <li>Choose <strong>Add to Home Screen</strong>, then <strong>Add</strong>.</li>
-        </ol>
-      {:else}
-        <ol>
-          <li>Open your browser menu (⋮ or ≡).</li>
-          <li>Choose <strong>Install app</strong> or <strong>Add to Home Screen</strong>.</li>
-        </ol>
-      {/if}
-      <p class="install-help-note">The map is already saved on this device{offlineState === 'ready' ? '' : ' (finishing download…)'}, so it works with no internet.</p>
-      <button type="button" on:click={() => (showInstallHelp = false)}>Got it</button>
-    </div>
-  </div>
-{/if}
+<InstallHelp {app} />
 
 <style>
-  :global(*) {
-    box-sizing: border-box;
-  }
-
-  :global(html),
-  :global(body) {
-    margin: 0;
-    min-height: 100%;
-    overflow: hidden;
-    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    color: #17201c;
-    background: #f5f2ea;
-  }
-
-  :global(button),
-  :global(input) {
-    font: inherit;
-  }
-
   .app-shell {
     display: grid;
     grid-template-columns: minmax(0, 1fr) min(400px, 32vw);
@@ -1329,352 +247,6 @@
     background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='150'%20height='96'%3E%3Ctext%20x='6'%20y='54'%20font-family='sans-serif'%20font-size='17'%20fill='%23aab0a6'%20transform='rotate(-18%206%2054)'%3Eoffline%3C/text%3E%3C/svg%3E");
   }
 
-  .map-canvas {
-    position: absolute;
-    inset: 0;
-  }
-
-  .lines-popup {
-    position: absolute;
-    z-index: 13;
-    max-width: min(240px, calc(100vw - 20px));
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    padding: 7px 9px;
-    border-radius: 8px;
-    background: rgba(255, 252, 244, 0.98);
-    border: 1px solid rgba(23, 32, 28, 0.14);
-    box-shadow: 0 8px 22px rgba(27, 31, 28, 0.18);
-    pointer-events: none;
-    font-size: 12px;
-    font-weight: 700;
-    color: #17201c;
-  }
-
-  .line-chip {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .line-swatch {
-    flex: 0 0 auto;
-    width: 14px;
-    height: 4px;
-    border-radius: 2px;
-    box-shadow: 0 0 0 1px rgba(23, 32, 28, 0.15);
-  }
-
-  .marker-layer {
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    pointer-events: none;
-  }
-
-  :global(.maplibregl-ctrl-top-right),
-  :global(.maplibregl-ctrl-bottom-left),
-  :global(.maplibregl-ctrl-bottom-right),
-  :global(.maplibregl-ctrl-top-left) {
-    display: none;
-  }
-
-  .topbar {
-    position: absolute;
-    top: max(12px, env(safe-area-inset-top));
-    left: 12px;
-    right: 12px;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto auto;
-    gap: 8px;
-    z-index: 10;
-    pointer-events: none;
-  }
-
-  .search,
-  .reset-button,
-  .offline-button,
-  .roadmap-menu,
-  .zoom-controls,
-  .price-controls,
-  .results-shell,
-  .results-panel,
-  .state-pill {
-    pointer-events: auto;
-  }
-
-  .search {
-    display: grid;
-    gap: 3px;
-    max-width: 560px;
-    padding: 8px 10px;
-    border: 1px solid rgba(23, 32, 28, 0.14);
-    border-radius: 8px;
-    background: rgba(255, 252, 244, 0.96);
-    box-shadow: 0 8px 22px rgba(27, 31, 28, 0.12);
-  }
-
-  .search span {
-    font-size: 10px;
-    line-height: 1;
-    color: #6a5f55;
-    text-transform: uppercase;
-    font-weight: 700;
-  }
-
-  .search-field {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    min-width: 0;
-  }
-
-  .search-field input {
-    flex: 1 1 auto;
-  }
-
-  .search-go {
-    flex: 0 0 auto;
-    display: grid;
-    place-items: center;
-    width: 30px;
-    height: 30px;
-    padding: 0;
-    border: 0;
-    border-radius: 999px;
-    color: #fff;
-    background: #17201c;
-    cursor: pointer;
-  }
-
-  .search input {
-    width: 100%;
-    border: 0;
-    outline: 0;
-    background: transparent;
-    color: #17201c;
-    font-size: 16px;
-    min-width: 0;
-  }
-
-  .search-count {
-    min-width: 30px;
-    padding: 3px 6px;
-    border-radius: 999px;
-    color: #fff;
-    background: #17201c;
-    text-align: center;
-    font-size: 12px;
-    font-weight: 800;
-    line-height: 1.2;
-  }
-
-  .reset-button,
-  .offline-button,
-  .zoom-controls button,
-  .price-controls button {
-    border: 1px solid rgba(23, 32, 28, 0.14);
-    color: #17201c;
-    background: rgba(255, 252, 244, 0.96);
-    box-shadow: 0 8px 22px rgba(27, 31, 28, 0.12);
-    cursor: pointer;
-  }
-
-  .reset-button {
-    min-width: 62px;
-    height: 48px;
-    border-radius: 8px;
-    font-weight: 700;
-  }
-
-  .offline-button {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    min-width: 96px;
-    height: 48px;
-    padding: 0 12px;
-    border-radius: 8px;
-    font-weight: 800;
-    white-space: nowrap;
-    justify-content: center;
-  }
-
-  .offline-button.ready {
-    color: #1f6b45;
-  }
-
-  .offline-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #b9b1a3;
-    flex: 0 0 auto;
-  }
-
-  .offline-dot.online {
-    background: #2d8a5f;
-  }
-
-  .offline-icon {
-    flex: 0 0 auto;
-    margin-left: -1px;
-  }
-
-  .roadmap-menu {
-    position: absolute;
-    right: 12px;
-    bottom: max(12px, env(safe-area-inset-bottom));
-    min-width: 96px;
-    z-index: 9;
-    color: #17201c;
-  }
-
-  .roadmap-menu summary {
-    display: grid;
-    height: 40px;
-    place-items: center;
-    padding: 0 12px;
-    border: 1px solid rgba(23, 32, 28, 0.14);
-    border-radius: 8px;
-    background: rgba(255, 252, 244, 0.96);
-    box-shadow: 0 8px 22px rgba(27, 31, 28, 0.12);
-    cursor: pointer;
-    font-weight: 800;
-    list-style: none;
-  }
-
-  .roadmap-menu summary::-webkit-details-marker {
-    display: none;
-  }
-
-  .roadmap-menu[open] summary {
-    color: #fff;
-    background: #17201c;
-  }
-
-  .roadmap-menu ul {
-    position: absolute;
-    right: 0;
-    bottom: 48px;
-    display: grid;
-    gap: 7px;
-    width: min(320px, calc(100vw - 24px));
-    max-height: min(55vh, 430px);
-    margin: 0;
-    padding: 12px 14px 12px 26px;
-    overflow: auto;
-    border: 1px solid rgba(23, 32, 28, 0.12);
-    border-radius: 8px;
-    background: rgba(255, 252, 244, 0.98);
-    box-shadow: 0 18px 40px rgba(27, 31, 28, 0.18);
-  }
-
-  .roadmap-menu li {
-    font-size: 13px;
-    line-height: 1.25;
-  }
-
-  .zoom-controls {
-    position: absolute;
-    right: 12px;
-    top: 84px;
-    display: grid;
-    gap: 6px;
-    z-index: 9;
-  }
-
-  .zoom-controls button {
-    width: 44px;
-    height: 44px;
-    border-radius: 8px;
-    font-size: 24px;
-    font-weight: 800;
-  }
-
-  .zoom-controls .location-button {
-    font-size: 12px;
-    letter-spacing: 0;
-  }
-
-  .zoom-controls .location-button.active {
-    color: #fff;
-    background: #2563eb;
-  }
-
-  .price-controls {
-    position: absolute;
-    left: 12px;
-    bottom: max(12px, env(safe-area-inset-bottom));
-    display: flex;
-    gap: 6px;
-    z-index: 9;
-  }
-
-  .price-controls button {
-    min-width: 40px;
-    height: 36px;
-    border-radius: 8px;
-    padding: 0 10px;
-    font-size: 12px;
-    font-weight: 800;
-  }
-
-  .price-controls button.active {
-    color: #fff;
-    background: #17201c;
-  }
-
-  .results-shell {
-    position: absolute;
-    top: calc(max(12px, env(safe-area-inset-top)) + var(--topbar-height, 56px) + 8px);
-    left: 12px;
-    bottom: calc(max(12px, env(safe-area-inset-bottom)) + 50px);
-    width: min(420px, calc(100vw - 24px));
-    z-index: 12;
-  }
-
-  .results-panel {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    border: 1px solid rgba(23, 32, 28, 0.12);
-    border-radius: 8px;
-    background: rgba(255, 252, 244, 0.98);
-    box-shadow: 0 18px 40px rgba(27, 31, 28, 0.18);
-  }
-
-  .search-results-scrollbar {
-    display: none;
-  }
-
-  .results-panel button {
-    display: grid;
-    gap: 3px;
-    width: 100%;
-    padding: 10px 12px;
-    border: 0;
-    border-bottom: 1px solid rgba(23, 32, 28, 0.08);
-    text-align: left;
-    color: #17201c;
-    background: transparent;
-    cursor: pointer;
-  }
-
-  .results-panel button:last-child {
-    border-bottom: 0;
-  }
-
-  .results-panel span {
-    color: #6a5f55;
-    font-size: 12px;
-  }
-
   .state-pill {
     position: absolute;
     left: 50%;
@@ -1682,15 +254,15 @@
     transform: translate(-50%, -50%);
     z-index: 20;
     padding: 10px 14px;
-    border-radius: 8px;
-    color: #17201c;
-    background: rgba(255, 252, 244, 0.96);
-    box-shadow: 0 14px 34px rgba(27, 31, 28, 0.18);
+    border-radius: var(--r-s);
+    color: var(--ink);
+    background: var(--surface);
+    box-shadow: var(--shadow-3);
     font-weight: 800;
   }
 
   .state-pill.error {
-    color: #9f241d;
+    color: var(--error);
   }
 
   .attribution {
@@ -1707,202 +279,7 @@
   }
 
   .attribution a {
-    color: #38433e;
-  }
-
-  .details-panel {
-    position: relative;
-    min-width: 0;
-    height: 100%;
-    overflow: auto;
-    padding: 22px 22px 28px;
-    border-left: 1px solid rgba(23, 32, 28, 0.14);
-    background: #fffdf7;
-    box-shadow: -14px 0 32px rgba(27, 31, 28, 0.08);
-  }
-
-  .close-button {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    width: 36px;
-    height: 36px;
-    border: 1px solid rgba(23, 32, 28, 0.12);
-    border-radius: 8px;
-    color: #17201c;
-    background: #f7f2e8;
-    cursor: pointer;
-    font-weight: 800;
-  }
-
-  .eyebrow {
-    margin: 0 44px 9px 0;
-    color: #8b4a37;
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 0;
-    text-transform: uppercase;
-  }
-
-  h1 {
-    margin: 0;
-    max-width: 100%;
-    font-size: clamp(24px, 4vw, 34px);
-    line-height: 1.04;
-    letter-spacing: 0;
-  }
-
-  .meta-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin: 14px 0 12px;
-  }
-
-  .meta-row span {
-    padding: 5px 8px;
-    border-radius: 8px;
-    color: #38433e;
-    background: #ece6da;
-    font-size: 12px;
-    font-weight: 800;
-  }
-
-  .address {
-    margin: 0 0 16px;
-    color: #5f675f;
-    line-height: 1.35;
-  }
-
-  .description {
-    margin: 0 0 18px;
-    line-height: 1.5;
-  }
-
-  .description-shell {
-    position: relative;
-  }
-
-  .description-scrollbar {
-    display: none;
-  }
-
-  .facts {
-    display: grid;
-    gap: 10px;
-    margin: 0;
-  }
-
-  .facts div {
-    padding-top: 10px;
-    border-top: 1px solid #e3ded4;
-  }
-
-  .facts dt {
-    margin-bottom: 4px;
-    color: #8b4a37;
-    font-size: 11px;
-    font-weight: 800;
-    text-transform: uppercase;
-  }
-
-  .facts dd {
-    margin: 0;
-    line-height: 1.4;
-  }
-
-  .facts a {
-    color: #275f78;
-  }
-
-  .actions {
-    position: sticky;
-    bottom: -28px;
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
-    margin: 20px -22px -28px;
-    padding: 12px 22px max(18px, env(safe-area-inset-bottom));
-    background: linear-gradient(180deg, rgba(255, 253, 247, 0), #fffdf7 18%);
-  }
-
-  .actions a {
-    display: grid;
-    min-height: 42px;
-    place-items: center;
-    border-radius: 8px;
-    color: #fff;
-    background: #17201c;
-    text-decoration: none;
-    font-weight: 800;
-  }
-
-  .actions .citymapper-action {
-    display: none;
-  }
-
-  .action-label-short {
-    display: none;
-  }
-
-  .empty-panel {
-    display: grid;
-    align-content: center;
-    min-height: 100%;
-  }
-
-  .empty-panel p:last-child {
-    color: #5f675f;
-  }
-
-  .install-help {
-    position: fixed;
-    inset: 0;
-    z-index: 40;
-    display: grid;
-    place-items: center;
-    padding: 20px;
-    background: rgba(23, 32, 28, 0.5);
-  }
-
-  .install-help-card {
-    width: min(360px, 100%);
-    padding: 20px 22px;
-    border-radius: 14px;
-    background: #fffdf7;
-    box-shadow: 0 24px 60px rgba(27, 31, 28, 0.3);
-  }
-
-  .install-help-card h2 {
-    margin: 0 0 12px;
-    font-size: 18px;
-  }
-
-  .install-help-card ol {
-    margin: 0 0 12px;
-    padding-left: 20px;
-    display: grid;
-    gap: 8px;
-    line-height: 1.4;
-    font-size: 14px;
-  }
-
-  .install-help-note {
-    margin: 0 0 14px;
-    color: #5f675f;
-    font-size: 13px;
-    line-height: 1.4;
-  }
-
-  .install-help-card button {
-    width: 100%;
-    min-height: 42px;
-    border: 0;
-    border-radius: 8px;
-    color: #fff;
-    background: #17201c;
-    font-weight: 800;
-    cursor: pointer;
+    color: var(--ink-soft);
   }
 
   @media (max-width: 820px) {
@@ -1912,244 +289,6 @@
 
     .map {
       height: 100dvh;
-    }
-
-    .details-panel {
-      position: fixed;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      z-index: 30;
-      display: flex;
-      flex-direction: column;
-      height: auto;
-      max-height: min(56dvh, 470px);
-      padding: 14px 14px max(8px, env(safe-area-inset-bottom));
-      border-top: 1px solid rgba(23, 32, 28, 0.16);
-      border-left: 0;
-      border-radius: 12px 12px 0 0;
-      transform: translateY(calc(100% - 0px));
-      transition: transform 180ms ease;
-      box-shadow: 0 -18px 38px rgba(27, 31, 28, 0.2);
-    }
-
-    .details-panel.open {
-      transform: translateY(0);
-    }
-
-    .details-panel:not(.open) {
-      display: none;
-    }
-
-    .details-panel h1 {
-      padding-right: 34px;
-      font-size: 22px;
-      line-height: 1.06;
-    }
-
-    .details-panel .eyebrow {
-      margin: 0 42px 6px 0;
-      font-size: 10px;
-    }
-
-    .details-panel .meta-row {
-      gap: 5px;
-      margin: 9px 0 8px;
-    }
-
-    .details-panel .meta-row span {
-      padding: 4px 7px;
-      font-size: 11px;
-    }
-
-    .details-panel .address {
-      margin-bottom: 9px;
-      font-size: 13px;
-    }
-
-    .details-panel .description-shell {
-      order: 7;
-      margin: 0 0 8px;
-    }
-
-    .details-panel .description-shell.can-scroll-down::after {
-      content: "";
-      position: absolute;
-      left: 0;
-      right: 9px;
-      bottom: 0;
-      height: 1.7em;
-      pointer-events: none;
-      background: linear-gradient(180deg, rgba(255, 253, 247, 0), #fffdf7 82%);
-    }
-
-    .details-panel .description {
-      max-height: calc(1.42em * var(--description-visible-lines, 6));
-      margin: 0;
-      padding-right: 12px;
-      overflow-y: auto;
-      scrollbar-width: none;
-      line-height: 1.42;
-      font-size: 14px;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    .details-panel .description::-webkit-scrollbar {
-      display: none;
-      width: 0;
-      height: 0;
-    }
-
-    .description-scrollbar {
-      display: block;
-      position: absolute;
-      top: 2px;
-      right: 1px;
-      bottom: 2px;
-      width: 3px;
-      border-radius: 999px;
-      background: rgba(23, 32, 28, 0.08);
-      pointer-events: none;
-    }
-
-    .description-scrollbar span {
-      position: absolute;
-      left: 0;
-      right: 0;
-      min-height: 18%;
-      border-radius: 999px;
-      background: rgba(23, 32, 28, 0.46);
-    }
-
-    .details-panel .facts {
-      order: 8;
-      gap: 8px;
-      font-size: 13px;
-    }
-
-    .details-panel .facts div {
-      padding-top: 8px;
-    }
-
-    .actions {
-      position: static;
-      order: 6;
-      display: flex;
-      overflow-x: auto;
-      gap: 6px;
-      margin: 2px 0 10px;
-      padding: 0 2px 2px;
-      background: transparent;
-      overscroll-behavior-x: contain;
-      scrollbar-width: none;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    .actions::-webkit-scrollbar {
-      display: none;
-    }
-
-    .actions a {
-      flex: 0 0 auto;
-      min-width: 82px;
-      min-height: 38px;
-      padding: 0 10px;
-      font-size: 12px;
-      white-space: nowrap;
-    }
-
-    .actions .citymapper-action {
-      display: grid;
-    }
-
-    .action-label-full {
-      display: none;
-    }
-
-    .action-label-short {
-      display: inline;
-    }
-
-    .topbar {
-      grid-template-columns: minmax(0, 1fr) 58px auto;
-    }
-
-    .offline-button {
-      min-width: 84px;
-      padding: 0 8px;
-      font-size: 13px;
-    }
-
-    .results-shell {
-      bottom: auto;
-      max-height: calc(var(--mobile-search-visible-results, 4) * 56px);
-    }
-
-    .results-panel {
-      height: auto;
-      max-height: inherit;
-      overscroll-behavior: contain;
-      scrollbar-width: none;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    .results-panel::-webkit-scrollbar {
-      display: none;
-      width: 0;
-      height: 0;
-    }
-
-    .results-panel button {
-      height: 56px;
-      padding: 8px 12px;
-      overflow: hidden;
-    }
-
-    .results-panel strong,
-    .results-panel span {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .search-results-scrollbar {
-      display: block;
-      position: absolute;
-      top: 3px;
-      right: 3px;
-      bottom: 3px;
-      width: 3px;
-      border-radius: 999px;
-      background: rgba(23, 32, 28, 0.08);
-      pointer-events: none;
-    }
-
-    .search-results-scrollbar span {
-      position: absolute;
-      left: 0;
-      right: 0;
-      min-height: 18%;
-      border-radius: 999px;
-      background: rgba(23, 32, 28, 0.46);
-    }
-
-    .zoom-controls {
-      top: 98px;
-    }
-
-    .roadmap-menu {
-      min-width: 84px;
-    }
-
-    .roadmap-menu summary {
-      padding: 0 8px;
-      font-size: 13px;
-    }
-
-    .price-controls {
-      overflow-x: auto;
-      max-width: calc(100vw - 24px);
-      padding-bottom: 2px;
     }
   }
 </style>

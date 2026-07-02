@@ -1,8 +1,11 @@
 <script>
+  import '../app.css';
   import { onMount } from 'svelte';
   import { dev } from '$app/environment';
   import { injectAnalytics } from '@vercel/analytics/sveltekit';
   import { injectSpeedInsights } from '@vercel/speed-insights/sveltekit';
+
+  let { children } = $props();
 
   injectAnalytics({ mode: dev ? 'development' : 'production' });
   injectSpeedInsights();
@@ -26,4 +29,4 @@
   });
 </script>
 
-<slot />
+{@render children()}
