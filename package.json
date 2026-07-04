@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1",
-    "build": "vite build",
+    "build": "node scripts/fetch-data.mjs && vite build",
+    "fetch:data": "node scripts/fetch-data.mjs --force",
     "preview": "vite preview --host 127.0.0.1",
     "export:data": "python data-pipeline/scripts/build-public-data.py",
     "build:basemap": "node data-pipeline/scripts/build-basemap.mjs",
