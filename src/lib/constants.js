@@ -47,6 +47,8 @@ export const LONDON_BOUNDS = {
   minLon: -0.5103,
   maxLon: 0.334
 };
+/** Charing Cross — the traditional centre of London, used to sort the entries list. */
+export const CENTRAL_LONDON = { lat: 51.5074, lon: -0.1278 };
 
 // ---- Canvas markers ----------------------------------------------------------
 export const MARKER_PADDING = 48;
@@ -57,6 +59,29 @@ export const MARKER_LAYER_OPACITY = 0.42;
 export const PRICED_MARKER_LAYER_OPACITY = 1;
 export const FULL_MARKER_ZOOM = 14;
 export const MID_MARKER_ZOOM = 12;
+
+// ---- Spiderfy (fan-out of stacked markers) -----------------------------------
+// Tapping a stack of overlapping markers fans them out into big, spaced,
+// thumb-tappable targets joined by "legs" to a shared origin. Replaces the old
+// repeat-tap cycling. See docs/ARCHITECTURE.md.
+/** "Sufficiently zoomed in" gate: at/above this we fan; below, a spread stack nudges the camera in. */
+export const SPIDERFY_MIN_ZOOM = FULL_MARKER_ZOOM;
+/** Px span (at a given zoom) below which markers read as stacked. Drives the co-located test. */
+export const SPIDER_SEPARATION_PX = 34;
+/** BFS link distance to grow the true cluster from the tapped seed (2*fullRadius+4). */
+export const SPIDER_STACK_LINK_PX = 28;
+/** Centre-to-centre spacing of adjacent fanned dots on the ring (24px dot + a tiny gap). */
+export const SPIDER_GAP = 30;
+/** Floor on the ring radius so a 2–3 stack doesn't collapse onto the anchor. */
+export const SPIDER_MIN_R = 28;
+/** Cap on fanned members for a legitimately huge co-located set. */
+export const SPIDER_MAX = 40;
+/** Expand duration (ms); 0 under prefers-reduced-motion. Collapse is instant. */
+export const SPIDER_MS = 190;
+/** Per-member start delay (fraction of progress) for a cascading bloom. */
+export const SPIDER_STAGGER = 0.03;
+/** Minimum gap from any viewport edge; the constellation is shifted inward to respect it. */
+export const SPIDER_EDGE_PAD = 16;
 
 export const PRICES = ['all', '$', '$$', '$$$', '$$$$'];
 

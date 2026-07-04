@@ -1,17 +1,27 @@
-// Canvas marker overlay. Ported verbatim from the tuned implementation:
+// Canvas marker overlay + spiderfy.
 // - regular markers composited at a FLAT 0.42 opacity (overlaps must not darken)
 // - the priced ("38 Best London") markers composited fully opaque, ON TOP
 // - the selected marker drawn above everything at full detail
 // - offscreen sprite cache keyed by price/detail/DPR
-// - hit-testing with click-cycling through overlapping markers
+// - tapping a stack fans it out (spiderfy) into spaced, thumb-tappable targets
 
 import {
   FULL_MARKER_ZOOM,
   MARKER_LAYER_OPACITY,
   MARKER_PADDING,
   MARKER_SPRITE_PADDING,
+  MAX_ZOOM,
   MID_MARKER_ZOOM,
   PRICED_MARKER_LAYER_OPACITY,
+  SPIDER_EDGE_PAD,
+  SPIDER_GAP,
+  SPIDER_MAX,
+  SPIDER_MIN_R,
+  SPIDER_MS,
+  SPIDER_SEPARATION_PX,
+  SPIDER_STACK_LINK_PX,
+  SPIDER_STAGGER,
+  SPIDERFY_MIN_ZOOM,
   clamp,
   hasCoordinates,
   markerColor
@@ -25,10 +35,8 @@ function markerPriority(restaurant) {
 // much larger target than a mouse cursor.
 const HIT_EXTRA = 8;
 const TOUCH_HIT_EXTRA = 22;
-// How far a follow-up tap can land from the previous one and still count as
-// "the same spot" for cycling. Generous for thumbs.
-const CYCLE_WINDOW = 22;
-const TOUCH_CYCLE_WINDOW = 48;
+// Full-detail marker radius — fanned targets always draw at this size.
+const FULL_RADIUS = 12;
 
 /** Markers within tolerance of a screen point, nearest-first (deterministic). */
 function candidatesAt(map, restaurants, selectedId, point, extra) {
@@ -67,6 +75,24 @@ function metersPerPixel(lat, z) {
   return (156543.03392 * Math.cos((lat * Math.PI) / 180)) / 2 ** z;
 }
 
+const easeOutCubic = (t) => 1 - (1 - t) ** 3;
+
+/**
+ * Fan slot offsets (relative to the origin): one even ring, sized so adjacent
+ * dots sit ~SPIDER_GAP apart (a tiny, uniform gap), floored at MIN_R for small
+ * stacks. The ring grows with count so it never self-overlaps.
+ */
+function fanSlots(n) {
+  if (n < 2) return [{ dx: 0, dy: 0 }];
+  const radius = Math.max(SPIDER_MIN_R, SPIDER_GAP / (2 * Math.sin(Math.PI / n)));
+  const slots = [];
+  for (let i = 0; i < n; i++) {
+    const angle = -Math.PI / 2 + (i * 2 * Math.PI) / n; // start at 12 o'clock, clockwise
+    slots.push({ dx: radius * Math.cos(angle), dy: radius * Math.sin(angle) });
+  }
+  return slots;
+}
+
 export class MarkerRenderer {
   /**
    * @param {object} opts
@@ -85,8 +111,10 @@ export class MarkerRenderer {
     this.frame = 0;
     this.spriteCache = new Map();
     this.layerCanvas = null;
-    this.lastPick = null;
     this.lastVisible = [];
+    // Spiderfy state (null when closed). members[].tx/ty are absolute screen px.
+    this.spider = null;
+    this.spiderFrame = 0;
   }
 
   schedule() {
@@ -99,12 +127,24 @@ export class MarkerRenderer {
 
   destroy() {
     if (this.frame) cancelAnimationFrame(this.frame);
+    if (this.spiderFrame) cancelAnimationFrame(this.spiderFrame);
     this.frame = 0;
+    this.spiderFrame = 0;
+    this.spider = null;
     this.map = null;
   }
 
-  clearPick() {
-    this.lastPick = null;
+  isSpiderOpen() {
+    return !!this.spider;
+  }
+
+  collapseSpider() {
+    if (this.spiderFrame) cancelAnimationFrame(this.spiderFrame);
+    this.spiderFrame = 0;
+    if (this.spider) {
+      this.spider = null;
+      this.schedule();
+    }
   }
 
   draw() {
@@ -129,6 +169,7 @@ export class MarkerRenderer {
 
     const { restaurants, selectedId, userLocation } = this.read();
     const z = map.getZoom();
+    const spiderIds = this.spider ? new Set(this.spider.members.map((m) => m.restaurant.id)) : null;
     const markers = [];
     for (const restaurant of restaurants) {
       const point = map.project([restaurant.lon, restaurant.lat]);
@@ -152,6 +193,7 @@ export class MarkerRenderer {
     const pricedMarkers = [];
     let selectedMarker = null;
     for (const marker of markers) {
+      if (spiderIds?.has(marker.restaurant.id)) continue; // drawn in the spider tail instead
       if (marker.restaurant.id === selectedId) {
         selectedMarker = marker;
         continue;
@@ -177,6 +219,7 @@ export class MarkerRenderer {
 
     if (selectedMarker) this.drawMarker(ctx, selectedMarker, true, z);
     this.drawUserLocation(ctx, userLocation, z);
+    if (this.spider) this.drawSpider(ctx, z, selectedId);
   }
 
   drawMarker(ctx, marker, active, z) {
@@ -258,12 +301,269 @@ export class MarkerRenderer {
     ctx.restore();
   }
 
+  // ---- Spiderfy ---------------------------------------------------------------
+
+  /** Screen position of a marker as drawn (base projection + ring offset). */
+  originPx(restaurant) {
+    const p = this.map.project([restaurant.lon, restaurant.lat]);
+    return { x: p.x + restaurant.offsetX, y: p.y + restaurant.offsetY };
+  }
+
+  /** Grow the true stack around a seed by screen-space proximity (BFS). */
+  buildCluster(seed) {
+    const { restaurants } = this.read();
+    const pool = this.lastVisible.length ? this.lastVisible : restaurants;
+    const seedPx = this.originPx(seed);
+    const inSet = new Set([seed.id]);
+    const set = [seed];
+    const queue = [{ px: seedPx }];
+    while (queue.length) {
+      const current = queue.pop();
+      for (const restaurant of pool) {
+        if (inSet.has(restaurant.id)) continue;
+        const px = this.originPx(restaurant);
+        if (Math.hypot(px.x - current.px.x, px.y - current.px.y) <= SPIDER_STACK_LINK_PX) {
+          inSet.add(restaurant.id);
+          set.push(restaurant);
+          queue.push({ px });
+        }
+      }
+    }
+    // Deterministic slot order: priced first, then nearest the seed, then id.
+    set.sort((a, b) => {
+      const priority = markerPriority(b) - markerPriority(a);
+      if (priority) return priority;
+      const da = Math.hypot(this.originPx(a).x - seedPx.x, this.originPx(a).y - seedPx.y);
+      const db = Math.hypot(this.originPx(b).x - seedPx.x, this.originPx(b).y - seedPx.y);
+      if (Math.abs(da - db) > 0.5) return da - db;
+      return String(a.id).localeCompare(String(b.id));
+    });
+    if (set.length > SPIDER_MAX) set.length = SPIDER_MAX;
+    return set;
+  }
+
+  /** Max pairwise screen distance of a cluster's BASE coords, evaluated at `zoom`. */
+  geoSpanAtZoom(cluster, zoom) {
+    const factor = 2 ** (zoom - this.map.getZoom());
+    const points = cluster.map((r) => this.map.project([r.lon, r.lat]));
+    let max = 0;
+    for (let i = 0; i < points.length; i++) {
+      for (let j = i + 1; j < points.length; j++) {
+        const dx = (points[i].x - points[j].x) * factor;
+        const dy = (points[i].y - points[j].y) * factor;
+        const distance = Math.hypot(dx, dy);
+        if (distance > max) max = distance;
+      }
+    }
+    return max;
+  }
+
+  /** True when zooming could physically un-stack the cluster (vs exact dupes). */
+  isSeparableAtMaxZoom(cluster) {
+    return this.geoSpanAtZoom(cluster, MAX_ZOOM) >= SPIDER_SEPARATION_PX;
+  }
+
+  geoCentroid(cluster) {
+    let lon = 0;
+    let lat = 0;
+    for (const r of cluster) {
+      lon += r.lon;
+      lat += r.lat;
+    }
+    return [lon / cluster.length, lat / cluster.length];
+  }
+
+  /** Camera zoom that pulls a separable cluster apart (for below-gate taps). */
+  separateZoom(cluster) {
+    const current = this.map.getZoom();
+    let minLon = Infinity;
+    let minLat = Infinity;
+    let maxLon = -Infinity;
+    let maxLat = -Infinity;
+    for (const r of cluster) {
+      minLon = Math.min(minLon, r.lon);
+      maxLon = Math.max(maxLon, r.lon);
+      minLat = Math.min(minLat, r.lat);
+      maxLat = Math.max(maxLat, r.lat);
+    }
+    try {
+      const camera = this.map.cameraForBounds(
+        [
+          [minLon, minLat],
+          [maxLon, maxLat]
+        ],
+        { padding: 120, maxZoom: MAX_ZOOM }
+      );
+      if (camera && Number.isFinite(camera.zoom)) return clamp(camera.zoom, current + 1, MAX_ZOOM);
+    } catch {
+      // fall through
+    }
+    return Math.min(MAX_ZOOM, current + 2);
+  }
+
+  openSpider(cluster) {
+    const anchor = this.map.project([cluster[0].lon, cluster[0].lat]); // true coord, no offset
+    const slots = fanSlots(cluster.length);
+    const members = cluster.map((restaurant, i) => ({
+      restaurant,
+      tx: anchor.x + slots[i].dx,
+      ty: anchor.y + slots[i].dy
+    }));
+    this.applyEdgeCorrection(members);
+
+    const reduce = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+    this.spider = {
+      members,
+      anchorLngLat: [cluster[0].lon, cluster[0].lat],
+      start: typeof performance !== 'undefined' ? performance.now() : 0,
+      dur: reduce ? 0 : SPIDER_MS,
+      phase: reduce ? 'open' : 'expanding'
+    };
+    this.spiderTick();
+  }
+
+  /** Shift the whole constellation inward if any slot lands under an edge/topbar. */
+  applyEdgeCorrection(members) {
+    const width = this.host?.clientWidth || 0;
+    const height = this.host?.clientHeight || 0;
+    if (!width || !height) return;
+    const margin = FULL_RADIUS + SPIDER_EDGE_PAD;
+    const padTop = margin + 56; // clear the top bar / search
+    let minX = Infinity;
+    let maxX = -Infinity;
+    let minY = Infinity;
+    let maxY = -Infinity;
+    for (const m of members) {
+      minX = Math.min(minX, m.tx);
+      maxX = Math.max(maxX, m.tx);
+      minY = Math.min(minY, m.ty);
+      maxY = Math.max(maxY, m.ty);
+    }
+    let dx = 0;
+    let dy = 0;
+    if (minX - margin < 0) dx = margin - minX;
+    else if (maxX + margin > width) dx = width - margin - maxX;
+    if (minY - padTop < 0) dy = padTop - minY;
+    else if (maxY + margin > height) dy = height - margin - maxY;
+    if (dx || dy) for (const m of members) {
+      m.tx += dx;
+      m.ty += dy;
+    }
+  }
+
+  spiderTick() {
+    this.spiderFrame = 0;
+    this.draw();
+    const spider = this.spider;
+    if (!spider || spider.phase === 'open') return;
+    const now = typeof performance !== 'undefined' ? performance.now() : 0;
+    const progress = (now - spider.start) / Math.max(1, spider.dur);
+    if (progress >= 1) {
+      spider.phase = 'open';
+      this.draw();
+      return;
+    }
+    if (typeof requestAnimationFrame !== 'undefined') {
+      this.spiderFrame = requestAnimationFrame(() => this.spiderTick());
+    }
+  }
+
+  drawSpider(ctx, z, selectedId) {
+    const spider = this.spider;
+    if (!spider || !this.map) return;
+    const now = typeof performance !== 'undefined' ? performance.now() : 0;
+    const progress = clamp((now - spider.start) / Math.max(1, spider.dur), 0, 1);
+    const origin = this.map.project(spider.anchorLngLat);
+    const n = spider.members.length;
+    // Scale the per-member stagger down for large fans so the last still finishes.
+    const stagger = Math.min(SPIDER_STAGGER, 0.4 / Math.max(1, n - 1));
+    const denom = Math.max(0.2, 1 - (n - 1) * stagger);
+
+    const placed = spider.members.map((m, i) => {
+      const raw = clamp((progress - i * stagger) / denom, 0, 1);
+      const ease = easeOutCubic(raw);
+      return {
+        member: m,
+        ease,
+        cx: origin.x + (m.tx - origin.x) * ease,
+        cy: origin.y + (m.ty - origin.y) * ease
+      };
+    });
+
+    // Legs first (under the dots).
+    ctx.save();
+    ctx.lineCap = 'round';
+    for (const p of placed) {
+      ctx.globalAlpha = p.ease;
+      ctx.beginPath();
+      ctx.moveTo(origin.x, origin.y);
+      ctx.lineTo(p.cx, p.cy);
+      ctx.strokeStyle = 'rgba(27, 31, 28, 0.30)';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(origin.x, origin.y);
+      ctx.lineTo(p.cx, p.cy);
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    // Origin hub.
+    ctx.beginPath();
+    ctx.arc(origin.x, origin.y, 3, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(27, 31, 28, 0.5)';
+    ctx.fill();
+
+    // Dots opaque on top; the selected member drawn last to stay on top.
+    const detailZoom = Math.max(z, FULL_MARKER_ZOOM);
+    let selectedPlacement = null;
+    for (const p of placed) {
+      if (p.member.restaurant.id === selectedId) {
+        selectedPlacement = p;
+        continue;
+      }
+      const sprite = this.getSprite(p.member.restaurant.priceRange, false, detailZoom);
+      ctx.drawImage(sprite.canvas, p.cx - sprite.size / 2, p.cy - sprite.size / 2, sprite.size, sprite.size);
+    }
+    if (selectedPlacement) {
+      const sprite = this.getSprite(selectedPlacement.member.restaurant.priceRange, true, detailZoom);
+      ctx.drawImage(
+        sprite.canvas,
+        selectedPlacement.cx - sprite.size / 2,
+        selectedPlacement.cy - sprite.size / 2,
+        sprite.size,
+        sprite.size
+      );
+    }
+  }
+
+  /** Nearest fanned member under a point (or null). */
+  hitSpider(point, touch = false) {
+    if (!this.spider) return null;
+    const extra = touch ? TOUCH_HIT_EXTRA : HIT_EXTRA;
+    let best = null;
+    let bestDistance = Infinity;
+    for (const m of this.spider.members) {
+      const distance = Math.hypot(point.x - m.tx, point.y - m.ty);
+      if (distance <= FULL_RADIUS + extra && distance < bestDistance) {
+        bestDistance = distance;
+        best = m.restaurant;
+      }
+    }
+    return best;
+  }
+
+  // ---- Interaction ------------------------------------------------------------
+
   /**
-   * Non-mutating: the nearest marker under a point (or null). Used for hover so
-   * it never disturbs the click-cycling state.
+   * Non-mutating: the restaurant under a point (or null). Spider-aware so the
+   * cursor tracks fanned targets; never opens/closes the fan. Used for hover.
    */
   hitTest(point, touch = false) {
     if (!this.map) return null;
+    if (this.spider) return this.hitSpider(point, touch);
     const { restaurants, selectedId } = this.read();
     const extra = touch ? TOUCH_HIT_EXTRA : HIT_EXTRA;
     const candidates = candidatesAt(this.map, restaurants, selectedId, point, extra);
@@ -271,30 +571,38 @@ export class MarkerRenderer {
   }
 
   /**
-   * Select a marker under a tap/click. Repeated taps near the same spot cycle
-   * through the overlapping markers there. Robust to imprecise thumbs: the cycle
-   * advances from the previously chosen marker (as long as it's still in range)
-   * rather than requiring an identical tap position or candidate set.
+   * Resolve a tap/click. Returns a typed action for MapView to carry out:
+   *  - { type: 'select', restaurant }  → open its details
+   *  - { type: 'lines' }               → show the rail/tube lines popup
+   *  - { type: 'spiderfy' }            → fan opened (side effect); just clear popups
+   *  - { type: 'zoom', center, zoom }  → ease the camera in to un-stack a spread cluster
+   *  - { type: 'consumed' }            → tap-away closed a fan; do nothing else
    */
-  pick(point, { touch = false } = {}) {
+  activate(point, { touch = false } = {}) {
     if (!this.map) return null;
-    const { restaurants, selectedId } = this.read();
     const extra = touch ? TOUCH_HIT_EXTRA : HIT_EXTRA;
-    const window = touch ? TOUCH_CYCLE_WINDOW : CYCLE_WINDOW;
+
+    // A fan is open: it owns this tap.
+    if (this.spider) {
+      const hit = this.hitSpider(point, touch);
+      this.collapseSpider();
+      return hit ? { type: 'select', restaurant: hit } : { type: 'consumed' };
+    }
+
+    const { restaurants, selectedId } = this.read();
     const candidates = candidatesAt(this.map, restaurants, selectedId, point, extra);
-    if (!candidates.length) {
-      this.lastPick = null;
-      return null;
+    if (!candidates.length) return { type: 'lines' };
+    if (candidates.length === 1) return { type: 'select', restaurant: candidates[0].restaurant };
+
+    const cluster = this.buildCluster(candidates[0].restaurant);
+    if (cluster.length <= 1) return { type: 'select', restaurant: candidates[0].restaurant };
+
+    const z = this.map.getZoom();
+    if (z < SPIDERFY_MIN_ZOOM && this.isSeparableAtMaxZoom(cluster)) {
+      // Below the fan gate and zooming can help — nudge the camera in instead.
+      return { type: 'zoom', center: this.geoCentroid(cluster), zoom: this.separateZoom(cluster) };
     }
-    const near =
-      this.lastPick && Math.abs(this.lastPick.x - point.x) <= window && Math.abs(this.lastPick.y - point.y) <= window;
-    let index = 0;
-    if (near && this.lastPick.id != null) {
-      const previous = candidates.findIndex((candidate) => candidate.restaurant.id === this.lastPick.id);
-      if (previous !== -1) index = (previous + 1) % candidates.length;
-    }
-    const chosen = candidates[index].restaurant;
-    this.lastPick = { id: chosen.id, x: point.x, y: point.y };
-    return chosen;
+    this.openSpider(cluster);
+    return { type: 'spiderfy' };
   }
 }

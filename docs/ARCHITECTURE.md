@@ -31,7 +31,8 @@ src/
       markers.js          MarkerRenderer: canvas overlay — regular markers at a
                           FLAT 0.42 alpha (overlaps must not darken), priced
                           markers opaque on top, selected above all; sprite
-                          cache; hit-test with click-cycling
+                          cache; activate() = tap → select / lines / spiderfy /
+                          zoom; spiderfy fans a stack onto an even ring
       MapView.svelte      Map lifecycle, events, geolocation, camera API
     ui/
       TopBar.svelte       Search + Reset + offline/install chip
@@ -60,9 +61,14 @@ src/
   bounded to GB with a viewport-fit min zoom; online = Protomaps API (key is
   domain-restricted, safe in the bundle), unbounded, minZoom 2. Swap follows
   the browser's online/offline events.
-- **Interaction**: clicking prefers restaurants over the rail-lines popup;
-  repeated clicks cycle through overlapping markers; Escape closes
-  help → popups → details.
+- **Interaction**: clicking prefers restaurants over the rail-lines popup.
+  Tapping a stack of overlapping markers fans them out (spiderfy) onto one even
+  ring of thumb-sized targets joined by legs to the origin; tapping a leg selects
+  it, tapping away or any camera gesture collapses it. Below the fan zoom gate
+  (14) a *separable* stack instead eases the camera in; exact duplicates always
+  fan. Escape closes help → spider → popups → details.
+- **Entries list** (desktop idle panel): ordered `$$`, `$`, `$$$`, `$$$$`, then
+  the unpriced rest — each group by distance from central London.
 - **Offline**: the service worker precaches app shell + data + basemap with
   byte progress (`precache-progress/done/idle` messages) and serves pmtiles
   Range requests from cache. `.pmtiles` are committed as plain Git binaries

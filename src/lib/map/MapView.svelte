@@ -102,16 +102,32 @@
     });
     map.on('idle', () => settleSoon());
     map.on('movestart', (event) => {
-      if (event.originalEvent) mapWasInteractedWith = true;
+      if (event.originalEvent) {
+        mapWasInteractedWith = true;
+        renderer.collapseSpider(); // a user camera gesture retracts an open fan
+      }
     });
     map.on('click', (event) => {
-      const picked = renderer.pick(event.point, { touch: isTouch(event) });
-      if (picked) {
-        app.select(picked);
-        app.linesPopup = null; // restaurant takes priority
-        return;
+      const action = renderer.activate(event.point, { touch: isTouch(event) });
+      if (!action) return;
+      switch (action.type) {
+        case 'select':
+          app.select(action.restaurant);
+          app.linesPopup = null; // restaurant takes priority
+          break;
+        case 'spiderfy':
+          app.linesPopup = null; // fan opened; user picks a leg next
+          break;
+        case 'zoom':
+          app.linesPopup = null;
+          map.easeTo({ center: action.center, zoom: action.zoom, duration: 350 });
+          break;
+        case 'consumed':
+          break; // tap-away closed the fan
+        case 'lines':
+        default:
+          app.linesPopup = linesAt(event.point);
       }
-      app.linesPopup = linesAt(event.point);
     });
     // Desktop hover: live line identification (touch devices rely on tap above).
     // hitTest is non-mutating so hovering never disturbs the tap-cycle state.
@@ -154,6 +170,15 @@
       renderer?.schedule();
       settleSoon();
     }
+  });
+
+  // Collapse an open fan when the data set or selection changes elsewhere (a
+  // filter that removes members, a search/list/deep-link selection). Selecting a
+  // fanned member already collapses it in activate(), so this is a no-op then.
+  $effect(() => {
+    app.filtered;
+    app.selected;
+    renderer?.collapseSpider();
   });
 
   // Swap basemap when connectivity changes (after initial mount).
@@ -271,8 +296,16 @@
     map.easeTo({ zoom: clamp(map.getZoom() + delta, map.getMinZoom(), MAX_ZOOM), duration: 200 });
   }
 
+  export function spiderOpen() {
+    return renderer?.isSpiderOpen() ?? false;
+  }
+
+  export function collapseSpider() {
+    renderer?.collapseSpider();
+  }
+
   export function resetView() {
-    renderer?.clearPick();
+    renderer?.collapseSpider();
     if (app.userLocation) {
       setLocationView(app.userLocation);
     } else {
