@@ -42,6 +42,11 @@
     const protocol = new Protocol();
     maplibregl.addProtocol('pmtiles', protocol.tile);
 
+    // Coarse pointers (thumbs) get a larger tap target + a more forgiving cycle
+    // window so tapping through stacked markers doesn't demand pixel precision.
+    const coarsePointer = window.matchMedia?.('(any-pointer: coarse)')?.matches ?? false;
+    const isTouch = (event) => coarsePointer || event?.originalEvent?.pointerType === 'touch';
+
     const startOnline = app.online && Boolean(ONLINE_TILE_URL);
     styleMode = startOnline ? 'online' : 'local';
     if (initialView) {
@@ -100,7 +105,7 @@
       if (event.originalEvent) mapWasInteractedWith = true;
     });
     map.on('click', (event) => {
-      const picked = renderer.pick(event.point);
+      const picked = renderer.pick(event.point, { touch: isTouch(event) });
       if (picked) {
         app.select(picked);
         app.linesPopup = null; // restaurant takes priority
@@ -109,8 +114,9 @@
       app.linesPopup = linesAt(event.point);
     });
     // Desktop hover: live line identification (touch devices rely on tap above).
+    // hitTest is non-mutating so hovering never disturbs the tap-cycle state.
     map.on('mousemove', (event) => {
-      if (renderer.pick(event.point)) {
+      if (renderer.hitTest(event.point)) {
         app.hoverLines = null;
         map.getCanvas().style.cursor = 'pointer';
         return;
