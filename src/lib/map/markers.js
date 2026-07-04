@@ -21,6 +21,38 @@ function markerPriority(restaurant) {
   return restaurant?.priceRange ? 1 : 0;
 }
 
+// Hit tolerance (px) added to a marker's radius. Coarse pointers (thumbs) get a
+// much larger target than a mouse cursor.
+const HIT_EXTRA = 8;
+const TOUCH_HIT_EXTRA = 22;
+// How far a follow-up tap can land from the previous one and still count as
+// "the same spot" for cycling. Generous for thumbs.
+const CYCLE_WINDOW = 22;
+const TOUCH_CYCLE_WINDOW = 48;
+
+/** Markers within tolerance of a screen point, nearest-first (deterministic). */
+function candidatesAt(map, restaurants, selectedId, point, extra) {
+  const candidates = [];
+  for (const restaurant of restaurants) {
+    const projected = map.project([restaurant.lon, restaurant.lat]);
+    const x = projected.x + restaurant.offsetX;
+    const y = projected.y + restaurant.offsetY;
+    const distance = Math.hypot(point.x - x, point.y - y);
+    const radius = restaurant.id === selectedId ? 17 : 13;
+    if (distance <= radius + extra) candidates.push({ restaurant, distance });
+  }
+  candidates.sort((a, b) => {
+    const distanceDifference = a.distance - b.distance;
+    if (Math.abs(distanceDifference) > 4) return distanceDifference;
+    return (
+      markerPriority(b.restaurant) - markerPriority(a.restaurant) ||
+      distanceDifference ||
+      String(a.restaurant.id).localeCompare(String(b.restaurant.id))
+    );
+  });
+  return candidates;
+}
+
 function markerDetail(z, active) {
   if (active || z >= FULL_MARKER_ZOOM) {
     return { key: 'full', radius: active ? 17 : 12, strokeWidth: active ? 3 : 2, shadowBlur: active ? 14 : 8, shadowOffsetY: active ? 4 : 3, showPrice: true };
@@ -227,40 +259,42 @@ export class MarkerRenderer {
   }
 
   /**
-   * Hit-test a screen point. Repeated clicks in (roughly) the same spot cycle
-   * through overlapping markers; priced markers win ties within 4px.
+   * Non-mutating: the nearest marker under a point (or null). Used for hover so
+   * it never disturbs the click-cycling state.
    */
-  pick(point) {
-    const { map } = this;
-    if (!map) return null;
+  hitTest(point, touch = false) {
+    if (!this.map) return null;
     const { restaurants, selectedId } = this.read();
-    const candidates = [];
-    for (const restaurant of restaurants) {
-      const projected = map.project([restaurant.lon, restaurant.lat]);
-      const x = projected.x + restaurant.offsetX;
-      const y = projected.y + restaurant.offsetY;
-      const distance = Math.hypot(point.x - x, point.y - y);
-      const radius = restaurant.id === selectedId ? 17 : 13;
-      if (distance <= radius + 8) candidates.push({ restaurant, distance });
-    }
+    const extra = touch ? TOUCH_HIT_EXTRA : HIT_EXTRA;
+    const candidates = candidatesAt(this.map, restaurants, selectedId, point, extra);
+    return candidates.length ? candidates[0].restaurant : null;
+  }
+
+  /**
+   * Select a marker under a tap/click. Repeated taps near the same spot cycle
+   * through the overlapping markers there. Robust to imprecise thumbs: the cycle
+   * advances from the previously chosen marker (as long as it's still in range)
+   * rather than requiring an identical tap position or candidate set.
+   */
+  pick(point, { touch = false } = {}) {
+    if (!this.map) return null;
+    const { restaurants, selectedId } = this.read();
+    const extra = touch ? TOUCH_HIT_EXTRA : HIT_EXTRA;
+    const window = touch ? TOUCH_CYCLE_WINDOW : CYCLE_WINDOW;
+    const candidates = candidatesAt(this.map, restaurants, selectedId, point, extra);
     if (!candidates.length) {
       this.lastPick = null;
       return null;
     }
-    candidates.sort((a, b) => {
-      const distanceDifference = a.distance - b.distance;
-      if (Math.abs(distanceDifference) > 4) return distanceDifference;
-      return (
-        markerPriority(b.restaurant) - markerPriority(a.restaurant) ||
-        distanceDifference ||
-        String(a.restaurant.id).localeCompare(String(b.restaurant.id))
-      );
-    });
-    const key = candidates.map((candidate) => candidate.restaurant.id).join('|');
-    const repeatedPick =
-      this.lastPick && this.lastPick.key === key && Math.abs(this.lastPick.x - point.x) <= 18 && Math.abs(this.lastPick.y - point.y) <= 18;
-    const index = repeatedPick ? (this.lastPick.index + 1) % candidates.length : 0;
-    this.lastPick = { key, index, x: point.x, y: point.y };
-    return candidates[index].restaurant;
+    const near =
+      this.lastPick && Math.abs(this.lastPick.x - point.x) <= window && Math.abs(this.lastPick.y - point.y) <= window;
+    let index = 0;
+    if (near && this.lastPick.id != null) {
+      const previous = candidates.findIndex((candidate) => candidate.restaurant.id === this.lastPick.id);
+      if (previous !== -1) index = (previous + 1) % candidates.length;
+    }
+    const chosen = candidates[index].restaurant;
+    this.lastPick = { id: chosen.id, x: point.x, y: point.y };
+    return chosen;
   }
 }
