@@ -1,6 +1,6 @@
 <script>
-  import { DESCRIPTION_VISIBLE_LINES, IN_VIEW_LIST_LIMIT, hasCoordinates } from '../constants.js';
-  import { distanceMeters, formatDistance } from '../data.js';
+  import { CENTRAL_LONDON, DESCRIPTION_VISIBLE_LINES, IN_VIEW_LIST_LIMIT, hasCoordinates } from '../constants.js';
+  import { distanceMeters } from '../data.js';
   import { buildShareUrl, getCitymapperUrl, getGoogleMapsUrl } from '../links.js';
 
   /**
@@ -14,16 +14,19 @@
   const citymapperUrl = $derived(selected ? getCitymapperUrl(selected, app.userLocation, app.isAndroid) : '');
 
   // ---- In-view list ------------------------------------------------------------
+  // Order: $$ first, then $, $$$, $$$$, then the unpriced rest — each group by
+  // distance from central London (Charing Cross).
+  const PRICE_RANK = { $$: 0, $: 1, $$$: 2, $$$$: 3 };
+  const priceRank = (r) => (r.priceRange in PRICE_RANK ? PRICE_RANK[r.priceRange] : 4);
   const inViewSorted = $derived.by(() => {
-    const here = app.userLocation;
     const items = app.inView.filter((r) => hasCoordinates(r));
-    if (here && hasCoordinates(here)) {
-      return items
-        .map((r) => ({ r, d: distanceMeters(here, r) }))
-        .sort((a, b) => a.d - b.d)
-        .map(({ r, d }) => ({ ...r, distanceLabel: formatDistance(d) }));
-    }
-    return [...items].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+    return [...items].sort((a, b) => {
+      const rank = priceRank(a) - priceRank(b);
+      if (rank) return rank;
+      const distance = distanceMeters(CENTRAL_LONDON, a) - distanceMeters(CENTRAL_LONDON, b);
+      if (distance) return distance;
+      return (a.name || '').localeCompare(b.name || '');
+    });
   });
   const listItems = $derived(inViewSorted.slice(0, IN_VIEW_LIST_LIMIT));
   const listOverflow = $derived(Math.max(0, inViewSorted.length - IN_VIEW_LIST_LIMIT));
@@ -171,7 +174,7 @@
       <header>
         <p class="eyebrow">Eater Maps</p>
         <h1>{app.totalCount.toLocaleString()} entries</h1>
-        <p class="sub">{app.visibleMarkerCount.toLocaleString()} in view{app.userLocation ? ' · nearest first' : ''}</p>
+        <p class="sub">{app.visibleMarkerCount.toLocaleString()} in view</p>
       </header>
       {#if listItems.length}
         <ul class="in-view">
@@ -182,9 +185,7 @@
                   <strong>{restaurant.name}</strong>
                   <span class="row-address">{restaurant.address}</span>
                 </span>
-                {#if restaurant.distanceLabel}
-                  <span class="row-side">{restaurant.distanceLabel}</span>
-                {:else if restaurant.priceRange}
+                {#if restaurant.priceRange}
                   <span class="row-side price">{restaurant.priceRange}</span>
                 {/if}
               </button>

@@ -64,6 +64,7 @@
     const onKeyDown = (event) => {
       if (event.key !== 'Escape') return;
       if (app.showInstallHelp) app.showInstallHelp = false;
+      else if (mapView?.spiderOpen?.()) mapView.collapseSpider();
       else if (app.linesPopup || app.hoverLines) {
         app.linesPopup = null;
         app.hoverLines = null;
