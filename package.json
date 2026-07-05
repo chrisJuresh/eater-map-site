@@ -9,6 +9,7 @@
     "fetch:data": "node scripts/fetch-data.mjs --force",
     "preview": "vite preview --host 127.0.0.1",
     "export:data": "python data-pipeline/scripts/build-public-data.py",
+    "dedupe:data": "node data-pipeline/scripts/dedupe.mjs",
     "build:basemap": "node data-pipeline/scripts/build-basemap.mjs",
     "build:tube": "node data-pipeline/scripts/build-tube.mjs",
     "test": "vitest run"
