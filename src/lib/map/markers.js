@@ -340,9 +340,11 @@ export class MarkerRenderer {
   }
 
   /**
-   * Keep the fan in sync with the current selection: a stacked selection at
-   * close zoom is always shown fanned; anything else collapses it. Idempotent —
-   * re-selecting a member of the SAME stack keeps the existing fan (no re-animate).
+   * Keep the fan in sync with the current selection. An OPEN fan is STATIC: if it
+   * already contains the selected restaurant, it is left completely untouched
+   * (selecting another leg only moves the highlight — never re-anchors/rebuilds).
+   * A fan only (re)builds when a restaurant OUTSIDE the current fan is selected,
+   * and collapses when nothing stacked/close-zoom is selected.
    */
   syncSpider(selected) {
     if (!this.map) return;
@@ -350,20 +352,13 @@ export class MarkerRenderer {
       this.collapseSpider();
       return;
     }
+    if (this.spider && this.spider.members.some((m) => m.restaurant.id === selected.id)) return;
     const cluster = this.buildCluster(selected);
     if (cluster.length <= 1) {
       this.collapseSpider();
       return;
     }
-    if (this.spider && this.sameMembers(cluster)) return; // already fanned — highlight updates on draw
     this.openSpider(cluster);
-  }
-
-  sameMembers(cluster) {
-    const members = this.spider?.members;
-    if (!members || members.length !== cluster.length) return false;
-    const ids = new Set(members.map((m) => m.restaurant.id));
-    return cluster.every((r) => ids.has(r.id));
   }
 
   openSpider(cluster) {
