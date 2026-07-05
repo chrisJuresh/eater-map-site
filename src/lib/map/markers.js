@@ -15,6 +15,7 @@ import {
   SPIDER_EDGE_PAD,
   SPIDER_GAP,
   SPIDER_MAX,
+  SPIDER_MEMBER_OPACITY,
   SPIDER_MIN_R,
   SPIDER_MS,
   SPIDER_STACK_LINK_PX,
@@ -482,17 +483,21 @@ export class MarkerRenderer {
     ctx.fillStyle = 'rgba(27, 31, 28, 0.5)';
     ctx.fill();
 
-    // Dots opaque on top; the selected member drawn last to stay on top.
+    // Non-selected dots at an intermediate opacity (between the map's 0.42 and the
+    // opaque selected marker); the selected member drawn last, opaque, on top.
     const detailZoom = Math.max(z, FULL_MARKER_ZOOM);
     let selectedPlacement = null;
+    ctx.save();
     for (const p of placed) {
       if (p.member.restaurant.id === selectedId) {
         selectedPlacement = p;
         continue;
       }
+      ctx.globalAlpha = SPIDER_MEMBER_OPACITY * p.ease;
       const sprite = this.getSprite(p.member.restaurant.priceRange, false, detailZoom);
       ctx.drawImage(sprite.canvas, p.cx - sprite.size / 2, p.cy - sprite.size / 2, sprite.size, sprite.size);
     }
+    ctx.restore();
     if (selectedPlacement) {
       const sprite = this.getSprite(selectedPlacement.member.restaurant.priceRange, true, detailZoom);
       ctx.drawImage(
