@@ -72,9 +72,10 @@ src/
   keeps the fan; it collapses on deselect, below zoom 14, or when no longer
   stacked. Escape closes help → popups → details (which collapses the fan).
 - **Deduped details**: each record is one restaurant merged from many Eater
-  guides (`dedupe.mjs`). The title is the fullest base name, optionally prefixed
-  with the distinct dishes it was listed under ("Kifto/Lamb at **Wolkite**",
-  base bold). Descriptions are shown 38-best-first then longest-first, in one
+  guides (`dedupe.mjs`). The title splits into `namePre`/`nameCore`/`namePost`:
+  the SIMPLEST base name is bold ("**Ombra**"), the dish prefix and extra suffix
+  words ("Bar & Restaurant") are smaller/lighter — inline on desktop, stacked
+  above/below on mobile. Descriptions are shown 38-best-first then longest-first, in one
   bounded scroll (custom mobile scrollbar). Differing website/Eater links become
   a picker; differing phones a list; the fullest address wins. Header shows the
   deduped restaurant count (`stats.restaurantCount`), not raw appearances.
