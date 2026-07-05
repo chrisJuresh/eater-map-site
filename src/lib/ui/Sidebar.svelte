@@ -1,5 +1,5 @@
 <script>
-  import { CENTRAL_LONDON, DESCRIPTION_VISIBLE_LINES, IN_VIEW_LIST_LIMIT, hasCoordinates } from '../constants.js';
+  import { CENTRAL_LONDON, IN_VIEW_LIST_LIMIT, hasCoordinates } from '../constants.js';
   import { distanceMeters } from '../data.js';
   import { buildShareUrl, getCitymapperUrl, getGoogleMapsUrl } from '../links.js';
 
@@ -31,42 +31,29 @@
   const listItems = $derived(inViewSorted.slice(0, IN_VIEW_LIST_LIMIT));
   const listOverflow = $derived(Math.max(0, inViewSorted.length - IN_VIEW_LIST_LIMIT));
 
-  // ---- Description measurement (custom mobile scrollbar) ------------------------
-  let descriptionEl = $state(null);
-  let descriptionHasMore = $state(false);
-  let descriptionCanScrollDown = $state(false);
-  let descriptionScrollbar = $state({ top: 0, height: 100 });
-  let measuredId = '';
-
-  const clampPct = (v, min, max) => Math.min(max, Math.max(min, v));
-
-  function measureDescription() {
-    if (!descriptionEl) {
-      descriptionHasMore = false;
-      descriptionCanScrollDown = false;
-      descriptionScrollbar = { top: 0, height: 100 };
-      measuredId = '';
-      return;
+  // ---- Descriptions + sources (deduped records) --------------------------------
+  // Distinct descriptions (each with the guide it came from); records merged from
+  // several guides expose them all. Falls back to the single legacy fields.
+  const descriptions = $derived(
+    selected?.descriptions?.length
+      ? selected.descriptions
+      : selected?.description
+        ? [{ text: selected.description, pageTitle: selected.pageTitle, entryUrl: selected.entryUrl }]
+        : []
+  );
+  // Every source guide whose description wasn't already shown above — so you can
+  // still open the guides whose write-up duplicated another. Deduped by URL.
+  const extraSources = $derived.by(() => {
+    const shown = new Set(descriptions.map((d) => d.entryUrl));
+    const out = [];
+    for (const source of selected?.sources || []) {
+      if (!source.entryUrl || shown.has(source.entryUrl)) continue;
+      shown.add(source.entryUrl);
+      out.push(source);
     }
-    const maxScroll = Math.max(0, descriptionEl.scrollHeight - descriptionEl.clientHeight);
-    descriptionHasMore = maxScroll > 1;
-    descriptionCanScrollDown = maxScroll - descriptionEl.scrollTop > 1;
-    const thumbHeight = descriptionHasMore
-      ? clampPct((descriptionEl.clientHeight / descriptionEl.scrollHeight) * 100, 18, 100)
-      : 100;
-    const thumbTop = descriptionHasMore && maxScroll ? (descriptionEl.scrollTop / maxScroll) * (100 - thumbHeight) : 0;
-    descriptionScrollbar = { top: thumbTop, height: thumbHeight };
-  }
-
-  $effect(() => {
-    const id = app.selected?.id || '';
-    app.selected?.description;
-    if (descriptionEl && id !== measuredId) {
-      descriptionEl.scrollTop = 0;
-      measuredId = id;
-    }
-    measureDescription();
+    return out;
   });
+  const guideCount = $derived(selected?.sources?.length || (selected?.entryUrl ? 1 : 0));
 
   // ---- Share ---------------------------------------------------------------------
   let shareFeedback = $state(''); // '' | 'Copied ✓' | 'Copy failed'
@@ -114,7 +101,7 @@
 <aside class:open={selected} class="details-panel">
   {#if selected}
     <button class="close-button" type="button" onclick={() => app.closeDetails()} aria-label="Close">×</button>
-    <p class="eyebrow">{selected.pageTitle}</p>
+    <p class="eyebrow">{guideCount > 1 ? `Featured in ${guideCount} Eater guides` : selected.pageTitle}</p>
     <h1 class="display-name">{selected.name}</h1>
     <div class="meta-row">
       {#if selected.priceRange}<span>{selected.priceRange}</span>{/if}
@@ -123,21 +110,27 @@
     </div>
     <p class="address">{selected.address}</p>
 
-    {#if selected.description}
-      <div
-        class:can-scroll-down={descriptionCanScrollDown}
-        class:has-more={descriptionHasMore}
-        class="description-shell"
-        style={`--description-visible-lines: ${DESCRIPTION_VISIBLE_LINES};`}
-      >
-        <p class="description" bind:this={descriptionEl} onscroll={measureDescription}>
-          {selected.description}
-        </p>
-        {#if descriptionHasMore}
-          <span class="description-scrollbar" aria-hidden="true">
-            <span style={`top: ${descriptionScrollbar.top}%; height: ${descriptionScrollbar.height}%;`}></span>
-          </span>
-        {/if}
+    {#if descriptions.length}
+      <div class="descriptions">
+        {#each descriptions as d, i (d.entryUrl || i)}
+          <div class="desc-block">
+            <p class="description">{d.text}</p>
+            {#if d.entryUrl}
+              <a class="desc-source" href={d.entryUrl} target="_blank" rel="noreferrer">{d.pageTitle}</a>
+            {/if}
+          </div>
+        {/each}
+      </div>
+    {/if}
+
+    {#if extraSources.length}
+      <div class="featured-in">
+        <h2>Also featured in</h2>
+        <ul>
+          {#each extraSources as s, i (s.entryUrl || i)}
+            <li><a href={s.entryUrl} target="_blank" rel="noreferrer">{s.pageTitle}</a></li>
+          {/each}
+        </ul>
       </div>
     {/if}
 
@@ -276,17 +269,62 @@
     line-height: 1.35;
   }
 
-  .description {
+  .descriptions {
+    display: grid;
+    gap: 14px;
     margin: 0 0 18px;
+  }
+
+  .desc-block {
+    display: grid;
+    gap: 4px;
+  }
+
+  .description {
+    margin: 0;
     line-height: 1.5;
   }
 
-  .description-shell {
-    position: relative;
+  .desc-source {
+    justify-self: start;
+    color: var(--brand);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    text-decoration: none;
   }
 
-  .description-scrollbar {
-    display: none;
+  .desc-source:hover {
+    text-decoration: underline;
+  }
+
+  .featured-in {
+    margin: 0 0 18px;
+    padding-top: 12px;
+    border-top: 1px solid var(--hairline);
+  }
+
+  .featured-in h2 {
+    margin: 0 0 8px;
+    color: var(--brand);
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+
+  .featured-in ul {
+    display: grid;
+    gap: 7px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .featured-in a {
+    color: var(--link);
+    font-size: 13px;
+    line-height: 1.3;
   }
 
   .facts {
@@ -492,58 +530,20 @@
       font-size: 13px;
     }
 
-    .details-panel .description-shell {
+    .details-panel .descriptions {
       order: 7;
+      gap: 12px;
       margin: 0 0 8px;
     }
 
-    .details-panel .description-shell.can-scroll-down::after {
-      content: '';
-      position: absolute;
-      left: 0;
-      right: 9px;
-      bottom: 0;
-      height: 1.7em;
-      pointer-events: none;
-      background: linear-gradient(180deg, rgba(255, 253, 247, 0), var(--paper) 82%);
-    }
-
     .details-panel .description {
-      max-height: calc(1.42em * var(--description-visible-lines, 6));
-      margin: 0;
-      padding-right: 12px;
-      overflow-y: auto;
-      scrollbar-width: none;
-      line-height: 1.42;
       font-size: 14px;
-      -webkit-overflow-scrolling: touch;
+      line-height: 1.42;
     }
 
-    .details-panel .description::-webkit-scrollbar {
-      display: none;
-      width: 0;
-      height: 0;
-    }
-
-    .description-scrollbar {
-      display: block;
-      position: absolute;
-      top: 2px;
-      right: 1px;
-      bottom: 2px;
-      width: 3px;
-      border-radius: var(--r-full);
-      background: rgba(23, 32, 28, 0.08);
-      pointer-events: none;
-    }
-
-    .description-scrollbar span {
-      position: absolute;
-      left: 0;
-      right: 0;
-      min-height: 18%;
-      border-radius: var(--r-full);
-      background: rgba(23, 32, 28, 0.46);
+    .details-panel .featured-in {
+      order: 7;
+      margin: 0 0 8px;
     }
 
     .details-panel .facts {
