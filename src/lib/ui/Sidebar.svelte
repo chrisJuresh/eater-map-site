@@ -1,5 +1,5 @@
 <script>
-  import { CENTRAL_LONDON, IN_VIEW_LIST_LIMIT, hasCoordinates } from '../constants.js';
+  import { CENTRAL_LONDON, DESCRIPTION_VISIBLE_LINES, IN_VIEW_LIST_LIMIT, hasCoordinates } from '../constants.js';
   import { distanceMeters } from '../data.js';
   import { buildShareUrl, getCitymapperUrl, getGoogleMapsUrl } from '../links.js';
 
@@ -31,9 +31,15 @@
   const listItems = $derived(inViewSorted.slice(0, IN_VIEW_LIST_LIMIT));
   const listOverflow = $derived(Math.max(0, inViewSorted.length - IN_VIEW_LIST_LIMIT));
 
-  // ---- Descriptions + sources (deduped records) --------------------------------
-  // Distinct descriptions (each with the guide it came from); records merged from
-  // several guides expose them all. Falls back to the single legacy fields.
+  // ---- Name (bold the real restaurant, e.g. "Kifto/Lamb at **Wolkite**") -------
+  const nameBase = $derived(selected?.nameBase || selected?.name || '');
+  const namePrefix = $derived(
+    selected?.name && selected.name !== nameBase && selected.name.endsWith(nameBase)
+      ? selected.name.slice(0, selected.name.length - nameBase.length)
+      : ''
+  );
+
+  // ---- Descriptions (already sorted in the data: 38-best first, then longest) ---
   const descriptions = $derived(
     selected?.descriptions?.length
       ? selected.descriptions
@@ -41,19 +47,62 @@
         ? [{ text: selected.description, pageTitle: selected.pageTitle, entryUrl: selected.entryUrl }]
         : []
   );
-  // Every source guide whose description wasn't already shown above — so you can
-  // still open the guides whose write-up duplicated another. Deduped by URL.
-  const extraSources = $derived.by(() => {
-    const shown = new Set(descriptions.map((d) => d.entryUrl));
+
+  // ---- Action targets — a picker appears when there is more than one -----------
+  const guideLinks = $derived.by(() => {
     const out = [];
-    for (const source of selected?.sources || []) {
-      if (!source.entryUrl || shown.has(source.entryUrl)) continue;
-      shown.add(source.entryUrl);
-      out.push(source);
+    const seen = new Set();
+    for (const s of selected?.sources || []) {
+      if (!s.entryUrl || seen.has(s.entryUrl)) continue;
+      seen.add(s.entryUrl);
+      out.push(s);
     }
+    if (!out.length && selected?.entryUrl) out.push({ pageTitle: selected.pageTitle, entryUrl: selected.entryUrl });
     return out;
   });
-  const guideCount = $derived(selected?.sources?.length || (selected?.entryUrl ? 1 : 0));
+  const websiteUrls = $derived(
+    selected?.websiteUrls?.length ? selected.websiteUrls : selected?.websiteUrl ? [selected.websiteUrl] : []
+  );
+  const phones = $derived(selected?.phones?.length ? selected.phones : selected?.phone ? [selected.phone] : []);
+  const guideCount = $derived(guideLinks.length);
+
+  let openPicker = $state(null); // 'eater' | 'website' | null
+  const togglePicker = (which) => (openPicker = openPicker === which ? null : which);
+  const prettyUrl = (u) => String(u || '').replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/$/, '');
+
+  // ---- Descriptions scroll (mobile: one bounded scroll for the whole list) ------
+  let descriptionsEl = $state(null);
+  let descScroll = $state({ more: false, canDown: false, top: 0, height: 100 });
+  let measuredId = '';
+  const clampPct = (v, min, max) => Math.min(max, Math.max(min, v));
+
+  function measureDescriptions() {
+    const el = descriptionsEl;
+    if (!el) {
+      descScroll = { more: false, canDown: false, top: 0, height: 100 };
+      return;
+    }
+    const maxScroll = Math.max(0, el.scrollHeight - el.clientHeight);
+    const more = maxScroll > 1;
+    const thumb = more ? clampPct((el.clientHeight / el.scrollHeight) * 100, 18, 100) : 100;
+    descScroll = {
+      more,
+      canDown: maxScroll - el.scrollTop > 1,
+      top: more && maxScroll ? (el.scrollTop / maxScroll) * (100 - thumb) : 0,
+      height: thumb
+    };
+  }
+
+  $effect(() => {
+    const id = selected?.id || '';
+    if (id !== measuredId) {
+      openPicker = null;
+      if (descriptionsEl) descriptionsEl.scrollTop = 0;
+      measuredId = id;
+    }
+    descriptions.length;
+    measureDescriptions();
+  });
 
   // ---- Share ---------------------------------------------------------------------
   let shareFeedback = $state(''); // '' | 'Copied ✓' | 'Copy failed'
@@ -101,8 +150,16 @@
 <aside class:open={selected} class="details-panel">
   {#if selected}
     <button class="close-button" type="button" onclick={() => app.closeDetails()} aria-label="Close">×</button>
-    <p class="eyebrow">{guideCount > 1 ? `Featured in ${guideCount} Eater guides` : selected.pageTitle}</p>
-    <h1 class="display-name">{selected.name}</h1>
+    {#if guideCount > 1}
+      <p class="eyebrow">Featured in {guideCount} Eater guides</p>
+    {:else if guideLinks[0]}
+      <p class="eyebrow">
+        <a href={guideLinks[0].entryUrl} target="_blank" rel="noreferrer">{guideLinks[0].pageTitle}</a>
+      </p>
+    {/if}
+    <h1 class="display-name">
+      {#if namePrefix}<span class="name-dishes">{namePrefix}</span>{nameBase}{:else}{selected.name}{/if}
+    </h1>
     <div class="meta-row">
       {#if selected.priceRange}<span>{selected.priceRange}</span>{/if}
       {#if selected.openFor}<span>{selected.openFor}</span>{/if}
@@ -111,26 +168,27 @@
     <p class="address">{selected.address}</p>
 
     {#if descriptions.length}
-      <div class="descriptions">
-        {#each descriptions as d, i (d.entryUrl || i)}
-          <div class="desc-block">
-            <p class="description">{d.text}</p>
-            {#if d.entryUrl}
-              <a class="desc-source" href={d.entryUrl} target="_blank" rel="noreferrer">{d.pageTitle}</a>
-            {/if}
-          </div>
-        {/each}
-      </div>
-    {/if}
-
-    {#if extraSources.length}
-      <div class="featured-in">
-        <h2>Also featured in</h2>
-        <ul>
-          {#each extraSources as s, i (s.entryUrl || i)}
-            <li><a href={s.entryUrl} target="_blank" rel="noreferrer">{s.pageTitle}</a></li>
+      <div
+        class:can-scroll-down={descScroll.canDown}
+        class:has-more={descScroll.more}
+        class="descriptions-shell"
+        style={`--description-visible-lines: ${DESCRIPTION_VISIBLE_LINES};`}
+      >
+        <div class="descriptions" bind:this={descriptionsEl} onscroll={measureDescriptions}>
+          {#each descriptions as d, i (d.entryUrl || i)}
+            <div class="desc-block">
+              <p class="description">{d.text}</p>
+              {#if guideCount > 1 && d.entryUrl}
+                <a class="desc-source" href={d.entryUrl} target="_blank" rel="noreferrer">{d.pageTitle}</a>
+              {/if}
+            </div>
           {/each}
-        </ul>
+        </div>
+        {#if descScroll.more}
+          <span class="descriptions-scrollbar" aria-hidden="true">
+            <span style={`top: ${descScroll.top}%; height: ${descScroll.height}%;`}></span>
+          </span>
+        {/if}
       </div>
     {/if}
 
@@ -140,33 +198,65 @@
       {#if selected.knowBeforeYouGo}<div><dt>Know First</dt><dd>{selected.knowBeforeYouGo}</dd></div>{/if}
       {#if selected.outdoorSeating}<div><dt>Outdoor</dt><dd>{selected.outdoorSeating}</dd></div>{/if}
       {#if selected.additionalLocationNotes}<div><dt>More Locations</dt><dd>{selected.additionalLocationNotes}</dd></div>{/if}
-      {#if selected.phone}<div><dt>Phone</dt><dd><a href={`tel:${selected.phone}`}>{selected.phone}</a></dd></div>{/if}
+      {#if phones.length === 1}
+        <div><dt>Phone</dt><dd><a href={`tel:${phones[0]}`}>{phones[0]}</a></dd></div>
+      {:else if phones.length > 1}
+        <div>
+          <dt>Phones</dt>
+          <dd class="phone-list">{#each phones as p (p)}<a href={`tel:${p}`}>{p}</a>{/each}</dd>
+        </div>
+      {/if}
     </dl>
+
+    {#if openPicker}
+      <div class="picker-menu">
+        {#if openPicker === 'website'}
+          {#each websiteUrls as u (u)}
+            <a href={u} target="_blank" rel="noreferrer" onclick={() => (openPicker = null)}>{prettyUrl(u)}</a>
+          {/each}
+        {:else if openPicker === 'eater'}
+          {#each guideLinks as l (l.entryUrl)}
+            <a href={l.entryUrl} target="_blank" rel="noreferrer" onclick={() => (openPicker = null)}>{l.pageTitle}</a>
+          {/each}
+        {/if}
+      </div>
+    {/if}
 
     <div class="actions">
       {#if googleMapsUrl}
-        <a href={googleMapsUrl} target="_blank" rel="noreferrer" aria-label={`Open ${selected.name} in Google Maps`}>
+        <a href={googleMapsUrl} target="_blank" rel="noreferrer" aria-label={`Open ${nameBase} in Google Maps`}>
           <span class="action-label-full">Google Maps</span>
           <span class="action-label-short">Google</span>
         </a>
       {/if}
       {#if citymapperUrl}
-        <a class="citymapper-action" href={citymapperUrl} aria-label={`Open mobile directions to ${selected.name} in Citymapper`}>
+        <a class="citymapper-action" href={citymapperUrl} aria-label={`Open mobile directions to ${nameBase} in Citymapper`}>
           Citymapper
         </a>
       {/if}
-      <button class="share-action" type="button" onclick={share} aria-label={`Share a link to ${selected.name}`}>
+      <button class="share-action" type="button" onclick={share} aria-label={`Share a link to ${nameBase}`}>
         {shareFeedback || 'Share'}
       </button>
-      {#if selected.websiteUrl}<a href={selected.websiteUrl} target="_blank" rel="noreferrer">Website</a>{/if}
-      {#if selected.bookingUrl}<a href={selected.bookingUrl} target="_blank" rel="noreferrer">Book</a>{/if}
-      {#if selected.entryUrl}<a href={selected.entryUrl} target="_blank" rel="noreferrer">Eater</a>{/if}
+      {#if websiteUrls.length === 1}
+        <a href={websiteUrls[0]} target="_blank" rel="noreferrer">Website</a>
+      {:else if websiteUrls.length > 1}
+        <button type="button" class="picker-toggle" class:open={openPicker === 'website'} onclick={() => togglePicker('website')}>
+          Website ▾
+        </button>
+      {/if}
+      {#if guideLinks.length === 1}
+        <a href={guideLinks[0].entryUrl} target="_blank" rel="noreferrer">Eater</a>
+      {:else if guideLinks.length > 1}
+        <button type="button" class="picker-toggle" class:open={openPicker === 'eater'} onclick={() => togglePicker('eater')}>
+          Eater ▾
+        </button>
+      {/if}
     </div>
   {:else}
     <div class="list-panel">
       <header>
         <p class="eyebrow">Eater Maps</p>
-        <h1>{app.totalCount.toLocaleString()} entries</h1>
+        <h1>{app.totalCount.toLocaleString()} restaurants</h1>
         <p class="sub">{app.visibleMarkerCount.toLocaleString()} in view</p>
       </header>
       {#if listItems.length}
@@ -232,6 +322,16 @@
     text-transform: uppercase;
   }
 
+  /* The source-guide link keeps the reddish-orange eyebrow look — just pressable. */
+  .eyebrow a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .eyebrow a:hover {
+    text-decoration: underline;
+  }
+
   h1 {
     margin: 0;
     max-width: 100%;
@@ -245,6 +345,14 @@
     font-family: var(--font-serif);
     font-weight: 700;
     letter-spacing: -0.01em;
+  }
+
+  /* The dish prefix ("Kifto/Lamb at ") reads lighter and smaller so the
+     restaurant name is clearly the focus. */
+  .name-dishes {
+    font-size: 0.62em;
+    font-weight: 400;
+    color: var(--ink-mute);
   }
 
   .meta-row {
@@ -269,10 +377,14 @@
     line-height: 1.35;
   }
 
+  .descriptions-shell {
+    position: relative;
+    margin: 0 0 18px;
+  }
+
   .descriptions {
     display: grid;
     gap: 14px;
-    margin: 0 0 18px;
   }
 
   .desc-block {
@@ -299,32 +411,53 @@
     text-decoration: underline;
   }
 
-  .featured-in {
-    margin: 0 0 18px;
-    padding-top: 12px;
-    border-top: 1px solid var(--hairline);
+  /* Desktop: the whole panel scrolls, so the inner custom scrollbar is hidden. */
+  .descriptions-scrollbar {
+    display: none;
   }
 
-  .featured-in h2 {
-    margin: 0 0 8px;
-    color: var(--brand);
-    font-size: 11px;
-    font-weight: 800;
-    text-transform: uppercase;
-  }
-
-  .featured-in ul {
+  /* Multiple phones / picker menu (differing links across merged guides). */
+  .phone-list {
     display: grid;
-    gap: 7px;
-    margin: 0;
-    padding: 0;
-    list-style: none;
+    gap: 2px;
   }
 
-  .featured-in a {
+  .phone-list a {
+    color: var(--link);
+  }
+
+  .picker-menu {
+    display: grid;
+    gap: 2px;
+    margin: 0 0 10px;
+    padding: 8px 10px;
+    border: 1px solid var(--line-soft);
+    border-radius: var(--r-s);
+    background: var(--surface-solid, var(--paper));
+    box-shadow: var(--shadow-2);
+    max-height: 40vh;
+    overflow: auto;
+  }
+
+  .picker-menu a {
     color: var(--link);
     font-size: 13px;
-    line-height: 1.3;
+    line-height: 1.35;
+    padding: 3px 0;
+    text-decoration: none;
+  }
+
+  .picker-menu a:hover {
+    text-decoration: underline;
+  }
+
+  .picker-toggle {
+    cursor: pointer;
+  }
+
+  .picker-toggle.open {
+    background: var(--ink);
+    color: #fff;
   }
 
   .facts {
@@ -367,7 +500,8 @@
   }
 
   .actions a,
-  .actions .share-action {
+  .actions .share-action,
+  .actions .picker-toggle {
     display: grid;
     min-height: 42px;
     place-items: center;
@@ -530,10 +664,26 @@
       font-size: 13px;
     }
 
-    .details-panel .descriptions {
+    /* One bounded scroll for the whole description list (not a scroll per review). */
+    .details-panel .descriptions-shell {
       order: 7;
-      gap: 12px;
+      position: relative;
       margin: 0 0 8px;
+    }
+
+    .details-panel .descriptions {
+      max-height: calc(1.42em * var(--description-visible-lines, 6));
+      gap: 12px;
+      padding-right: 12px;
+      overflow-y: auto;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .details-panel .descriptions::-webkit-scrollbar {
+      display: none;
+      width: 0;
+      height: 0;
     }
 
     .details-panel .description {
@@ -541,9 +691,40 @@
       line-height: 1.42;
     }
 
-    .details-panel .featured-in {
-      order: 7;
-      margin: 0 0 8px;
+    .details-panel .descriptions-shell.can-scroll-down::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 9px;
+      bottom: 0;
+      height: 1.7em;
+      pointer-events: none;
+      background: linear-gradient(180deg, rgba(255, 253, 247, 0), var(--paper) 82%);
+    }
+
+    .descriptions-scrollbar {
+      display: block;
+      position: absolute;
+      top: 2px;
+      right: 1px;
+      bottom: 2px;
+      width: 3px;
+      border-radius: var(--r-full);
+      background: rgba(23, 32, 28, 0.08);
+      pointer-events: none;
+    }
+
+    .descriptions-scrollbar span {
+      position: absolute;
+      left: 0;
+      right: 0;
+      min-height: 18%;
+      border-radius: var(--r-full);
+      background: rgba(23, 32, 28, 0.46);
+    }
+
+    .details-panel .picker-menu {
+      order: 5;
     }
 
     .details-panel .facts {
@@ -575,7 +756,8 @@
     }
 
     .actions a,
-    .actions .share-action {
+    .actions .share-action,
+    .actions .picker-toggle {
       flex: 0 0 auto;
       min-width: 82px;
       min-height: 38px;

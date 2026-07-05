@@ -63,11 +63,20 @@ src/
   the browser's online/offline events.
 - **Interaction**: clicking selects the nearest marker (never zooms); an empty
   tap shows the rail-lines popup. The spiderfy fan is **selection-driven**: while
-  a stacked restaurant is selected AND zoom ≥ 14, its stack is shown fanned onto
-  one even ring of thumb-sized targets (legs to the origin), and the fan follows
-  the map. Tapping another leg switches the selection and keeps the fan; it
-  collapses when the selection is cleared, drops below zoom 14, or is no longer
+  a stacked restaurant is selected AND zoom ≥ 14, its stack fans onto one even
+  ring of thumb-sized targets (legs to the origin), following the map. A "stack"
+  is defined GEOGRAPHICALLY — restaurants within `SPIDER_STACK_RADIUS_M` (25 m),
+  NOT by screen overlap — so a dense neighbourhood at low zoom never chains into
+  a giant fan (kept to a handful). Tapping another leg switches selection and
+  keeps the fan; it collapses on deselect, below zoom 14, or when no longer
   stacked. Escape closes help → popups → details (which collapses the fan).
+- **Deduped details**: each record is one restaurant merged from many Eater
+  guides (`dedupe.mjs`). The title is the fullest base name, optionally prefixed
+  with the distinct dishes it was listed under ("Kifto/Lamb at **Wolkite**",
+  base bold). Descriptions are shown 38-best-first then longest-first, in one
+  bounded scroll (custom mobile scrollbar). Differing website/Eater links become
+  a picker; differing phones a list; the fullest address wins. Header shows the
+  deduped restaurant count (`stats.restaurantCount`), not raw appearances.
 - **Entries list** (desktop idle panel): ordered `$$`, `$`, `$$$`, `$$$$`, then
   the unpriced rest — each group by distance from central London.
 - **Offline**: the service worker precaches app shell + data + basemap with

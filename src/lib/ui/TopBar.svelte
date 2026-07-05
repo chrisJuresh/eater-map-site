@@ -21,7 +21,7 @@
     <div class="search-field">
       <input
         bind:value={app.query}
-        type="search"
+        type="text"
         placeholder="Restaurant, place or address"
         autocomplete="off"
         enterkeyhint="search"
@@ -30,12 +30,13 @@
       {#if app.searchText}
         <output class="search-count" aria-live="polite">{app.filtered.length.toLocaleString()}</output>
       {/if}
-      <button class="search-go" type="button" onclick={onGoToSearch} aria-label="Go to place" title="Go to place">
-        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-          <circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2" />
-          <line x1="15.5" y1="15.5" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-        </svg>
-      </button>
+      {#if app.query}
+        <button class="search-clear" type="button" onclick={() => (app.query = '')} aria-label="Clear search" title="Clear">
+          <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+            <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" />
+          </svg>
+        </button>
+      {/if}
     </div>
   </label>
   <button class="reset-button" type="button" onclick={onReset}>Reset</button>
@@ -133,18 +134,23 @@
     line-height: 1.2;
   }
 
-  .search-go {
+  .search-clear {
     flex: 0 0 auto;
     display: grid;
     place-items: center;
-    width: 30px;
-    height: 30px;
+    width: 26px;
+    height: 26px;
     padding: 0;
     border: 0;
     border-radius: var(--r-full);
-    color: #fff;
-    background: var(--ink);
+    color: var(--ink-mute);
+    background: var(--chip);
     cursor: pointer;
+  }
+
+  .search-clear:hover {
+    color: var(--ink);
+    background: var(--line);
   }
 
   .reset-button,

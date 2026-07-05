@@ -94,6 +94,73 @@ function distanceMeters(a, b) {
 const priced = (r) => Boolean(r.priceRange);
 const cleanName = (r) => !/\s+@\s+|\s+at\s+|\s+[—–-]\s+/i.test(r.name || ''); // a standalone name
 
+// ---- name synthesis ----------------------------------------------------------
+/** Split a source name into { dish (prefix, e.g. "Kifto"), base (the restaurant) }. */
+function splitName(raw) {
+  const n = String(raw || '').trim();
+  const at = n.split(/\s+@\s+/);
+  if (at.length > 1) return { dish: at.slice(0, -1).join(' @ ').trim(), base: at[at.length - 1].trim() };
+  const m = n.match(/^(.*?)\s+(?:at|from)\s+(.+)$/i);
+  if (m) return { dish: m[1].trim(), base: m[2].trim() };
+  const dash = n.split(/\s+[—–-]\s+/);
+  if (dash.length > 1) return { dish: dash.slice(0, -1).join(' - ').trim(), base: dash[dash.length - 1].trim() };
+  return { dish: '', base: n };
+}
+
+/**
+ * Display name preserving the dedupe's naming info: the fullest restaurant name,
+ * prefixed with the distinct dishes it was listed under WHEN that stays short
+ * ("Kifto/Lamb/Beef at Wolkite Restaurant & Bar"). Returns { name, base } so the
+ * base (the real restaurant) can be rendered bold. Long/many dishes -> base only.
+ */
+function synthName(cluster, primary) {
+  const parts = cluster.map((e) => splitName(e.name));
+  let base = splitName(primary.name).base; // fullest base: prefer primary, else most words
+  for (const p of parts) {
+    if (p.base && p.base.split(/\s+/).length > base.split(/\s+/).length) base = p.base;
+  }
+  const seen = new Set();
+  const dishes = [];
+  for (const p of parts) {
+    const dish = p.dish.trim();
+    if (!dish || seen.has(dish.toLowerCase())) continue;
+    seen.add(dish.toLowerCase());
+    dishes.push(dish);
+  }
+  const combined = dishes.join('/');
+  if (dishes.length && dishes.length <= 4 && combined.length <= 42) return { name: `${combined} at ${base}`, base };
+  return { name: base, base };
+}
+
+/** Fullest address among the sources (most complete: postcode + London + UK + length). */
+function bestAddress(cluster) {
+  const addrs = [...new Set(cluster.map((e) => (e.address || '').trim()).filter(Boolean))];
+  if (!addrs.length) return '';
+  const score = (a) =>
+    (/[A-Z]{1,2}\d/.test(a) ? 2 : 0) + (/\bUK\b/i.test(a) ? 1 : 0) + (/london/i.test(a) ? 1 : 0) + a.length / 100;
+  return addrs.sort((x, y) => score(y) - score(x))[0];
+}
+
+const uniqVals = (arr) => [...new Set(arr.filter((v) => v && String(v).trim()))];
+
+/** Distinct URLs, deduped by a normalised key (ignore protocol/www/trailing slash). */
+function uniqUrls(arr) {
+  const seen = new Set();
+  const out = [];
+  for (const u of arr) {
+    if (!u || !String(u).trim()) continue;
+    const key = String(u)
+      .toLowerCase()
+      .replace(/^https?:\/\//, '')
+      .replace(/^www\./, '')
+      .replace(/\/+$/, '');
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(u);
+  }
+  return out;
+}
+
 // ---- clustering --------------------------------------------------------------
 /** Split same-named entries into geographic clusters (union by distance). */
 function geoClusters(entries) {
@@ -123,35 +190,43 @@ const firstNonEmpty = (cluster, key) => cluster.map((e) => e[key]).find((v) => v
 
 function mergeCluster(cluster) {
   const primary = pickPrimary(cluster);
-  // Keep every source in full so NOTHING is lost (alt names/addresses/phones/urls).
-  const sources = cluster.map((e) => ({
-    name: e.name,
-    pageTitle: e.pageTitle,
-    entryUrl: e.entryUrl,
-    description: e.description || '',
-    address: e.address,
-    phone: e.phone || '',
-    websiteUrl: e.websiteUrl || '',
-    googleMapsUrl: e.googleMapsUrl || ''
-  }));
-  // Distinct descriptions (collapse near-identical), each with its source.
-  const seen = new Set();
+  const { name, base } = synthName(cluster, primary);
+  // Keep every source guide (title + link) so any review is reachable.
+  const seenUrl = new Set();
+  const sources = [];
+  for (const e of cluster) {
+    if (!e.entryUrl || seenUrl.has(e.entryUrl)) continue;
+    seenUrl.add(e.entryUrl);
+    sources.push({ name: e.name, pageTitle: e.pageTitle, entryUrl: e.entryUrl });
+  }
+  // Descriptions sorted: priced (38-best) first, then longest first; near-identical collapsed.
+  const ordered = [...cluster].sort((a, b) => {
+    if (priced(a) !== priced(b)) return priced(a) ? -1 : 1;
+    return (b.description || '').length - (a.description || '').length;
+  });
+  const seenDesc = new Set();
   const descriptions = [];
-  for (const e of [primary, ...cluster.filter((c) => c !== primary)]) {
+  for (const e of ordered) {
     const key = descKey(e.description);
-    if (!key || seen.has(key)) continue;
-    seen.add(key);
+    if (!key || seenDesc.has(key)) continue;
+    seenDesc.add(key);
     descriptions.push({ text: e.description, pageTitle: e.pageTitle, entryUrl: e.entryUrl });
   }
+  // Distinct action targets — the UI shows a picker when there's more than one.
+  const websiteUrls = uniqUrls(cluster.map((e) => e.websiteUrl));
+  const phones = uniqVals(cluster.map((e) => e.phone));
   return {
     id: primary.id,
-    name: baseName(primary.name) || primary.name,
-    address: primary.address,
+    name,
+    nameBase: base, // the restaurant part, rendered bold in the details title
+    address: bestAddress(cluster),
     lat: primary.lat,
     lon: primary.lon,
     priceRange: cluster.find(priced)?.priceRange,
-    phone: firstNonEmpty(cluster, 'phone'),
-    websiteUrl: firstNonEmpty(cluster, 'websiteUrl'),
+    phone: phones[0] || '',
+    phones,
+    websiteUrl: websiteUrls[0] || '',
+    websiteUrls,
     googleMapsUrl: primary.googleMapsUrl || firstNonEmpty(cluster, 'googleMapsUrl'),
     entryUrl: primary.entryUrl,
     pageTitle: primary.pageTitle,

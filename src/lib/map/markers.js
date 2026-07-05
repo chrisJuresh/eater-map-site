@@ -18,7 +18,7 @@ import {
   SPIDER_MEMBER_OPACITY,
   SPIDER_MIN_R,
   SPIDER_MS,
-  SPIDER_STACK_LINK_PX,
+  SPIDER_STACK_RADIUS_M,
   SPIDER_STAGGER,
   SPIDERFY_MIN_ZOOM,
   clamp,
@@ -72,6 +72,17 @@ function markerDetail(z, active) {
 
 function metersPerPixel(lat, z) {
   return (156543.03392 * Math.cos((lat * Math.PI) / 180)) / 2 ** z;
+}
+
+/** Great-circle distance in metres between two {lat, lon} points. */
+function metersBetween(a, b) {
+  const R = 6371000;
+  const dLat = ((b.lat - a.lat) * Math.PI) / 180;
+  const dLon = ((b.lon - a.lon) * Math.PI) / 180;
+  const la = (a.lat * Math.PI) / 180;
+  const lb = (b.lat * Math.PI) / 180;
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(la) * Math.cos(lb) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
 }
 
 const easeOutCubic = (t) => 1 - (1 - t) ** 3;
@@ -302,40 +313,26 @@ export class MarkerRenderer {
 
   // ---- Spiderfy ---------------------------------------------------------------
 
-  /** Screen position of a marker as drawn (base projection + ring offset). */
-  originPx(restaurant) {
-    const p = this.map.project([restaurant.lon, restaurant.lat]);
-    return { x: p.x + restaurant.offsetX, y: p.y + restaurant.offsetY };
-  }
-
-  /** Grow the true stack around a seed by screen-space proximity (BFS). */
+  /**
+   * The stack = restaurants within SPIDER_STACK_RADIUS_M metres of the seed (i.e.
+   * genuinely at the same spot), NOT everything that visually overlaps at the
+   * current zoom. This keeps fans small (~a handful) even when tapping a dense
+   * neighbourhood at low zoom, instead of chaining a whole area into one huge fan.
+   */
   buildCluster(seed) {
     const { restaurants } = this.read();
     const pool = this.lastVisible.length ? this.lastVisible : restaurants;
-    const seedPx = this.originPx(seed);
-    const inSet = new Set([seed.id]);
-    const set = [seed];
-    const queue = [{ px: seedPx }];
-    while (queue.length) {
-      if (set.length >= SPIDER_MAX) break; // safety: never grow/scan an unbounded stack
-      const current = queue.pop();
-      for (const restaurant of pool) {
-        if (inSet.has(restaurant.id)) continue;
-        const px = this.originPx(restaurant);
-        if (Math.hypot(px.x - current.px.x, px.y - current.px.y) <= SPIDER_STACK_LINK_PX) {
-          inSet.add(restaurant.id);
-          set.push(restaurant);
-          queue.push({ px });
-        }
-      }
+    const set = [];
+    for (const restaurant of pool) {
+      if (metersBetween(seed, restaurant) <= SPIDER_STACK_RADIUS_M) set.push(restaurant);
     }
+    if (!set.some((r) => r.id === seed.id)) set.push(seed);
     // Deterministic slot order: priced first, then nearest the seed, then id.
     set.sort((a, b) => {
       const priority = markerPriority(b) - markerPriority(a);
       if (priority) return priority;
-      const da = Math.hypot(this.originPx(a).x - seedPx.x, this.originPx(a).y - seedPx.y);
-      const db = Math.hypot(this.originPx(b).x - seedPx.x, this.originPx(b).y - seedPx.y);
-      if (Math.abs(da - db) > 0.5) return da - db;
+      const distance = metersBetween(seed, a) - metersBetween(seed, b);
+      if (Math.abs(distance) > 0.5) return distance;
       return String(a.id).localeCompare(String(b.id));
     });
     if (set.length > SPIDER_MAX) set.length = SPIDER_MAX;
