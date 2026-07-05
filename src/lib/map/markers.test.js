@@ -95,6 +95,23 @@ describe('MarkerRenderer.syncSpider (selection-driven fan)', () => {
     expect(r.isSpiderOpen()).toBe(true);
   });
 
+  it('stays static when a member is selected even if seeding from it would differ', () => {
+    // a,b ~15m apart; c ~30m from a (>25m). Seeding from a -> {a,b}; from b -> {a,b,c}.
+    const line = [
+      { id: 'a', lat: 51.5, lon: -0.1, offsetX: 0, offsetY: 0 },
+      { id: 'b', lat: 51.5, lon: -0.0997835, offsetX: 0, offsetY: 0 },
+      { id: 'c', lat: 51.5, lon: -0.099567, offsetX: 0, offsetY: 0 }
+    ];
+    const r = makeRenderer(line, { zoom: 16 });
+    r.syncSpider(line[0]);
+    const fan = r.spider;
+    const before = fan.members.map((m) => m.restaurant.id).sort();
+    expect(before).toEqual(['a', 'b']); // c is >25m from the seed
+    r.syncSpider(line[1]); // selecting b (a member) must NOT rebuild to {a,b,c}
+    expect(r.spider).toBe(fan); // fan untouched — still anchored on a, still {a,b}
+    expect(r.spider.members.map((m) => m.restaurant.id).sort()).toEqual(before);
+  });
+
   it('lays a large stack on a single even ring (equidistant, not a spiral)', () => {
     const stack = Array.from({ length: 16 }, (_, i) => ({ id: `n${i}`, lon: 300, lat: 300, offsetX: 0, offsetY: 0 }));
     const r = makeRenderer(stack, { zoom: 16 });
