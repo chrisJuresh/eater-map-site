@@ -18,7 +18,8 @@ const OWNER = 'chrisJuresh';
 const REPO = 'eater-map-data';
 const BRANCH = 'main';
 const FILE = 'restaurants.json';
-const OUT = 'static/data/restaurants.json';
+// Raw curated data lands here; the build then dedupes it into restaurants.json.
+const OUT = 'static/data/restaurants.raw.json';
 
 const force = process.argv.includes('--force');
 

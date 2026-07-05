@@ -2,6 +2,10 @@
 __pycache__/
 *.pyc
 
+# Restaurant data — private (fetched from eater-map-data at build) + generated
+static/data/restaurants.raw.json
+static/data/restaurants.json
+
 # Build and dependency output
 node_modules/
 .pnpm-store/

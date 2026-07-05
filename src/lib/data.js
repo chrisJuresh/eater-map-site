@@ -25,13 +25,16 @@ export function annotateRestaurants(items) {
     const duplicateIndex = duplicateSeen.get(key) || 0;
     duplicateSeen.set(key, duplicateIndex + 1);
     const offset = markerOffset(duplicateIndex, duplicateCounts.get(key) || 1);
+    // Deduped records carry descriptions[]/sources[]; fall back to single fields.
+    const descriptionTexts = item.descriptions?.length ? item.descriptions.map((d) => d.text) : [item.description];
+    const sourceTitles = item.sources?.length ? item.sources.map((s) => s.pageTitle) : [item.pageTitle];
     return {
       ...item,
       lat: Number(item.lat),
       lon: Number(item.lon),
       offsetX: offset.x,
       offsetY: offset.y,
-      searchText: [item.name, item.address, item.pageTitle, item.description, item.priceRange, item.openFor, item.bestFor]
+      searchText: [item.name, item.address, item.priceRange, item.openFor, item.bestFor, ...descriptionTexts, ...sourceTitles]
         .filter(Boolean)
         .join(' ')
         .toLowerCase()
