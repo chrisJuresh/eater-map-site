@@ -68,9 +68,14 @@ src/
   is markers whose drawn centres OVERLAP on screen (within `SPIDER_OVERLAP_PX`),
   gathered non-transitively from the seed (no chaining) and capped to the closest
   `SPIDER_MAX` — being screen-space it's zoom-aware, so zooming in until markers
-  separate opens no fan. Tapping another leg switches selection and
-  keeps the fan; it collapses on deselect, below zoom 14, or when no longer
-  stacked. Escape closes help → popups → details (which collapses the fan).
+  separate opens no fan. Tapping another leg switches selection and keeps the fan
+  (static against selection). It is NOT static against zoom: zooming in re-evaluates
+  an open fan and prunes legs that have separated from the anchor — plus any member
+  a filter change removed — while always keeping two members so it stays coherent:
+  the anchor and the selected leg (survivors re-lay onto a tighter ring, snapped
+  open in place; zooming out never adds any back). It collapses on
+  deselect, below zoom 14, or when ≤1 member remains stacked. Escape closes
+  help → popups → details (which collapses the fan).
 - **Deduped details**: each record is one restaurant merged from many Eater
   guides (`dedupe.mjs`). The title splits into `namePre`/`nameCore`/`namePost`:
   the SIMPLEST base name is bold ("**Ombra**"), the dish prefix and extra suffix
