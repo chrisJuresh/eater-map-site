@@ -39,24 +39,27 @@ const IN = flag('--in', 'static/data/restaurants.raw.json');
 const OUT = flag('--out', 'static/data/restaurants.json');
 const write = args.includes('--write');
 
-const MERGE_METERS = 120; // same-named entries within this distance are the same place
+// Same-named entries within this distance are the same place geocoded to slightly
+// different points. Calibrated from the data: real geocoding-splits of one
+// restaurant sit at <=175m (St. John 120m, 40 Maltby St 127m, Willy's Pies 175m),
+// while the closest genuine same-name chain branches are >=286m (Kaffeine, with
+// different postcodes). 200m sits in that gap - no false merges (audited).
+const MERGE_METERS = 200;
 const SUBSET_METERS = 60; // subset-name recall pass only merges within this tight radius
 
 // ---- name normalisation ------------------------------------------------------
 const stripAccents = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '');
 
-/** The underlying restaurant name (drop "Dish @ / at / — Restaurant" framing). */
+/** The underlying restaurant name (drop "Dish @ / at Restaurant" framing).
+ *  NB: no dash split — "Elliot's - Hackney" is Restaurant-then-Location, so a
+ *  dash split wrongly makes the base "Hackney". */
 function baseName(rawName) {
   let n = String(rawName || '').trim();
   const at = n.split(/\s+@\s+/); // Eater's explicit "Dish @ Restaurant" delimiter
   if (at.length > 1) n = at[at.length - 1];
   else {
-    const dash = n.split(/\s+[—–-]\s+/); // "Note — Restaurant"
-    if (dash.length > 1) n = dash[dash.length - 1];
-    else {
-      const m = n.match(/^.*\s+at\s+(.+)$/i); // "Dish at Restaurant"
-      if (m) n = m[1];
-    }
+    const m = n.match(/^.*\s+at\s+(.+)$/i); // "Dish at Restaurant"
+    if (m) n = m[1];
   }
   return n.trim();
 }
@@ -67,6 +70,10 @@ function nameKey(rawName) {
     .toLowerCase()
     .replace(/&/g, ' and ')
     .replace(/[^a-z0-9]+/g, ' ')
+    // Canonicalise the "Street"/"St" abbreviation so a restaurant named after its
+    // address ("40 Maltby Street" vs "40 Maltby St") groups as one. Whole-word only,
+    // so leading "St" = Saint ("St John") is untouched. Merge still needs geo.
+    .replace(/\bstreet\b/g, 'st')
     .replace(/\b(the|restaurant|london)\b/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
@@ -91,8 +98,45 @@ function distanceMeters(a, b) {
   return 2 * R * Math.asin(Math.sqrt(h));
 }
 
+/** Full UK postcode (e.g. "EC1M4AY"), normalised, or '' if none in the address. */
+function fullPostcode(address) {
+  const m = String(address || '')
+    .toUpperCase()
+    .match(/\b[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}\b/);
+  return m ? m[0].replace(/\s+/g, '') : '';
+}
+
+/**
+ * Within ONE same-name group, re-merge geo-clusters that share a full postcode.
+ * Same normalised name + identical full postcode == the same restaurant geocoded
+ * to slightly different points (e.g. St. John split ~120m across EC1M4AY). Chains
+ * have DIFFERENT postcodes per branch, so this never merges distinct restaurants.
+ */
+function mergeSamePostcode(clusters) {
+  if (clusters.length < 2) return clusters;
+  const pcSets = clusters.map((c) => new Set(c.map((e) => fullPostcode(e.address)).filter(Boolean)));
+  const parent = clusters.map((_, i) => i);
+  const find = (x) => (parent[x] === x ? x : (parent[x] = find(parent[x])));
+  for (let i = 0; i < clusters.length; i++) {
+    for (let j = i + 1; j < clusters.length; j++) {
+      if ([...pcSets[i]].some((p) => pcSets[j].has(p))) {
+        const ri = find(i);
+        const rj = find(j);
+        if (ri !== rj) parent[Math.max(ri, rj)] = Math.min(ri, rj);
+      }
+    }
+  }
+  const grouped = new Map();
+  clusters.forEach((c, i) => {
+    const root = find(i);
+    if (!grouped.has(root)) grouped.set(root, []);
+    grouped.get(root).push(...c);
+  });
+  return [...grouped.values()];
+}
+
 const priced = (r) => Boolean(r.priceRange);
-const cleanName = (r) => !/\s+@\s+|\s+at\s+|\s+[—–-]\s+/i.test(r.name || ''); // a standalone name
+const cleanName = (r) => !/\s+@\s+|\s+at\s+/i.test(r.name || ''); // a standalone name
 
 // ---- name synthesis ----------------------------------------------------------
 /** Split a source name into { dish (prefix, e.g. "Kifto"), base (the restaurant) }. */
@@ -102,9 +146,7 @@ function splitName(raw) {
   if (at.length > 1) return { dish: at.slice(0, -1).join(' @ ').trim(), base: at[at.length - 1].trim() };
   const m = n.match(/^(.*?)\s+(?:at|from)\s+(.+)$/i);
   if (m) return { dish: m[1].trim(), base: m[2].trim() };
-  const dash = n.split(/\s+[—–-]\s+/);
-  if (dash.length > 1) return { dish: dash.slice(0, -1).join(' - ').trim(), base: dash[dash.length - 1].trim() };
-  return { dish: '', base: n };
+  return { dish: '', base: n }; // no dash split (see baseName)
 }
 
 /**
@@ -269,7 +311,7 @@ for (const r of raw) {
   byName.get(key).push(r);
 }
 let clusters = [];
-for (const entries of byName.values()) clusters.push(...geoClusters(entries));
+for (const entries of byName.values()) clusters.push(...mergeSamePostcode(geoClusters(entries)));
 
 // 3: recall pass — merge subset-named clusters at the same location. Union-find,
 // bucketed by leading token so only plausible pairs are compared (fast + safe).
