@@ -64,12 +64,17 @@ export const MID_MARKER_ZOOM = 12;
 // Tapping a stack of overlapping markers fans them out into big, spaced,
 // thumb-tappable targets joined by "legs" to a shared origin. Replaces the old
 // repeat-tap cycling. See docs/ARCHITECTURE.md.
-/** "Sufficiently zoomed in" gate: the fan only appears at/above this zoom. */
-export const SPIDERFY_MIN_ZOOM = FULL_MARKER_ZOOM;
+// ▼▼▼ Tapping a stacked restaurant fans it out only at/above this zoom. ▼▼▼
+// Lower it to fan out when more zoomed out; raise it to require a closer zoom.
+// This is the one number to change to tune when the spider appears.
+export const SPIDERFY_MIN_ZOOM = 14;
+// ▲▲▲
 /** BFS link distance to grow the true cluster from the selected seed (2*fullRadius+4). */
 export const SPIDER_STACK_LINK_PX = 28;
 /** Centre-to-centre spacing of adjacent fanned dots on the ring (24px dot + a tiny gap). */
 export const SPIDER_GAP = 30;
+/** Opacity of non-selected fanned dots — perceptually between the map's 0.42 and 1.0. */
+export const SPIDER_MEMBER_OPACITY = 0.72;
 /** Floor on the ring radius so a 2–3 stack doesn't collapse onto the anchor. */
 export const SPIDER_MIN_R = 28;
 /** Cap on fanned members for a legitimately huge co-located set. */
