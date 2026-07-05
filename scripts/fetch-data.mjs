@@ -39,17 +39,39 @@ if (!token) {
 }
 
 const url = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${FILE}?ref=${BRANCH}`;
-const response = await fetch(url, {
-  headers: {
-    Authorization: `Bearer ${token}`,
-    Accept: 'application/vnd.github.raw',
-    'User-Agent': 'eater-map-build',
-    'X-GitHub-Api-Version': '2022-11-28'
-  }
-});
+console.log(`[fetch-data] token present (length ${token.length}); requesting ${OWNER}/${REPO}/${FILE}`);
+
+let response;
+try {
+  response = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: 'application/vnd.github.raw',
+      'User-Agent': 'eater-map-build',
+      'X-GitHub-Api-Version': '2022-11-28'
+    }
+  });
+} catch (error) {
+  console.error(`[fetch-data] network error: ${error?.message || error}`);
+  process.exit(1);
+}
 
 if (!response.ok) {
-  console.error(`[fetch-data] request failed: ${response.status} ${response.statusText}`);
+  let body = '';
+  try {
+    body = (await response.text()).slice(0, 200);
+  } catch {
+    // ignore
+  }
+  console.error(`[fetch-data] GitHub API ${response.status} ${response.statusText} for ${OWNER}/${REPO}/${FILE}`);
+  if (body) console.error(`[fetch-data] response: ${body}`);
+  const hint =
+    response.status === 401
+      ? 'the token VALUE is wrong/expired — regenerate the PAT and update DATA_REPO_TOKEN.'
+      : response.status === 404
+        ? `the token can't see ${OWNER}/${REPO} — the fine-grained PAT must select that repo with Contents: Read-only.`
+        : 'check the PAT scopes and the DATA_REPO_TOKEN value.';
+  console.error(`[fetch-data] likely cause: ${hint}`);
   process.exit(1);
 }
 
