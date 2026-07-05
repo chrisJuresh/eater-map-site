@@ -61,12 +61,13 @@ src/
   bounded to GB with a viewport-fit min zoom; online = Protomaps API (key is
   domain-restricted, safe in the bundle), unbounded, minZoom 2. Swap follows
   the browser's online/offline events.
-- **Interaction**: clicking prefers restaurants over the rail-lines popup.
-  Tapping a stack of overlapping markers fans them out (spiderfy) onto one even
-  ring of thumb-sized targets joined by legs to the origin; tapping a leg selects
-  it, tapping away or any camera gesture collapses it. Below the fan zoom gate
-  (14) a *separable* stack instead eases the camera in; exact duplicates always
-  fan. Escape closes help → spider → popups → details.
+- **Interaction**: clicking selects the nearest marker (never zooms); an empty
+  tap shows the rail-lines popup. The spiderfy fan is **selection-driven**: while
+  a stacked restaurant is selected AND zoom ≥ 14, its stack is shown fanned onto
+  one even ring of thumb-sized targets (legs to the origin), and the fan follows
+  the map. Tapping another leg switches the selection and keeps the fan; it
+  collapses when the selection is cleared, drops below zoom 14, or is no longer
+  stacked. Escape closes help → popups → details (which collapses the fan).
 - **Entries list** (desktop idle panel): ordered `$$`, `$`, `$$$`, `$$$$`, then
   the unpriced rest — each group by distance from central London.
 - **Offline**: the service worker precaches app shell + data + basemap with
