@@ -113,6 +113,113 @@ describe('MarkerRenderer.syncSpider (selection-driven fan)', () => {
     expect(r.spider.members.map((m) => m.restaurant.id).sort()).toEqual(before);
   });
 
+  it('prunes legs that separate as you zoom in, then collapses when only the anchor is left', () => {
+    // A scalable fake map: project multiplies coords by `scale`, so raising scale
+    // simulates zooming in (markers spread apart on screen). getZoom stays past the
+    // gate throughout so only overlap — not the gate — drives membership.
+    let scale = 1;
+    const data = [
+      { id: 'a', lon: 0, lat: 0, offsetX: 0, offsetY: 0 },
+      { id: 'b', lon: 10, lat: 0, offsetX: 0, offsetY: 0 }, // 10px from a at scale 1
+      { id: 'c', lon: 20, lat: 0, offsetX: 0, offsetY: 0 } //  20px from a at scale 1
+    ];
+    const map = { getZoom: () => 16, project: ([lon, lat]) => ({ x: lon * scale, y: lat * scale }) };
+    const r = new MarkerRenderer({ map, canvas: {}, host: {}, read: () => ({ restaurants: data, selectedId: 'a', userLocation: null }) });
+
+    r.syncSpider(data[0]);
+    expect(r.spider.members.map((m) => m.restaurant.id).sort()).toEqual(['a', 'b', 'c']); // all within 26px
+
+    scale = 2; // b→20px (still ≤26), c→40px (>26, separated)
+    r.syncSpider(data[0]); // selecting the anchor (a member) → prune path, not rebuild
+    expect(r.spider.members.map((m) => m.restaurant.id).sort()).toEqual(['a', 'b']);
+
+    scale = 3; // b→30px (>26, separated) — only the anchor would remain
+    r.syncSpider(data[0]);
+    expect(r.isSpiderOpen()).toBe(false); // ≤1 survivor collapses the fan
+  });
+
+  it('does not prune on pan or zoom-out (screen distances stay within overlap)', () => {
+    let scale = 1;
+    const data = [
+      { id: 'a', lon: 0, lat: 0, offsetX: 0, offsetY: 0 },
+      { id: 'b', lon: 12, lat: 0, offsetX: 0, offsetY: 0 }
+    ];
+    const map = { getZoom: () => 16, project: ([lon, lat]) => ({ x: lon * scale, y: lat * scale }) };
+    const r = new MarkerRenderer({ map, canvas: {}, host: {}, read: () => ({ restaurants: data, selectedId: 'a', userLocation: null }) });
+    r.syncSpider(data[0]);
+    const fan = r.spider;
+    scale = 0.5; // zoom out → markers closer together; nothing separates
+    r.syncSpider(data[0]);
+    expect(r.spider).toBe(fan); // untouched — no prune, no rebuild
+    expect(r.spider.members.map((m) => m.restaurant.id).sort()).toEqual(['a', 'b']);
+  });
+
+  it('keeps the selected leg pinned in the fan even after it separates on zoom-in', () => {
+    // Selection drives the fan; a non-anchor selected leg must never be pruned out
+    // (its highlight would detach and the next moveend would thrash into a rebuild).
+    let scale = 1;
+    let selectedId = 'a';
+    const data = [
+      { id: 'a', lon: 0, lat: 0, offsetX: 0, offsetY: 0 },
+      { id: 'b', lon: 8, lat: 0, offsetX: 0, offsetY: 0 },
+      { id: 'c', lon: 12, lat: 0, offsetX: 0, offsetY: 0 }
+    ];
+    const map = { getZoom: () => 16, project: ([lon, lat]) => ({ x: lon * scale, y: lat * scale }) };
+    const r = new MarkerRenderer({ map, canvas: {}, host: {}, read: () => ({ restaurants: data, selectedId, userLocation: null }) });
+
+    r.syncSpider(data[0]); // anchor = a; fan [a,b,c] (b=8, c=12, both within 26)
+    expect(r.spider.members.map((m) => m.restaurant.id).sort()).toEqual(['a', 'b', 'c']);
+
+    selectedId = 'c';
+    scale = 3; // b=24 (≤26, kept by overlap), c=36 (>26 — but selected, so pinned)
+    r.syncSpider(data[2]);
+    expect(r.spider.members.map((m) => m.restaurant.id).sort()).toEqual(['a', 'b', 'c']);
+
+    scale = 4; // b=32 (>26, dropped), c=48 (>26 but selected → pinned), a is the anchor
+    r.syncSpider(data[2]);
+    expect(r.spider.members.map((m) => m.restaurant.id).sort()).toEqual(['a', 'c']);
+    expect(r.isSpiderOpen()).toBe(true); // anchor + pinned selection keep it open
+  });
+
+  it('drops a fan member that a filter change removes from the dataset', () => {
+    const all = [
+      { id: 'a', lon: 0, lat: 0, offsetX: 0, offsetY: 0 },
+      { id: 'b', lon: 6, lat: 0, offsetX: 0, offsetY: 0 },
+      { id: 'c', lon: 10, lat: 0, offsetX: 0, offsetY: 0 }
+    ];
+    let restaurants = all;
+    const map = { getZoom: () => 16, project: ([lon, lat]) => ({ x: lon, y: lat }) };
+    const r = new MarkerRenderer({ map, canvas: {}, host: {}, read: () => ({ restaurants, selectedId: 'a', userLocation: null }) });
+
+    r.syncSpider(all[0]);
+    expect(r.spider.members.map((m) => m.restaurant.id).sort()).toEqual(['a', 'b', 'c']);
+
+    restaurants = all.filter((x) => x.id !== 'b'); // b no longer passes the filter
+    r.syncSpider(all[0]); // a still selected+member → prune path drops the filtered-out b
+    expect(r.spider.members.map((m) => m.restaurant.id).sort()).toEqual(['a', 'c']);
+  });
+
+  it('collapses the fan when a filter change removes the anchor', () => {
+    const all = [
+      { id: 'a', lon: 0, lat: 0, offsetX: 0, offsetY: 0 },
+      { id: 'b', lon: 6, lat: 0, offsetX: 0, offsetY: 0 },
+      { id: 'c', lon: 10, lat: 0, offsetX: 0, offsetY: 0 }
+    ];
+    let restaurants = all;
+    let selectedId = 'a';
+    const map = { getZoom: () => 16, project: ([lon, lat]) => ({ x: lon, y: lat }) };
+    const r = new MarkerRenderer({ map, canvas: {}, host: {}, read: () => ({ restaurants, selectedId, userLocation: null }) });
+
+    r.syncSpider(all[0]); // anchor = a; fan [a,b,c]
+    selectedId = 'b'; // switch selection to a non-anchor leg (fan stays anchored on a)
+    r.syncSpider(all[1]);
+    expect(r.spider.members.map((m) => m.restaurant.id).sort()).toEqual(['a', 'b', 'c']);
+
+    restaurants = all.filter((x) => x.id !== 'a'); // filter removes the anchor itself
+    r.syncSpider(all[1]); // b still selected+member → prune path sees anchor gone → collapse
+    expect(r.isSpiderOpen()).toBe(false);
+  });
+
   it('caps a big overlapping stack to the closest SPIDER_MAX on one even ring', () => {
     const stack = Array.from({ length: 16 }, (_, i) => ({ id: `n${i}`, lon: 300, lat: 300, offsetX: 0, offsetY: 0 }));
     const r = makeRenderer(stack, { zoom: 16 });

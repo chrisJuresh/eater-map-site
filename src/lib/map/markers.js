@@ -338,11 +338,14 @@ export class MarkerRenderer {
   }
 
   /**
-   * Keep the fan in sync with the current selection. An OPEN fan is STATIC: if it
-   * already contains the selected restaurant, it is left completely untouched
-   * (selecting another leg only moves the highlight — never re-anchors/rebuilds).
-   * A fan only (re)builds when a restaurant OUTSIDE the current fan is selected,
-   * and collapses when nothing stacked/close-zoom is selected.
+   * Keep the fan in sync with the current selection. An OPEN fan is STATIC against
+   * SELECTION changes: if it already contains the selected restaurant, its member
+   * set is not rebuilt from a new seed (selecting another leg only moves the
+   * highlight — never re-anchors). It is NOT static against ZOOM: because this runs
+   * on moveend, an open fan is re-evaluated against the current zoom and legs that
+   * have separated from the anchor are pruned (see pruneSpider). A fan only
+   * (re)builds when a restaurant OUTSIDE the current fan is selected, and collapses
+   * when nothing stacked/close-zoom is selected.
    */
   syncSpider(selected) {
     if (!this.map) return;
@@ -350,13 +353,68 @@ export class MarkerRenderer {
       this.collapseSpider();
       return;
     }
-    if (this.spider && this.spider.members.some((m) => m.restaurant.id === selected.id)) return;
+    if (this.spider && this.spider.members.some((m) => m.restaurant.id === selected.id)) {
+      this.pruneSpider(selected); // static set, but zooming in still drops legs that separated
+      return;
+    }
     const cluster = this.buildCluster(selected);
     if (cluster.length <= 1) {
       this.collapseSpider();
       return;
     }
     this.openSpider(cluster);
+  }
+
+  /**
+   * Re-evaluate an OPEN fan against the CURRENT zoom/filter and drop members that
+   * no longer belong: legs that have separated from the anchor on screen (they
+   * would no longer be stacked if there were no fan), and members a filter change
+   * has removed from the dataset. Zooming in spreads markers apart so this shrinks
+   * the fan; zooming out only brings members closer, so it never removes any on
+   * zoom-out and never re-adds pruned ones (the set only contracts until a new seed
+   * rebuilds it). Two members are always kept so the fan stays coherent: the anchor
+   * (members[0], the geometric reference) and the currently selected leg (so its
+   * highlight never detaches from the fan, and the membership check in syncSpider
+   * keeps routing here instead of thrashing into a rebuild). ≤1 survivor collapses
+   * the fan; survivors are re-laid onto a tighter even ring, snapped fully open in
+   * place (no re-bloom), following the map.
+   */
+  pruneSpider(selected) {
+    const spider = this.spider;
+    if (!spider || !this.map) return;
+    const selectedId = selected?.id;
+    const visibleIds = new Set(this.read().restaurants.map((r) => r.id)); // the current filtered set
+    // The anchor is the fan's geometric origin; if a filter removed it there is no
+    // valid reference left, so tear the fan down (a later selection rebuilds cleanly).
+    // Checked before the survivor pass so the anchor is never a lingering filtered-out leg.
+    if (!visibleIds.has(spider.members[0].restaurant.id)) {
+      this.collapseSpider();
+      return;
+    }
+    const anchorPx = this.originPx(spider.members[0].restaurant);
+    const survivors = spider.members.filter((m, i) => {
+      if (i === 0 || m.restaurant.id === selectedId) return true; // anchor (checked above) + highlighted leg: kept
+      if (!visibleIds.has(m.restaurant.id)) return false; // removed by a filter change
+      const px = this.originPx(m.restaurant);
+      return Math.hypot(px.x - anchorPx.x, px.y - anchorPx.y) <= SPIDER_OVERLAP_PX;
+    });
+    if (survivors.length === spider.members.length) return; // nothing changed — leave it be
+    if (survivors.length <= 1) {
+      this.collapseSpider();
+      return;
+    }
+    const origin = this.map.project(spider.anchorLngLat);
+    const slots = fanSlots(survivors.length);
+    survivors.forEach((m, i) => {
+      m.dx = slots[i].dx;
+      m.dy = slots[i].dy;
+    });
+    spider.members = survivors;
+    this.applyEdgeCorrection(spider.members, origin);
+    if (this.spiderFrame) cancelAnimationFrame(this.spiderFrame); // drop any in-flight bloom tick
+    this.spiderFrame = 0;
+    spider.phase = 'open'; // snap the tighter ring fully open in place rather than re-blooming
+    this.schedule();
   }
 
   openSpider(cluster) {
@@ -429,7 +487,9 @@ export class MarkerRenderer {
     const spider = this.spider;
     if (!spider || !this.map) return;
     const now = typeof performance !== 'undefined' ? performance.now() : 0;
-    const progress = clamp((now - spider.start) / Math.max(1, spider.dur), 0, 1);
+    // 'open' means fully expanded regardless of the (possibly stale) start time —
+    // so a pruned fan snapped open in place never renders at a partial radius.
+    const progress = spider.phase === 'open' ? 1 : clamp((now - spider.start) / Math.max(1, spider.dur), 0, 1);
     const origin = this.map.project(spider.anchorLngLat);
     const n = spider.members.length;
     // Scale the per-member stagger down for large fans so the last still finishes.
