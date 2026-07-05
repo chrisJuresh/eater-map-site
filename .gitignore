@@ -6,6 +6,12 @@ __pycache__/
 static/data/restaurants.raw.json
 static/data/restaurants.json
 
+# Scraped Eater data & pipeline DBs — kept in the private eater-map-data repo
+/data/
+/data-pipeline/raw-downloads/
+/data-pipeline/archive/
+/data-pipeline/sitemap.csv
+
 # Build and dependency output
 node_modules/
 .pnpm-store/
