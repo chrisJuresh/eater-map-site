@@ -69,16 +69,19 @@ export const MID_MARKER_ZOOM = 12;
 // This is the one number to change to tune when the spider appears.
 export const SPIDERFY_MIN_ZOOM = 14;
 // ▲▲▲
-/** BFS link distance to grow the true cluster from the selected seed (2*fullRadius+4). */
-export const SPIDER_STACK_LINK_PX = 28;
+/** A "stack" = restaurants within this many metres of each other (same address/spot).
+ *  Geographic (zoom-independent) so a dense neighbourhood at low zoom isn't swept
+ *  into one giant fan — only genuinely co-located restaurants cluster. Data shows
+ *  this keeps clusters to ~8 max on the deduped set. */
+export const SPIDER_STACK_RADIUS_M = 25;
 /** Centre-to-centre spacing of adjacent fanned dots on the ring (24px dot + a tiny gap). */
 export const SPIDER_GAP = 30;
 /** Opacity of non-selected fanned dots — perceptually between the map's 0.42 and 1.0. */
 export const SPIDER_MEMBER_OPACITY = 0.72;
 /** Floor on the ring radius so a 2–3 stack doesn't collapse onto the anchor. */
 export const SPIDER_MIN_R = 28;
-/** Cap on fanned members for a legitimately huge co-located set. */
-export const SPIDER_MAX = 40;
+/** Safety cap on fanned members for a legitimately huge co-located set. */
+export const SPIDER_MAX = 16;
 /** Expand duration (ms); 0 under prefers-reduced-motion. Collapse is instant. */
 export const SPIDER_MS = 190;
 /** Per-member start delay (fraction of progress) for a cascading bloom. */

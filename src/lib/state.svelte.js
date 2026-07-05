@@ -45,7 +45,7 @@ export class AppState {
   searchText = $derived(this.query.trim().toLowerCase());
   filtered = $derived(filterRestaurants(this.restaurants, this.searchText, this.priceFilter));
   searchResults = $derived(this.searchText ? this.filtered.slice(0, SEARCH_LIMIT) : []);
-  totalCount = $derived(this.stats?.entryCount || this.restaurants.length);
+  totalCount = $derived(this.stats?.restaurantCount || this.restaurants.length);
   downloadPercent = $derived(
     this.downloadTotal ? Math.min(100, Math.round((this.downloadLoaded / this.downloadTotal) * 100)) : 0
   );
