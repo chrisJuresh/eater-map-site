@@ -108,17 +108,32 @@ function splitName(raw) {
 }
 
 /**
- * Display name preserving the dedupe's naming info: the fullest restaurant name,
- * prefixed with the distinct dishes it was listed under WHEN that stays short
- * ("Kifto/Lamb/Beef at Wolkite Restaurant & Bar"). Returns { name, base } so the
- * base (the real restaurant) can be rendered bold. Long/many dishes -> base only.
+ * Split the display name into three parts so the UI can render the SIMPLEST
+ * existing restaurant name bold and everything else smaller/lighter:
+ *   pre  = the distinct dishes it was listed under ("Kifto/Lamb at "), when short
+ *   core = the simplest base name (fewest words) — e.g. "Ombra" — rendered bold
+ *   post = the extra words the fullest variant adds ("Bar & Restaurant")
+ * name = pre + core + post (plain, for the list/search).
  */
 function synthName(cluster, primary) {
   const parts = cluster.map((e) => splitName(e.name));
-  let base = splitName(primary.name).base; // fullest base: prefer primary, else most words
-  for (const p of parts) {
-    if (p.base && p.base.split(/\s+/).length > base.split(/\s+/).length) base = p.base;
+  const bases = [...new Set(parts.map((p) => p.base).filter(Boolean))];
+  const wordCount = (s) => s.split(/\s+/).filter(Boolean).length;
+  const allCaps = (s) => s === s.toUpperCase() && /[A-Z]/.test(s);
+  // core = the simplest base: fewest words, prefer not-ALL-CAPS, then shortest.
+  const core =
+    [...bases].sort(
+      (a, b) =>
+        wordCount(a) - wordCount(b) || allCaps(a) - allCaps(b) || a.length - b.length || a.localeCompare(b)
+    )[0] || splitName(primary.name).base;
+  // post = the fullest base that extends the core, minus the core prefix.
+  const coreLower = core.toLowerCase();
+  let longest = core;
+  for (const b of bases) {
+    if (b.toLowerCase().startsWith(coreLower) && b.length > longest.length) longest = b;
   }
+  const post = longest.length > core.length ? longest.slice(core.length) : '';
+  // pre = distinct dish prefixes, when few and short.
   const seen = new Set();
   const dishes = [];
   for (const p of parts) {
@@ -128,8 +143,8 @@ function synthName(cluster, primary) {
     dishes.push(dish);
   }
   const combined = dishes.join('/');
-  if (dishes.length && dishes.length <= 4 && combined.length <= 42) return { name: `${combined} at ${base}`, base };
-  return { name: base, base };
+  const pre = dishes.length && dishes.length <= 4 && combined.length <= 42 ? `${combined} at ` : '';
+  return { name: `${pre}${core}${post}`, pre, core, post };
 }
 
 /** Fullest address among the sources (most complete: postcode + London + UK + length). */
@@ -190,7 +205,7 @@ const firstNonEmpty = (cluster, key) => cluster.map((e) => e[key]).find((v) => v
 
 function mergeCluster(cluster) {
   const primary = pickPrimary(cluster);
-  const { name, base } = synthName(cluster, primary);
+  const { name, pre, core, post } = synthName(cluster, primary);
   // Keep every source guide (title + link) so any review is reachable.
   const seenUrl = new Set();
   const sources = [];
@@ -218,7 +233,9 @@ function mergeCluster(cluster) {
   return {
     id: primary.id,
     name,
-    nameBase: base, // the restaurant part, rendered bold in the details title
+    namePre: pre, // dish prefix — smaller/lighter
+    nameCore: core, // simplest restaurant name — bold
+    namePost: post, // extra suffix words ("Bar & Restaurant") — smaller/lighter
     address: bestAddress(cluster),
     lat: primary.lat,
     lon: primary.lon,
