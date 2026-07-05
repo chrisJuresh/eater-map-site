@@ -31,13 +31,10 @@
   const listItems = $derived(inViewSorted.slice(0, IN_VIEW_LIST_LIMIT));
   const listOverflow = $derived(Math.max(0, inViewSorted.length - IN_VIEW_LIST_LIMIT));
 
-  // ---- Name (bold the real restaurant, e.g. "Kifto/Lamb at **Wolkite**") -------
-  const nameBase = $derived(selected?.nameBase || selected?.name || '');
-  const namePrefix = $derived(
-    selected?.name && selected.name !== nameBase && selected.name.endsWith(nameBase)
-      ? selected.name.slice(0, selected.name.length - nameBase.length)
-      : ''
-  );
+  // ---- Name parts: simplest restaurant name bold, dishes + suffix smaller ------
+  const namePre = $derived(selected?.namePre || ''); // "Kifto/Lamb at "
+  const nameCore = $derived(selected?.nameCore || selected?.name || ''); // "Ombra" (bold)
+  const namePost = $derived(selected?.namePost || ''); // " Bar & Restaurant"
 
   // ---- Descriptions (already sorted in the data: 38-best first, then longest) ---
   const descriptions = $derived(
@@ -157,9 +154,7 @@
         <a href={guideLinks[0].entryUrl} target="_blank" rel="noreferrer">{guideLinks[0].pageTitle}</a>
       </p>
     {/if}
-    <h1 class="display-name">
-      {#if namePrefix}<span class="name-dishes">{namePrefix}</span>{nameBase}{:else}{selected.name}{/if}
-    </h1>
+    <h1 class="display-name">{#if namePre}<span class="name-affix">{namePre}</span>{/if}<span class="name-core">{nameCore}</span>{#if namePost}<span class="name-affix">{namePost}</span>{/if}</h1>
     <div class="meta-row">
       {#if selected.priceRange}<span>{selected.priceRange}</span>{/if}
       {#if selected.openFor}<span>{selected.openFor}</span>{/if}
@@ -224,17 +219,17 @@
 
     <div class="actions">
       {#if googleMapsUrl}
-        <a href={googleMapsUrl} target="_blank" rel="noreferrer" aria-label={`Open ${nameBase} in Google Maps`}>
+        <a href={googleMapsUrl} target="_blank" rel="noreferrer" aria-label={`Open ${nameCore} in Google Maps`}>
           <span class="action-label-full">Google Maps</span>
           <span class="action-label-short">Google</span>
         </a>
       {/if}
       {#if citymapperUrl}
-        <a class="citymapper-action" href={citymapperUrl} aria-label={`Open mobile directions to ${nameBase} in Citymapper`}>
+        <a class="citymapper-action" href={citymapperUrl} aria-label={`Open mobile directions to ${nameCore} in Citymapper`}>
           Citymapper
         </a>
       {/if}
-      <button class="share-action" type="button" onclick={share} aria-label={`Share a link to ${nameBase}`}>
+      <button class="share-action" type="button" onclick={share} aria-label={`Share a link to ${nameCore}`}>
         {shareFeedback || 'Share'}
       </button>
       {#if websiteUrls.length === 1}
@@ -347,9 +342,13 @@
     letter-spacing: -0.01em;
   }
 
-  /* The dish prefix ("Kifto/Lamb at ") reads lighter and smaller so the
-     restaurant name is clearly the focus. */
-  .name-dishes {
+  /* Simplest restaurant name is bold; the dish prefix + suffix words read
+     smaller and lighter (desktop: inline; mobile: stacked above/below). */
+  .name-core {
+    font-weight: 700;
+  }
+
+  .name-affix {
     font-size: 0.62em;
     font-weight: 400;
     color: var(--ink-mute);
@@ -426,16 +425,21 @@
     color: var(--link);
   }
 
+  /* Desktop: float above everything, just over the sticky actions bar, so you
+     don't have to scroll to it. (Mobile resets this to in-flow below.) */
   .picker-menu {
+    position: sticky;
+    bottom: 66px;
+    z-index: 6;
     display: grid;
     gap: 2px;
-    margin: 0 0 10px;
+    margin: 0 0 8px;
     padding: 8px 10px;
     border: 1px solid var(--line-soft);
     border-radius: var(--r-s);
     background: var(--surface-solid, var(--paper));
-    box-shadow: var(--shadow-2);
-    max-height: 40vh;
+    box-shadow: var(--shadow-3);
+    max-height: 50vh;
     overflow: auto;
   }
 
@@ -644,6 +648,17 @@
       line-height: 1.06;
     }
 
+    /* Mobile: stack the dish prefix / suffix above and below the name. */
+    .details-panel .name-affix {
+      display: block;
+      line-height: 1.2;
+    }
+
+    .details-panel .name-core {
+      display: block;
+      margin: 3px 0;
+    }
+
     .details-panel .eyebrow {
       margin: 0 42px 6px 0;
       font-size: 10px;
@@ -724,7 +739,11 @@
     }
 
     .details-panel .picker-menu {
+      position: static;
       order: 5;
+      flex: 0 0 auto;
+      margin: 2px 0 8px;
+      max-height: 45vh;
     }
 
     .details-panel .facts {
@@ -740,6 +759,7 @@
     .actions {
       position: static;
       order: 6;
+      flex: 0 0 auto; /* keep full height — don't let the picker squish the buttons */
       display: flex;
       overflow-x: auto;
       gap: 6px;

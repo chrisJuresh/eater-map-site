@@ -18,7 +18,7 @@ import {
   SPIDER_MEMBER_OPACITY,
   SPIDER_MIN_R,
   SPIDER_MS,
-  SPIDER_STACK_RADIUS_M,
+  SPIDER_OVERLAP_PX,
   SPIDER_STAGGER,
   SPIDERFY_MIN_ZOOM,
   clamp,
@@ -72,17 +72,6 @@ function markerDetail(z, active) {
 
 function metersPerPixel(lat, z) {
   return (156543.03392 * Math.cos((lat * Math.PI) / 180)) / 2 ** z;
-}
-
-/** Great-circle distance in metres between two {lat, lon} points. */
-function metersBetween(a, b) {
-  const R = 6371000;
-  const dLat = ((b.lat - a.lat) * Math.PI) / 180;
-  const dLon = ((b.lon - a.lon) * Math.PI) / 180;
-  const la = (a.lat * Math.PI) / 180;
-  const lb = (b.lat * Math.PI) / 180;
-  const h = Math.sin(dLat / 2) ** 2 + Math.cos(la) * Math.cos(lb) * Math.sin(dLon / 2) ** 2;
-  return 2 * R * Math.asin(Math.sqrt(h));
 }
 
 const easeOutCubic = (t) => 1 - (1 - t) ** 3;
@@ -313,36 +302,47 @@ export class MarkerRenderer {
 
   // ---- Spiderfy ---------------------------------------------------------------
 
+  /** Screen position of a marker as drawn (base projection + ring offset). */
+  originPx(restaurant) {
+    const p = this.map.project([restaurant.lon, restaurant.lat]);
+    return { x: p.x + restaurant.offsetX, y: p.y + restaurant.offsetY };
+  }
+
   /**
-   * The stack = restaurants within SPIDER_STACK_RADIUS_M metres of the seed (i.e.
-   * genuinely at the same spot), NOT everything that visually overlaps at the
-   * current zoom. This keeps fans small (~a handful) even when tapping a dense
-   * neighbourhood at low zoom, instead of chaining a whole area into one huge fan.
+   * The stack = markers whose drawn centres OVERLAP the seed on screen (within
+   * SPIDER_OVERLAP_PX), gathered non-transitively from the seed so a dense area
+   * never chains into one giant fan. Screen-space, so once you zoom in enough
+   * that markers separate, nothing overlaps and no fan opens. When more than
+   * SPIDER_MAX overlap, only the closest to the seed qualify.
    */
   buildCluster(seed) {
     const { restaurants } = this.read();
     const pool = this.lastVisible.length ? this.lastVisible : restaurants;
-    const set = [];
+    const seedPx = this.originPx(seed);
+    const near = [];
     for (const restaurant of pool) {
-      if (metersBetween(seed, restaurant) <= SPIDER_STACK_RADIUS_M) set.push(restaurant);
+      const px = this.originPx(restaurant);
+      const distance = Math.hypot(px.x - seedPx.x, px.y - seedPx.y);
+      if (distance <= SPIDER_OVERLAP_PX) near.push({ restaurant, distance });
     }
-    if (!set.some((r) => r.id === seed.id)) set.push(seed);
-    // Deterministic slot order: priced first, then nearest the seed, then id.
-    set.sort((a, b) => {
-      const priority = markerPriority(b) - markerPriority(a);
-      if (priority) return priority;
-      const distance = metersBetween(seed, a) - metersBetween(seed, b);
-      if (Math.abs(distance) > 0.5) return distance;
-      return String(a.id).localeCompare(String(b.id));
+    if (!near.some((n) => n.restaurant.id === seed.id)) near.push({ restaurant: seed, distance: 0 });
+    // Closest to the seed qualify (cap), then a stable priced-first slot order.
+    near.sort((a, b) => {
+      if (Math.abs(a.distance - b.distance) > 0.5) return a.distance - b.distance;
+      return (
+        markerPriority(b.restaurant) - markerPriority(a.restaurant) ||
+        String(a.restaurant.id).localeCompare(String(b.restaurant.id))
+      );
     });
-    if (set.length > SPIDER_MAX) set.length = SPIDER_MAX;
-    return set;
+    return near.slice(0, SPIDER_MAX).map((n) => n.restaurant);
   }
 
   /**
-   * Keep the fan in sync with the current selection: a stacked selection at
-   * close zoom is always shown fanned; anything else collapses it. Idempotent —
-   * re-selecting a member of the SAME stack keeps the existing fan (no re-animate).
+   * Keep the fan in sync with the current selection. An OPEN fan is STATIC: if it
+   * already contains the selected restaurant, it is left completely untouched
+   * (selecting another leg only moves the highlight — never re-anchors/rebuilds).
+   * A fan only (re)builds when a restaurant OUTSIDE the current fan is selected,
+   * and collapses when nothing stacked/close-zoom is selected.
    */
   syncSpider(selected) {
     if (!this.map) return;
@@ -350,20 +350,13 @@ export class MarkerRenderer {
       this.collapseSpider();
       return;
     }
+    if (this.spider && this.spider.members.some((m) => m.restaurant.id === selected.id)) return;
     const cluster = this.buildCluster(selected);
     if (cluster.length <= 1) {
       this.collapseSpider();
       return;
     }
-    if (this.spider && this.sameMembers(cluster)) return; // already fanned — highlight updates on draw
     this.openSpider(cluster);
-  }
-
-  sameMembers(cluster) {
-    const members = this.spider?.members;
-    if (!members || members.length !== cluster.length) return false;
-    const ids = new Set(members.map((m) => m.restaurant.id));
-    return cluster.every((r) => ids.has(r.id));
   }
 
   openSpider(cluster) {

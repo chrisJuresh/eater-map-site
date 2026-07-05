@@ -95,13 +95,33 @@ describe('MarkerRenderer.syncSpider (selection-driven fan)', () => {
     expect(r.isSpiderOpen()).toBe(true);
   });
 
-  it('lays a large stack on a single even ring (equidistant, not a spiral)', () => {
+  it('stays static when a member is selected even if seeding from it would differ', () => {
+    // Screen px (fake project maps lon,lat->px): a-b and b-c overlap (20px);
+    // a-c (40px) don't. Seeding from a -> {a,b}; from b -> {a,b,c}.
+    const line = [
+      { id: 'a', lat: 0, lon: 0, offsetX: 0, offsetY: 0 },
+      { id: 'b', lat: 0, lon: 20, offsetX: 0, offsetY: 0 },
+      { id: 'c', lat: 0, lon: 40, offsetX: 0, offsetY: 0 }
+    ];
+    const r = makeRenderer(line, { zoom: 16 });
+    r.syncSpider(line[0]);
+    const fan = r.spider;
+    const before = fan.members.map((m) => m.restaurant.id).sort();
+    expect(before).toEqual(['a', 'b']); // c is >26px from the seed
+    r.syncSpider(line[1]); // selecting b (a member) must NOT rebuild to {a,b,c}
+    expect(r.spider).toBe(fan); // fan untouched — still anchored on a, still {a,b}
+    expect(r.spider.members.map((m) => m.restaurant.id).sort()).toEqual(before);
+  });
+
+  it('caps a big overlapping stack to the closest SPIDER_MAX on one even ring', () => {
     const stack = Array.from({ length: 16 }, (_, i) => ({ id: `n${i}`, lon: 300, lat: 300, offsetX: 0, offsetY: 0 }));
     const r = makeRenderer(stack, { zoom: 16 });
     r.syncSpider(stack[0]);
+    const n = r.spider.members.length;
+    expect(n).toBe(12); // SPIDER_MAX — only the closest qualify
     const radii = r.spider.members.map((m) => Math.hypot(m.dx, m.dy));
-    for (const radius of radii) expect(radius).toBeCloseTo(radii[0], 6);
-    const adjacent = 2 * radii[0] * Math.sin(Math.PI / 16);
+    for (const radius of radii) expect(radius).toBeCloseTo(radii[0], 6); // one ring
+    const adjacent = 2 * radii[0] * Math.sin(Math.PI / n);
     expect(adjacent).toBeGreaterThan(24); // dots don't overlap
     expect(adjacent).toBeLessThan(40); // gap stays tiny
   });
