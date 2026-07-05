@@ -10,10 +10,16 @@ echo.
 echo   Eater map - building and serving locally...
 echo.
 
+REM pnpm ships with Node via corepack; enable its shim if cmd can't see pnpm yet.
 where pnpm >nul 2>nul
 if errorlevel 1 (
-  echo   ERROR: pnpm is not installed or not on your PATH.
-  echo   Install Node.js + pnpm, then run this again.
+  echo   pnpm shim missing - enabling it via corepack...
+  where corepack >nul 2>nul && corepack enable pnpm >nul 2>nul
+)
+where pnpm >nul 2>nul
+if errorlevel 1 (
+  echo   ERROR: could not find or enable pnpm. Make sure Node.js is installed
+  echo   (nvm4w / nodejs on PATH), then run this again.
   echo.
   pause
   exit /b 1
