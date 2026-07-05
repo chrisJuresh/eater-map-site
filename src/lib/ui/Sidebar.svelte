@@ -322,6 +322,16 @@
     text-transform: uppercase;
   }
 
+  /* The source-guide link keeps the reddish-orange eyebrow look — just pressable. */
+  .eyebrow a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .eyebrow a:hover {
+    text-decoration: underline;
+  }
+
   h1 {
     margin: 0;
     max-width: 100%;
@@ -337,8 +347,10 @@
     letter-spacing: -0.01em;
   }
 
-  /* The dish prefix ("Kifto/Lamb at ") reads lighter so the restaurant is bold. */
+  /* The dish prefix ("Kifto/Lamb at ") reads lighter and smaller so the
+     restaurant name is clearly the focus. */
   .name-dishes {
+    font-size: 0.62em;
     font-weight: 400;
     color: var(--ink-mute);
   }
