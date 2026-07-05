@@ -97,36 +97,21 @@
     map.on('moveend', () => {
       renderer.schedule();
       settleSoon();
+      renderer.syncSpider(app.selected); // open/close the fan as the zoom gate is crossed
       const center = map.getCenter();
       onViewChange?.({ zoom: map.getZoom(), lat: center.lat, lon: center.lng });
     });
     map.on('idle', () => settleSoon());
     map.on('movestart', (event) => {
-      if (event.originalEvent) {
-        mapWasInteractedWith = true;
-        renderer.collapseSpider(); // a user camera gesture retracts an open fan
-      }
+      if (event.originalEvent) mapWasInteractedWith = true;
     });
     map.on('click', (event) => {
       const action = renderer.activate(event.point, { touch: isTouch(event) });
-      if (!action) return;
-      switch (action.type) {
-        case 'select':
-          app.select(action.restaurant);
-          app.linesPopup = null; // restaurant takes priority
-          break;
-        case 'spiderfy':
-          app.linesPopup = null; // fan opened; user picks a leg next
-          break;
-        case 'zoom':
-          app.linesPopup = null;
-          map.easeTo({ center: action.center, zoom: action.zoom, duration: 350 });
-          break;
-        case 'consumed':
-          break; // tap-away closed the fan
-        case 'lines':
-        default:
-          app.linesPopup = linesAt(event.point);
+      if (action?.type === 'select') {
+        app.select(action.restaurant);
+        app.linesPopup = null; // restaurant takes priority
+      } else {
+        app.linesPopup = linesAt(event.point);
       }
     });
     // Desktop hover: live line identification (touch devices rely on tap above).
@@ -172,13 +157,13 @@
     }
   });
 
-  // Collapse an open fan when the data set or selection changes elsewhere (a
-  // filter that removes members, a search/list/deep-link selection). Selecting a
-  // fanned member already collapses it in activate(), so this is a no-op then.
+  // Keep the fan in sync with the selection: a stacked selection at close zoom is
+  // always shown fanned; anything else collapses it. Idempotent, so re-selecting a
+  // member of the same stack keeps the fan open (no re-animate).
   $effect(() => {
     app.filtered;
     app.selected;
-    renderer?.collapseSpider();
+    if (mapReady) renderer?.syncSpider(app.selected);
   });
 
   // Swap basemap when connectivity changes (after initial mount).
@@ -294,14 +279,6 @@
   export function zoomBy(delta) {
     if (!map) return;
     map.easeTo({ zoom: clamp(map.getZoom() + delta, map.getMinZoom(), MAX_ZOOM), duration: 200 });
-  }
-
-  export function spiderOpen() {
-    return renderer?.isSpiderOpen() ?? false;
-  }
-
-  export function collapseSpider() {
-    renderer?.collapseSpider();
   }
 
   export function resetView() {

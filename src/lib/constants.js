@@ -64,11 +64,9 @@ export const MID_MARKER_ZOOM = 12;
 // Tapping a stack of overlapping markers fans them out into big, spaced,
 // thumb-tappable targets joined by "legs" to a shared origin. Replaces the old
 // repeat-tap cycling. See docs/ARCHITECTURE.md.
-/** "Sufficiently zoomed in" gate: at/above this we fan; below, a spread stack nudges the camera in. */
+/** "Sufficiently zoomed in" gate: the fan only appears at/above this zoom. */
 export const SPIDERFY_MIN_ZOOM = FULL_MARKER_ZOOM;
-/** Px span (at a given zoom) below which markers read as stacked. Drives the co-located test. */
-export const SPIDER_SEPARATION_PX = 34;
-/** BFS link distance to grow the true cluster from the tapped seed (2*fullRadius+4). */
+/** BFS link distance to grow the true cluster from the selected seed (2*fullRadius+4). */
 export const SPIDER_STACK_LINK_PX = 28;
 /** Centre-to-centre spacing of adjacent fanned dots on the ring (24px dot + a tiny gap). */
 export const SPIDER_GAP = 30;

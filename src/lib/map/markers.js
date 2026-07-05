@@ -10,7 +10,6 @@ import {
   MARKER_LAYER_OPACITY,
   MARKER_PADDING,
   MARKER_SPRITE_PADDING,
-  MAX_ZOOM,
   MID_MARKER_ZOOM,
   PRICED_MARKER_LAYER_OPACITY,
   SPIDER_EDGE_PAD,
@@ -18,7 +17,6 @@ import {
   SPIDER_MAX,
   SPIDER_MIN_R,
   SPIDER_MS,
-  SPIDER_SEPARATION_PX,
   SPIDER_STACK_LINK_PX,
   SPIDER_STAGGER,
   SPIDERFY_MIN_ZOOM,
@@ -318,6 +316,7 @@ export class MarkerRenderer {
     const set = [seed];
     const queue = [{ px: seedPx }];
     while (queue.length) {
+      if (set.length >= SPIDER_MAX) break; // safety: never grow/scan an unbounded stack
       const current = queue.pop();
       for (const restaurant of pool) {
         if (inSet.has(restaurant.id)) continue;
@@ -342,74 +341,39 @@ export class MarkerRenderer {
     return set;
   }
 
-  /** Max pairwise screen distance of a cluster's BASE coords, evaluated at `zoom`. */
-  geoSpanAtZoom(cluster, zoom) {
-    const factor = 2 ** (zoom - this.map.getZoom());
-    const points = cluster.map((r) => this.map.project([r.lon, r.lat]));
-    let max = 0;
-    for (let i = 0; i < points.length; i++) {
-      for (let j = i + 1; j < points.length; j++) {
-        const dx = (points[i].x - points[j].x) * factor;
-        const dy = (points[i].y - points[j].y) * factor;
-        const distance = Math.hypot(dx, dy);
-        if (distance > max) max = distance;
-      }
+  /**
+   * Keep the fan in sync with the current selection: a stacked selection at
+   * close zoom is always shown fanned; anything else collapses it. Idempotent —
+   * re-selecting a member of the SAME stack keeps the existing fan (no re-animate).
+   */
+  syncSpider(selected) {
+    if (!this.map) return;
+    if (!selected || this.map.getZoom() < SPIDERFY_MIN_ZOOM) {
+      this.collapseSpider();
+      return;
     }
-    return max;
+    const cluster = this.buildCluster(selected);
+    if (cluster.length <= 1) {
+      this.collapseSpider();
+      return;
+    }
+    if (this.spider && this.sameMembers(cluster)) return; // already fanned — highlight updates on draw
+    this.openSpider(cluster);
   }
 
-  /** True when zooming could physically un-stack the cluster (vs exact dupes). */
-  isSeparableAtMaxZoom(cluster) {
-    return this.geoSpanAtZoom(cluster, MAX_ZOOM) >= SPIDER_SEPARATION_PX;
-  }
-
-  geoCentroid(cluster) {
-    let lon = 0;
-    let lat = 0;
-    for (const r of cluster) {
-      lon += r.lon;
-      lat += r.lat;
-    }
-    return [lon / cluster.length, lat / cluster.length];
-  }
-
-  /** Camera zoom that pulls a separable cluster apart (for below-gate taps). */
-  separateZoom(cluster) {
-    const current = this.map.getZoom();
-    let minLon = Infinity;
-    let minLat = Infinity;
-    let maxLon = -Infinity;
-    let maxLat = -Infinity;
-    for (const r of cluster) {
-      minLon = Math.min(minLon, r.lon);
-      maxLon = Math.max(maxLon, r.lon);
-      minLat = Math.min(minLat, r.lat);
-      maxLat = Math.max(maxLat, r.lat);
-    }
-    try {
-      const camera = this.map.cameraForBounds(
-        [
-          [minLon, minLat],
-          [maxLon, maxLat]
-        ],
-        { padding: 120, maxZoom: MAX_ZOOM }
-      );
-      if (camera && Number.isFinite(camera.zoom)) return clamp(camera.zoom, current + 1, MAX_ZOOM);
-    } catch {
-      // fall through
-    }
-    return Math.min(MAX_ZOOM, current + 2);
+  sameMembers(cluster) {
+    const members = this.spider?.members;
+    if (!members || members.length !== cluster.length) return false;
+    const ids = new Set(members.map((m) => m.restaurant.id));
+    return cluster.every((r) => ids.has(r.id));
   }
 
   openSpider(cluster) {
-    const anchor = this.map.project([cluster[0].lon, cluster[0].lat]); // true coord, no offset
+    const origin = this.map.project([cluster[0].lon, cluster[0].lat]); // true coord, no offset
     const slots = fanSlots(cluster.length);
-    const members = cluster.map((restaurant, i) => ({
-      restaurant,
-      tx: anchor.x + slots[i].dx,
-      ty: anchor.y + slots[i].dy
-    }));
-    this.applyEdgeCorrection(members);
+    // Store offsets from the origin (not absolute px) so the fan follows the map.
+    const members = cluster.map((restaurant, i) => ({ restaurant, dx: slots[i].dx, dy: slots[i].dy }));
+    this.applyEdgeCorrection(members, origin);
 
     const reduce = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
     this.spider = {
@@ -422,8 +386,8 @@ export class MarkerRenderer {
     this.spiderTick();
   }
 
-  /** Shift the whole constellation inward if any slot lands under an edge/topbar. */
-  applyEdgeCorrection(members) {
+  /** Nudge the whole constellation inward if any slot lands under an edge/topbar. */
+  applyEdgeCorrection(members, origin) {
     const width = this.host?.clientWidth || 0;
     const height = this.host?.clientHeight || 0;
     if (!width || !height) return;
@@ -434,10 +398,12 @@ export class MarkerRenderer {
     let minY = Infinity;
     let maxY = -Infinity;
     for (const m of members) {
-      minX = Math.min(minX, m.tx);
-      maxX = Math.max(maxX, m.tx);
-      minY = Math.min(minY, m.ty);
-      maxY = Math.max(maxY, m.ty);
+      const x = origin.x + m.dx;
+      const y = origin.y + m.dy;
+      minX = Math.min(minX, x);
+      maxX = Math.max(maxX, x);
+      minY = Math.min(minY, y);
+      maxY = Math.max(maxY, y);
     }
     let dx = 0;
     let dy = 0;
@@ -446,8 +412,8 @@ export class MarkerRenderer {
     if (minY - padTop < 0) dy = padTop - minY;
     else if (maxY + margin > height) dy = height - margin - maxY;
     if (dx || dy) for (const m of members) {
-      m.tx += dx;
-      m.ty += dy;
+      m.dx += dx;
+      m.dy += dy;
     }
   }
 
@@ -485,8 +451,8 @@ export class MarkerRenderer {
       return {
         member: m,
         ease,
-        cx: origin.x + (m.tx - origin.x) * ease,
-        cy: origin.y + (m.ty - origin.y) * ease
+        cx: origin.x + m.dx * ease,
+        cy: origin.y + m.dy * ease
       };
     });
 
@@ -539,14 +505,17 @@ export class MarkerRenderer {
     }
   }
 
-  /** Nearest fanned member under a point (or null). */
+  /** Nearest fanned member under a point (or null). Follows the map via the origin. */
   hitSpider(point, touch = false) {
-    if (!this.spider) return null;
+    if (!this.spider || !this.map) return null;
+    const origin = this.map.project(this.spider.anchorLngLat);
     const extra = touch ? TOUCH_HIT_EXTRA : HIT_EXTRA;
     let best = null;
     let bestDistance = Infinity;
     for (const m of this.spider.members) {
-      const distance = Math.hypot(point.x - m.tx, point.y - m.ty);
+      const x = origin.x + m.dx;
+      const y = origin.y + m.dy;
+      const distance = Math.hypot(point.x - x, point.y - y);
       if (distance <= FULL_RADIUS + extra && distance < bestDistance) {
         bestDistance = distance;
         best = m.restaurant;
@@ -571,38 +540,27 @@ export class MarkerRenderer {
   }
 
   /**
-   * Resolve a tap/click. Returns a typed action for MapView to carry out:
-   *  - { type: 'select', restaurant }  → open its details
+   * Resolve a tap/click into a selection. Returns:
+   *  - { type: 'select', restaurant }  → open its details (the fan, if any, is
+   *      opened/closed by syncSpider() reacting to the new selection)
    *  - { type: 'lines' }               → show the rail/tube lines popup
-   *  - { type: 'spiderfy' }            → fan opened (side effect); just clear popups
-   *  - { type: 'zoom', center, zoom }  → ease the camera in to un-stack a spread cluster
-   *  - { type: 'consumed' }            → tap-away closed a fan; do nothing else
+   *
+   * No camera moves and no clustering happen here — clicking never zooms, and a
+   * far-zoom tap just selects the nearest marker.
    */
   activate(point, { touch = false } = {}) {
     if (!this.map) return null;
     const extra = touch ? TOUCH_HIT_EXTRA : HIT_EXTRA;
 
-    // A fan is open: it owns this tap.
+    // An open fan owns taps that land on its legs.
     if (this.spider) {
       const hit = this.hitSpider(point, touch);
-      this.collapseSpider();
-      return hit ? { type: 'select', restaurant: hit } : { type: 'consumed' };
+      if (hit) return { type: 'select', restaurant: hit };
     }
 
     const { restaurants, selectedId } = this.read();
     const candidates = candidatesAt(this.map, restaurants, selectedId, point, extra);
     if (!candidates.length) return { type: 'lines' };
-    if (candidates.length === 1) return { type: 'select', restaurant: candidates[0].restaurant };
-
-    const cluster = this.buildCluster(candidates[0].restaurant);
-    if (cluster.length <= 1) return { type: 'select', restaurant: candidates[0].restaurant };
-
-    const z = this.map.getZoom();
-    if (z < SPIDERFY_MIN_ZOOM && this.isSeparableAtMaxZoom(cluster)) {
-      // Below the fan gate and zooming can help — nudge the camera in instead.
-      return { type: 'zoom', center: this.geoCentroid(cluster), zoom: this.separateZoom(cluster) };
-    }
-    this.openSpider(cluster);
-    return { type: 'spiderfy' };
+    return { type: 'select', restaurant: candidates[0].restaurant };
   }
 }
