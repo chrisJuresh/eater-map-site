@@ -23,7 +23,7 @@
 //      of distinct descriptions (near-identical text collapsed). The 38-best priced
 //      entry wins the primary display fields.
 //
-// Usage: node data-pipeline/scripts/dedupe.mjs [--in FILE] [--out FILE] [--write]
+// Usage: node scripts/dedupe.mjs [--in FILE] [--out FILE] [--write]
 //   default in:  static/data/restaurants.raw.json
 //   default out: static/data/restaurants.json
 //   without --write it is a dry run (report only, no file written)
