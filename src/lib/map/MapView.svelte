@@ -115,15 +115,14 @@
       }
     });
     // Desktop hover: live line identification (touch devices rely on tap above).
-    // hitTest is non-mutating so hovering never disturbs the tap-cycle state.
+    // A restaurant and a line can sit under the cursor at once — show the line popup
+    // regardless (it is pointer-events:none, so clicks still fall through to select
+    // the restaurant, which the click handler prioritises). hitTest is non-mutating,
+    // so hovering never disturbs the tap-cycle state.
     map.on('mousemove', (event) => {
-      if (renderer.hitTest(event.point)) {
-        app.hoverLines = null;
-        map.getCanvas().style.cursor = 'pointer';
-        return;
-      }
+      const overRestaurant = Boolean(renderer.hitTest(event.point));
       app.hoverLines = linesAt(event.point);
-      map.getCanvas().style.cursor = app.hoverLines ? 'pointer' : '';
+      map.getCanvas().style.cursor = overRestaurant || app.hoverLines ? 'pointer' : '';
     });
     map.on('mouseout', () => (app.hoverLines = null));
 
