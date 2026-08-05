@@ -25,6 +25,9 @@
     bottom: max(12px, env(safe-area-inset-bottom));
     display: flex;
     gap: 0;
+    /* Height on the bordered shell (buttons stretch inside) so the bar is the
+       same 40px as the roadmap button across the row. */
+    height: var(--control-h-sm);
     z-index: 9;
     border: 1px solid var(--line);
     border-radius: var(--r-s);
@@ -34,13 +37,14 @@
   }
 
   .price-controls button {
-    min-width: 40px;
-    height: 36px;
+    min-width: 44px;
+    height: 100%;
     border: 0;
     border-right: 1px solid var(--line-soft);
     padding: 0 10px;
-    font-size: 12px;
-    font-weight: 800;
+    font-size: var(--control-font);
+    font-weight: var(--control-weight);
+    line-height: 1;
     color: var(--ink);
     background: transparent;
     cursor: pointer;

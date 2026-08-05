@@ -26,10 +26,11 @@
 </div>
 
 <style>
+  /* Sits one gap below the top bar — derived, so it follows the control height. */
   .zoom-controls {
     position: absolute;
     right: 12px;
-    top: 84px;
+    top: calc(max(12px, env(safe-area-inset-top)) + var(--control-h) + 12px);
     display: grid;
     gap: 6px;
     z-index: 9;
@@ -38,27 +39,22 @@
   .zoom-controls button {
     display: grid;
     place-items: center;
-    width: 44px;
-    height: 44px;
+    width: var(--control-h-sm);
+    height: var(--control-h-sm);
     border: 1px solid var(--line);
     border-radius: var(--r-s);
     color: var(--ink);
     background: var(--surface);
     box-shadow: var(--shadow-2);
     cursor: pointer;
-    font-size: 24px;
-    font-weight: 800;
+    font-size: 20px;
+    font-weight: var(--control-weight);
+    line-height: 1;
   }
 
   .location-button.active {
     color: #fff;
     background: var(--blue);
     border-color: var(--blue);
-  }
-
-  @media (max-width: 820px) {
-    .zoom-controls {
-      top: 98px;
-    }
   }
 </style>

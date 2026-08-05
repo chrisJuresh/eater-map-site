@@ -258,21 +258,25 @@
     color: var(--ink);
     background: var(--surface);
     box-shadow: var(--shadow-3);
-    font-weight: 800;
+    font-size: var(--control-font);
+    font-weight: var(--control-weight);
   }
 
   .state-pill.error {
     color: var(--error);
   }
 
+  /* A 22px pill centred against the bottom control row (price / roadmap). */
   .attribution {
     position: absolute;
     right: 118px;
-    bottom: 8px;
+    bottom: calc(max(12px, env(safe-area-inset-bottom)) + (var(--control-h-sm) - 22px) / 2);
     z-index: 8;
     display: flex;
+    align-items: center;
     gap: 5px;
-    padding: 3px 6px;
+    height: 22px;
+    padding: 0 6px;
     border-radius: 5px;
     background: rgba(255, 252, 244, 0.82);
     font-size: 11px;
@@ -289,6 +293,12 @@
 
     .map {
       height: 100dvh;
+    }
+
+    /* No room beside the price filter — sit one gap above the bottom row. */
+    .attribution {
+      right: 12px;
+      bottom: calc(max(12px, env(safe-area-inset-bottom)) + var(--control-h-sm) + 6px);
     }
   }
 </style>

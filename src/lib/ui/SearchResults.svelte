@@ -78,9 +78,10 @@
 <style>
   .results-shell {
     position: absolute;
-    top: calc(max(12px, env(safe-area-inset-top)) + var(--topbar-height, 56px) + 8px);
+    top: calc(max(12px, env(safe-area-inset-top)) + var(--topbar-height, 48px) + 8px);
     left: 12px;
-    bottom: calc(max(12px, env(safe-area-inset-bottom)) + 50px);
+    /* Clear the price filter in the bottom-left corner. */
+    bottom: calc(max(12px, env(safe-area-inset-bottom)) + var(--control-h-sm) + 8px);
     width: min(420px, calc(100vw - 24px));
     z-index: 12;
     pointer-events: none;

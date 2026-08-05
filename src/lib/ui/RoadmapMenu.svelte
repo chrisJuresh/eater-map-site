@@ -51,7 +51,7 @@
   .roadmap-menu > button {
     display: grid;
     width: 100%;
-    height: 40px;
+    height: var(--control-h-sm);
     place-items: center;
     padding: 0 12px;
     border: 1px solid var(--line);
@@ -59,7 +59,9 @@
     background: var(--surface);
     box-shadow: var(--shadow-2);
     cursor: pointer;
-    font-weight: 800;
+    font-size: var(--control-font);
+    font-weight: var(--control-weight);
+    line-height: 1;
     color: inherit;
   }
 
@@ -71,7 +73,7 @@
   .roadmap-menu ul {
     position: absolute;
     right: 0;
-    bottom: 48px;
+    bottom: calc(var(--control-h-sm) + 8px);
     display: grid;
     gap: 7px;
     width: min(320px, calc(100vw - 24px));
@@ -96,8 +98,7 @@
     }
 
     .roadmap-menu > button {
-      padding: 0 8px;
-      font-size: 13px;
+      padding: 0 10px;
     }
   }
 </style>

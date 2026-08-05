@@ -84,6 +84,13 @@ src/
   bounded scroll (custom mobile scrollbar). Differing website/Eater links become
   a picker; differing phones a list; the fullest address wins. Header shows the
   deduped restaurant count (`stats.restaurantCount`), not raw appearances.
+- **Map chrome scale**: every floating control uses the `--control-*` tokens in
+  `app.css` — `--control-h` (48px: search card, Reset, offline chip),
+  `--control-h-sm` (40px: zoom, price filter, roadmap) and one label style
+  (`--control-font` 14px / `--control-weight` 700). Heights are set on the
+  element (never derived from padding) so a row stays flush whatever it holds,
+  and neighbours (zoom top, results dropdown, attribution) offset from the
+  tokens rather than hardcoded pixels.
 - **Entries list** (desktop idle panel): ordered `$$`, `$`, `$$$`, `$$$$`, then
   the unpriced rest — each group by distance from central London.
 - **Offline**: the service worker precaches app shell + data + basemap with

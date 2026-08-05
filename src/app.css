@@ -26,6 +26,13 @@
   --r-m: 12px;
   --r-full: 999px;
 
+  /* Floating map chrome (top bar, zoom, price, roadmap) shares one scale so every
+     control in a row is the same height and every label the same size/weight. */
+  --control-h: 48px; /* top bar: search card, Reset, offline chip */
+  --control-h-sm: 40px; /* secondary: zoom, price filter, roadmap */
+  --control-font: 14px;
+  --control-weight: 700;
+
   --shadow-1: 0 2px 10px rgba(27, 31, 28, 0.1);
   --shadow-2: 0 8px 22px rgba(27, 31, 28, 0.12);
   --shadow-3: 0 18px 40px rgba(27, 31, 28, 0.18);
