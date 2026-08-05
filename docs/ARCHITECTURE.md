@@ -93,11 +93,16 @@ src/
   whatever it holds, and neighbours (zoom top, results dropdown, attribution)
   offset from the tokens rather than hardcoded pixels.
 - **Visual language (iOS 26 / Apple Maps)**: chrome is "liquid glass" — a
-  translucent fill (`--glass`, `--glass-thick`, `--glass-sheet`) over
-  `--glass-filter` (blur + saturation), a specular rim (`--glass-rim`: bright
-  inner top edge plus a 0.5px outer hairline) and a soft ambient shadow
-  (`--elev-1..3`). Controls are capsules (`--r-full`), menus 14px, popovers
-  20px, the mobile sheet 28px with a grabber. Colour is the iOS light-appearance
+  translucent fill (`--glass`, `--glass-thick`, `--glass-sheet`,
+  `--glass-sheet-float`) over `--glass-filter` (blur + saturation), a specular
+  rim (`--glass-rim`: bright inner top edge plus a 0.5px outer hairline) and a
+  soft ambient shadow (`--elev-1..3`). Controls are capsules (`--r-full`), menus
+  14px, popovers 20px, the mobile sheet 28px with a grabber. The mobile sheet
+  floats over the live map, so it is a true glass material — `--glass-sheet-float`
+  (0.74) over the heavier `--glass-filter-heavy` blur, plus the rim — where the
+  desktop panel sits over the page background and stays near-opaque
+  (`--glass-sheet`, 0.93). Scrims inside the sheet (the descriptions fade) end
+  on the sheet's own fill, never flat white. Colour is the iOS light-appearance
   system palette (`--label*`, `--separator*`, `--fill-*`, `--blue` #007AFF);
   actions are blue, never filled ink. Type is SF Pro via `-apple-system` at iOS
   sizes (17 body / 15 subhead / 13 footnote) with negative tracking. Deliberately
