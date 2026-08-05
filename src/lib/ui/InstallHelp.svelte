@@ -41,6 +41,8 @@
 {/if}
 
 <style>
+  /* UIAlertController: dimmed backdrop, 270px vibrant card, hairline-separated
+     blue action button across the foot. */
   .install-help {
     position: fixed;
     inset: 0;
@@ -48,46 +50,73 @@
     display: grid;
     place-items: center;
     padding: 20px;
-    background: rgba(23, 32, 28, 0.5);
+    background: rgba(0, 0, 0, 0.32);
   }
 
   .install-help-card {
-    width: min(360px, 100%);
-    padding: 20px 22px;
-    border-radius: 14px;
-    background: var(--paper);
-    box-shadow: var(--shadow-4);
+    overflow: hidden;
+    width: min(300px, 100%);
+    padding: 0;
+    border-radius: var(--r-menu);
+    background: var(--glass-sheet);
+    -webkit-backdrop-filter: var(--glass-filter);
+    backdrop-filter: var(--glass-filter);
+    box-shadow: var(--elev-3);
+    text-align: center;
   }
 
   .install-help-card h2 {
-    margin: 0 0 12px;
-    font-size: 18px;
+    margin: 0;
+    padding: 19px 16px 0;
+    font-size: 17px;
+    font-weight: var(--control-weight);
+    letter-spacing: -0.02em;
   }
 
   .install-help-card ol {
-    margin: 0 0 12px;
-    padding-left: 20px;
+    margin: 8px 0 0;
+    padding: 0 18px;
     display: grid;
-    gap: 8px;
-    line-height: 1.4;
-    font-size: 14px;
+    gap: 7px;
+    list-style: none;
+    counter-reset: step;
+    line-height: 1.35;
+    font-size: 13px;
+    text-align: left;
+  }
+
+  .install-help-card li {
+    counter-increment: step;
+  }
+
+  .install-help-card li::before {
+    content: counter(step) '. ';
+    color: var(--label-secondary);
   }
 
   .install-help-note {
-    margin: 0 0 14px;
-    color: var(--ink-mute);
+    margin: 10px 0 0;
+    padding: 0 18px 17px;
+    color: var(--label-secondary);
     font-size: 13px;
-    line-height: 1.4;
+    line-height: 1.35;
   }
 
   .install-help-card button {
     width: 100%;
-    min-height: 42px;
+    min-height: 44px;
     border: 0;
-    border-radius: var(--r-s);
-    color: #fff;
-    background: var(--ink);
-    font-weight: 800;
+    border-top: 0.5px solid var(--separator-strong);
+    border-radius: 0;
+    color: var(--blue);
+    background: transparent;
+    font-size: 17px;
+    font-weight: var(--control-weight);
     cursor: pointer;
+  }
+
+  .install-help-card button:active {
+    opacity: 1;
+    background: var(--fill-tertiary);
   }
 </style>

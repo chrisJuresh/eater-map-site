@@ -28,15 +28,17 @@
     display: flex;
     flex-direction: column;
     gap: 3px;
-    padding: 7px 9px;
-    border-radius: var(--r-s);
-    background: var(--surface-solid);
-    border: 1px solid var(--line);
-    box-shadow: var(--shadow-2);
+    padding: 8px 11px;
+    border-radius: var(--r-menu);
+    background: var(--glass-thick);
+    -webkit-backdrop-filter: var(--glass-filter);
+    backdrop-filter: var(--glass-filter);
+    border: 0;
+    box-shadow: var(--glass-rim), var(--elev-1);
     pointer-events: none;
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--ink);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--label);
   }
 
   .line-chip {
@@ -52,7 +54,7 @@
     flex: 0 0 auto;
     width: 14px;
     height: 4px;
-    border-radius: 2px;
-    box-shadow: 0 0 0 1px rgba(23, 32, 28, 0.15);
+    border-radius: var(--r-full);
+    box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.12);
   }
 </style>

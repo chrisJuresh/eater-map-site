@@ -7,7 +7,8 @@ mutate it directly.
 
 ```
 src/
-  app.css                 Design tokens (CSS custom properties) + global base
+  app.css                 Design tokens (iOS system palette + glass materials)
+                          and global base
   app.html                PWA meta / manifest / icons
   service-worker.js       Offline precache (streaming progress messages) +
                           HTTP-Range slicing so .pmtiles reads work from cache
@@ -37,7 +38,7 @@ src/
     ui/
       TopBar.svelte       Search + Reset + offline/install chip
       SearchResults.svelte  Dropdown + "Go to place" geocode row
-      ZoomControls.svelte   +/− and locate (crosshair)
+      ZoomControls.svelte   +/− capsule and locate (arrow, blue while tracking)
       PriceFilter.svelte    Segmented All/$/$$/$$$/$$$$
       LinesPopup.svelte     Rail lines under cursor/finger
       RoadmapMenu.svelte    Planned-features menu (bottom right)
@@ -84,6 +85,23 @@ src/
   bounded scroll (custom mobile scrollbar). Differing website/Eater links become
   a picker; differing phones a list; the fullest address wins. Header shows the
   deduped restaurant count (`stats.restaurantCount`), not raw appearances.
+- **Map chrome scale**: every floating control uses the `--control-*` tokens in
+  `app.css` — `--control-h` (48px: search field, Reset, offline chip),
+  `--control-h-sm` (44px, the iOS minimum target: zoom, price filter, roadmap)
+  and one label style (`--control-font` 15px / `--control-weight` 590). Heights
+  are set on the element (never derived from padding) so a row stays flush
+  whatever it holds, and neighbours (zoom top, results dropdown, attribution)
+  offset from the tokens rather than hardcoded pixels.
+- **Visual language (iOS 26 / Apple Maps)**: chrome is "liquid glass" — a
+  translucent fill (`--glass`, `--glass-thick`, `--glass-sheet`) over
+  `--glass-filter` (blur + saturation), a specular rim (`--glass-rim`: bright
+  inner top edge plus a 0.5px outer hairline) and a soft ambient shadow
+  (`--elev-1..3`). Controls are capsules (`--r-full`), menus 14px, popovers
+  20px, the mobile sheet 28px with a grabber. Colour is the iOS light-appearance
+  system palette (`--label*`, `--separator*`, `--fill-*`, `--blue` #007AFF);
+  actions are blue, never filled ink. Type is SF Pro via `-apple-system` at iOS
+  sizes (17 body / 15 subhead / 13 footnote) with negative tracking. Deliberately
+  light-only: the basemap has no dark style, so dark chrome would fight it.
 - **Entries list** (desktop idle panel): ordered `$$`, `$`, `$$$`, `$$$$`, then
   the unpriced rest — each group by distance from central London.
 - **Offline**: the service worker precaches app shell + data + basemap with
