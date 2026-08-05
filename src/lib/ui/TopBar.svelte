@@ -17,27 +17,31 @@
 
 <div class="topbar" bind:this={topbarEl}>
   <label class="search">
-    <span>Search</span>
-    <div class="search-field">
-      <input
-        bind:value={app.query}
-        type="text"
-        placeholder="Restaurant, place or address"
-        autocomplete="off"
-        enterkeyhint="search"
-        onkeydown={(event) => event.key === 'Enter' && onGoToSearch()}
-      />
-      {#if app.searchText}
-        <output class="search-count" aria-live="polite">{app.filtered.length.toLocaleString()}</output>
-      {/if}
-      {#if app.query}
-        <button class="search-clear" type="button" onclick={() => (app.query = '')} aria-label="Clear search" title="Clear">
-          <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
-            <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" />
-          </svg>
-        </button>
-      {/if}
-    </div>
+    <svg class="search-glyph" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true">
+      <circle cx="10.5" cy="10.5" r="6.6" fill="none" stroke="currentColor" stroke-width="2.2" />
+      <line x1="15.6" y1="15.6" x2="21" y2="21" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+    </svg>
+    <input
+      bind:value={app.query}
+      type="text"
+      aria-label="Search"
+      placeholder="Search Maps"
+      autocomplete="off"
+      enterkeyhint="search"
+      onkeydown={(event) => event.key === 'Enter' && onGoToSearch()}
+    />
+    {#if app.searchText}
+      <output class="search-count" aria-live="polite">{app.filtered.length.toLocaleString()}</output>
+    {/if}
+    {#if app.query}
+      <button class="search-clear" type="button" onclick={() => (app.query = '')} aria-label="Clear search" title="Clear">
+        <!-- SF Symbol "xmark.circle.fill": white glyph knocked out of a grey disc. -->
+        <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true">
+          <circle cx="10" cy="10" r="9" fill="currentColor" />
+          <path d="M7 7l6 6M13 7l-6 6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" />
+        </svg>
+      </button>
+    {/if}
   </label>
   <button class="reset-button" type="button" onclick={onReset}>Reset</button>
   {#if !app.isStandalone}
@@ -87,36 +91,26 @@
     pointer-events: auto;
   }
 
-  /* Fixed height (not padding-derived) so the card always matches the buttons
+  /* Fixed height (not padding-derived) so the capsule always matches the buttons
      beside it, whatever the field holds. */
   .search {
-    display: grid;
-    align-content: center;
-    gap: 2px;
-    height: var(--control-h);
-    max-width: 560px;
-    padding: 0 10px;
-    border: 1px solid var(--line);
-    border-radius: var(--r-s);
-    background: var(--surface);
-    box-shadow: var(--shadow-2);
-  }
-
-  .search span {
-    font-size: 11px;
-    line-height: 1;
-    color: var(--ink-faint);
-    text-transform: uppercase;
-    font-weight: var(--control-weight);
-    letter-spacing: 0.04em;
-  }
-
-  .search-field {
     display: flex;
     align-items: center;
     gap: 8px;
-    height: 24px;
-    min-width: 0;
+    height: var(--control-h);
+    max-width: 560px;
+    padding: 0 14px;
+    border: 0;
+    border-radius: var(--r-full);
+    background: var(--glass);
+    -webkit-backdrop-filter: var(--glass-filter);
+    backdrop-filter: var(--glass-filter);
+    box-shadow: var(--glass-rim), var(--elev-1);
+  }
+
+  .search-glyph {
+    flex: 0 0 auto;
+    color: var(--label-secondary);
   }
 
   .search input {
@@ -127,40 +121,44 @@
     outline: 0;
     padding: 0;
     background: transparent;
-    color: var(--ink);
-    font-size: 16px; /* prevents iOS focus zoom */
-    line-height: 1;
+    color: var(--label);
+    font-size: 17px; /* iOS body; also prevents iOS focus zoom */
+    line-height: 1.2;
+  }
+
+  .search input::placeholder {
+    color: var(--label-secondary);
   }
 
   .search-count {
-    min-width: 28px;
-    padding: 3px 6px;
+    flex: 0 0 auto;
+    min-width: 26px;
+    padding: 3px 7px;
     border-radius: var(--r-full);
-    color: #fff;
-    background: var(--ink);
+    color: var(--label-secondary);
+    background: var(--fill-secondary);
     text-align: center;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: var(--control-weight);
-    line-height: 1;
+    line-height: 1.25;
+    font-variant-numeric: tabular-nums;
   }
 
   .search-clear {
     flex: 0 0 auto;
     display: grid;
     place-items: center;
-    width: 24px;
-    height: 24px;
+    width: 22px;
+    height: 22px;
     padding: 0;
     border: 0;
-    border-radius: var(--r-full);
-    color: var(--ink-mute);
-    background: var(--chip);
+    background: transparent;
+    color: var(--label-tertiary);
     cursor: pointer;
   }
 
   .search-clear:hover {
-    color: var(--ink);
-    background: var(--line);
+    color: var(--label-secondary);
   }
 
   .reset-button,
@@ -170,13 +168,15 @@
     justify-content: center;
     gap: 7px;
     height: var(--control-h);
-    padding: 0 12px;
-    border: 1px solid var(--line);
-    color: var(--ink);
-    background: var(--surface);
-    box-shadow: var(--shadow-2);
+    padding: 0 16px;
+    border: 0;
+    color: var(--blue);
+    background: var(--glass);
+    -webkit-backdrop-filter: var(--glass-filter);
+    backdrop-filter: var(--glass-filter);
+    box-shadow: var(--glass-rim), var(--elev-1);
     cursor: pointer;
-    border-radius: var(--r-s);
+    border-radius: var(--r-full);
     font-size: var(--control-font);
     font-weight: var(--control-weight);
     /* Line box = font size, so the dot and tick centre on the label's glyphs. */
@@ -190,10 +190,11 @@
 
   .offline-button {
     min-width: 96px;
+    color: var(--label);
   }
 
   .offline-button.ready {
-    color: var(--green-deep);
+    color: var(--green);
   }
 
   .offline-dot {
@@ -201,7 +202,7 @@
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: #b9b1a3;
+    background: var(--label-tertiary);
   }
 
   .offline-dot.online {
@@ -216,12 +217,16 @@
 
   @media (max-width: 820px) {
     .topbar {
-      grid-template-columns: minmax(0, 1fr) 58px auto;
+      grid-template-columns: minmax(0, 1fr) 62px auto;
+    }
+
+    .reset-button,
+    .offline-button {
+      padding: 0 12px;
     }
 
     .offline-button {
-      min-width: 84px;
-      padding: 0 10px;
+      min-width: 88px;
     }
   }
 </style>

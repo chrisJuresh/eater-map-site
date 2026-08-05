@@ -253,37 +253,47 @@
     top: 50%;
     transform: translate(-50%, -50%);
     z-index: 20;
-    padding: 10px 14px;
-    border-radius: var(--r-s);
-    color: var(--ink);
-    background: var(--surface);
-    box-shadow: var(--shadow-3);
+    padding: 11px 18px;
+    border-radius: var(--r-full);
+    color: var(--label);
+    background: var(--glass-thick);
+    -webkit-backdrop-filter: var(--glass-filter);
+    backdrop-filter: var(--glass-filter);
+    box-shadow: var(--glass-rim), var(--elev-2);
     font-size: var(--control-font);
     font-weight: var(--control-weight);
   }
 
   .state-pill.error {
-    color: var(--error);
+    color: var(--red);
   }
 
-  /* A 22px pill centred against the bottom control row (price / roadmap). */
+  /* A 22px glass pill centred against the bottom control row (price / roadmap). */
   .attribution {
     position: absolute;
-    right: 118px;
+    right: 130px;
     bottom: calc(max(12px, env(safe-area-inset-bottom)) + (var(--control-h-sm) - 22px) / 2);
     z-index: 8;
     display: flex;
     align-items: center;
     gap: 5px;
     height: 22px;
-    padding: 0 6px;
-    border-radius: 5px;
-    background: rgba(255, 252, 244, 0.82);
+    padding: 0 9px;
+    border-radius: var(--r-full);
+    background: var(--glass);
+    -webkit-backdrop-filter: var(--glass-filter);
+    backdrop-filter: var(--glass-filter);
+    box-shadow: var(--glass-rim);
     font-size: 11px;
   }
 
   .attribution a {
-    color: var(--ink-soft);
+    color: var(--label-secondary);
+    text-decoration: none;
+  }
+
+  .attribution a:hover {
+    text-decoration: underline;
   }
 
   @media (max-width: 820px) {

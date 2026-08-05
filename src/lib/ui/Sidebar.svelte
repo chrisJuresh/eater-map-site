@@ -145,8 +145,16 @@
 </script>
 
 <aside class:open={selected} class="details-panel">
+  <!-- Mobile only: the sheet grabber every iOS sheet carries. -->
+  <span class="sheet-grabber" aria-hidden="true"></span>
   {#if selected}
-    <button class="close-button" type="button" onclick={() => app.closeDetails()} aria-label="Close">×</button>
+    <button class="close-button" type="button" onclick={() => app.closeDetails()} aria-label="Close">
+      <!-- SF Symbol "xmark.circle.fill". -->
+      <svg viewBox="0 0 30 30" width="30" height="30" aria-hidden="true">
+        <circle cx="15" cy="15" r="15" fill="currentColor" />
+        <path d="M10.6 10.6l8.8 8.8M19.4 10.6l-8.8 8.8" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="2.2" stroke-linecap="round" />
+      </svg>
+    </button>
     {#if guideCount > 1}
       <p class="eyebrow">Featured in {guideCount} Eater guides</p>
     {:else if guideLinks[0]}
@@ -217,33 +225,87 @@
       </div>
     {/if}
 
+    <!-- iOS place-card actions: a tinted glyph disc with its caption beneath. -->
     <div class="actions">
       {#if googleMapsUrl}
-        <a href={googleMapsUrl} target="_blank" rel="noreferrer" aria-label={`Open ${nameCore} in Google Maps`}>
-          <span class="action-label-full">Google Maps</span>
-          <span class="action-label-short">Google</span>
+        <a class="primary" href={googleMapsUrl} target="_blank" rel="noreferrer" aria-label={`Open ${nameCore} in Google Maps`}>
+          <span class="action-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="19" height="19">
+              <path d="M21 3L3 10.6l7.6 2.8L13.4 21 21 3z" fill="currentColor" />
+            </svg>
+          </span>
+          <span class="action-label"
+            ><span class="action-label-full">Google Maps</span><span class="action-label-short">Google</span></span
+          >
         </a>
       {/if}
       {#if citymapperUrl}
         <a class="citymapper-action" href={citymapperUrl} aria-label={`Open mobile directions to ${nameCore} in Citymapper`}>
-          Citymapper
+          <span class="action-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="19" height="19">
+              <rect x="5.5" y="3.2" width="13" height="14" rx="3.4" fill="none" stroke="currentColor" stroke-width="1.9" />
+              <path d="M8.6 12.6h6.8" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" />
+              <circle cx="9.2" cy="15.2" r="1.05" fill="currentColor" />
+              <circle cx="14.8" cy="15.2" r="1.05" fill="currentColor" />
+              <path d="M8.6 18.2l-1.4 2.6M15.4 18.2l1.4 2.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+            </svg>
+          </span>
+          <span class="action-label">Citymapper</span>
         </a>
       {/if}
       <button class="share-action" type="button" onclick={share} aria-label={`Share a link to ${nameCore}`}>
-        {shareFeedback || 'Share'}
+        <span class="action-icon" aria-hidden="true">
+          <!-- SF Symbol "square.and.arrow.up". -->
+          <svg viewBox="0 0 24 24" width="19" height="19">
+            <path d="M12 3.4v11" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" />
+            <path d="M8.4 6.9L12 3.3l3.6 3.6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M6.6 10.4H5.8v10h12.4v-10h-.8" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+        <span class="action-label">{shareFeedback || 'Share'}</span>
       </button>
       {#if websiteUrls.length === 1}
-        <a href={websiteUrls[0]} target="_blank" rel="noreferrer">Website</a>
+        <a href={websiteUrls[0]} target="_blank" rel="noreferrer">
+          <span class="action-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="19" height="19">
+              <circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="1.9" />
+              <ellipse cx="12" cy="12" rx="4" ry="8.6" fill="none" stroke="currentColor" stroke-width="1.6" />
+              <path d="M3.7 9.4h16.6M3.7 14.6h16.6" stroke="currentColor" stroke-width="1.6" />
+            </svg>
+          </span>
+          <span class="action-label">Website</span>
+        </a>
       {:else if websiteUrls.length > 1}
         <button type="button" class="picker-toggle" class:open={openPicker === 'website'} onclick={() => togglePicker('website')}>
-          Website ▾
+          <span class="action-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="19" height="19">
+              <circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="1.9" />
+              <ellipse cx="12" cy="12" rx="4" ry="8.6" fill="none" stroke="currentColor" stroke-width="1.6" />
+              <path d="M3.7 9.4h16.6M3.7 14.6h16.6" stroke="currentColor" stroke-width="1.6" />
+            </svg>
+          </span>
+          <span class="action-label">Website <span class="caret" aria-hidden="true">⌄</span></span>
         </button>
       {/if}
       {#if guideLinks.length === 1}
-        <a href={guideLinks[0].entryUrl} target="_blank" rel="noreferrer">Eater</a>
+        <a href={guideLinks[0].entryUrl} target="_blank" rel="noreferrer">
+          <span class="action-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="19" height="19">
+              <path d="M4.4 4.6h5.2A2.4 2.4 0 0112 7v12a2 2 0 00-2-1.6H4.4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+              <path d="M19.6 4.6h-5.2A2.4 2.4 0 0012 7v12a2 2 0 012-1.6h5.6z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+            </svg>
+          </span>
+          <span class="action-label">Eater</span>
+        </a>
       {:else if guideLinks.length > 1}
         <button type="button" class="picker-toggle" class:open={openPicker === 'eater'} onclick={() => togglePicker('eater')}>
-          Eater ▾
+          <span class="action-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="19" height="19">
+              <path d="M4.4 4.6h5.2A2.4 2.4 0 0112 7v12a2 2 0 00-2-1.6H4.4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+              <path d="M19.6 4.6h-5.2A2.4 2.4 0 0012 7v12a2 2 0 012-1.6h5.6z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+            </svg>
+          </span>
+          <span class="action-label">Eater <span class="caret" aria-hidden="true">⌄</span></span>
         </button>
       {/if}
     </div>
@@ -266,6 +328,9 @@
                 {#if restaurant.priceRange}
                   <span class="row-side price">{restaurant.priceRange}</span>
                 {/if}
+                <svg class="row-chevron" viewBox="0 0 24 24" width="13" height="13" aria-hidden="true">
+                  <path d="M9 4.5l7.5 7.5L9 19.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
               </button>
             </li>
           {/each}
@@ -281,45 +346,58 @@
 </aside>
 
 <style>
+  /* Desktop: a translucent material panel beside the map (iPadOS Maps sidebar).
+     Mobile: the same content as a bottom sheet — see the 820px block. */
   .details-panel {
     position: relative;
     min-width: 0;
     height: 100%;
     overflow: auto;
     padding: 22px 22px 28px;
-    border-left: 1px solid var(--line);
-    background: var(--paper);
-    box-shadow: -14px 0 32px rgba(27, 31, 28, 0.08);
+    border-left: 0.5px solid var(--separator-strong);
+    background: var(--glass-sheet);
+    -webkit-backdrop-filter: var(--glass-filter);
+    backdrop-filter: var(--glass-filter);
+    box-shadow: -14px 0 40px rgba(0, 0, 0, 0.07);
+  }
+
+  /* Grabber is a sheet affordance — mobile only. */
+  .sheet-grabber {
+    display: none;
   }
 
   .close-button {
     position: absolute;
-    top: 12px;
-    right: 12px;
-    width: 36px;
-    height: 36px;
-    border: 1px solid var(--line-soft);
-    border-radius: var(--r-s);
-    color: var(--ink);
-    background: var(--parch);
+    top: 14px;
+    right: 14px;
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--r-full);
+    /* The disc is the glyph's own fill: iOS tertiary-fill grey. */
+    color: rgba(118, 118, 128, 0.24);
+    background: transparent;
     cursor: pointer;
-    font-weight: 800;
-    font-size: 16px;
-    line-height: 1;
+    line-height: 0;
+  }
+
+  .close-button:hover {
+    color: rgba(118, 118, 128, 0.38);
   }
 
   .eyebrow {
-    margin: 0 44px 9px 0;
-    color: var(--brand);
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 0;
-    text-transform: uppercase;
+    margin: 0 44px 6px 0;
+    color: var(--label-secondary);
+    font-size: 13px;
+    font-weight: var(--control-weight);
+    letter-spacing: -0.01em;
   }
 
-  /* The source-guide link keeps the reddish-orange eyebrow look — just pressable. */
   .eyebrow a {
-    color: inherit;
+    color: var(--blue);
     text-decoration: none;
   }
 
@@ -330,16 +408,14 @@
   h1 {
     margin: 0;
     max-width: 100%;
-    font-size: clamp(24px, 4vw, 34px);
-    line-height: 1.04;
-    letter-spacing: 0;
+    font-size: clamp(24px, 4vw, 32px);
+    line-height: 1.08;
+    letter-spacing: -0.024em;
   }
 
-  /* Editorial serif for the restaurant name only. */
+  /* SF Pro Display weights: the name is bold, the affixes step down. */
   .display-name {
-    font-family: var(--font-serif);
     font-weight: 700;
-    letter-spacing: -0.01em;
   }
 
   /* Simplest restaurant name is bold; the dish prefix + suffix words read
@@ -349,30 +425,33 @@
   }
 
   .name-affix {
-    font-size: 0.62em;
+    font-size: 0.6em;
     font-weight: 400;
-    color: var(--ink-mute);
+    color: var(--label-secondary);
   }
 
+  /* iOS place card: a single interpunct-separated line of secondary metadata. */
   .meta-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
-    margin: 14px 0 12px;
+    align-items: baseline;
+    gap: 0 7px;
+    margin: 7px 0 3px;
+    color: var(--label-secondary);
+    font-size: 15px;
+    font-weight: 400;
   }
 
-  .meta-row span {
-    padding: 5px 8px;
-    border-radius: var(--r-s);
-    color: var(--ink-soft);
-    background: var(--chip);
-    font-size: 12px;
-    font-weight: 800;
+  .meta-row span + span::before {
+    content: '·';
+    margin-right: 7px;
+    color: var(--label-tertiary);
   }
 
   .address {
     margin: 0 0 16px;
-    color: var(--ink-mute);
+    color: var(--label-secondary);
+    font-size: 15px;
     line-height: 1.35;
   }
 
@@ -393,16 +472,16 @@
 
   .description {
     margin: 0;
-    line-height: 1.5;
+    font-size: 15px;
+    line-height: 1.47;
   }
 
   .desc-source {
     justify-self: start;
-    color: var(--brand);
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 0;
-    text-transform: uppercase;
+    color: var(--blue);
+    font-size: 13px;
+    font-weight: var(--control-weight);
+    letter-spacing: -0.01em;
     text-decoration: none;
   }
 
@@ -422,100 +501,140 @@
   }
 
   .phone-list a {
-    color: var(--link);
+    color: var(--blue);
   }
 
   /* Desktop: float above everything, just over the sticky actions bar, so you
-     don't have to scroll to it. (Mobile resets this to in-flow below.) */
+     don't have to scroll to it. (Mobile resets this to in-flow below.)
+     Styled as an iOS context menu: thick glass, hairline rows, 14px corners. */
   .picker-menu {
     position: sticky;
-    bottom: 66px;
+    bottom: 84px;
     z-index: 6;
     display: grid;
-    gap: 2px;
     margin: 0 0 8px;
-    padding: 8px 10px;
-    border: 1px solid var(--line-soft);
-    border-radius: var(--r-s);
-    background: var(--surface-solid, var(--paper));
-    box-shadow: var(--shadow-3);
+    padding: 0;
+    border: 0;
+    border-radius: var(--r-menu);
+    background: var(--glass-thick);
+    -webkit-backdrop-filter: var(--glass-filter);
+    backdrop-filter: var(--glass-filter);
+    box-shadow: var(--glass-rim), var(--elev-2);
     max-height: 50vh;
     overflow: auto;
   }
 
   .picker-menu a {
-    color: var(--link);
-    font-size: 13px;
-    line-height: 1.35;
-    padding: 3px 0;
+    color: var(--blue);
+    font-size: 15px;
+    line-height: 1.3;
+    padding: 11px 14px;
+    border-bottom: 0.5px solid var(--separator);
     text-decoration: none;
   }
 
+  .picker-menu a:last-child {
+    border-bottom: 0;
+  }
+
   .picker-menu a:hover {
-    text-decoration: underline;
-  }
-
-  .picker-toggle {
-    cursor: pointer;
-  }
-
-  .picker-toggle.open {
-    background: var(--ink);
-    color: #fff;
+    background: var(--fill-tertiary);
   }
 
   .facts {
     display: grid;
-    gap: 10px;
+    gap: 0;
     margin: 0;
   }
 
+  /* Grouped-list rows: hairline above each, caption then value. */
   .facts div {
-    padding-top: 10px;
-    border-top: 1px solid var(--hairline);
+    padding: 11px 0;
+    border-top: 0.5px solid var(--separator);
   }
 
   .facts dt {
-    margin-bottom: 4px;
-    color: var(--brand);
-    font-size: 11px;
-    font-weight: 800;
-    text-transform: uppercase;
+    margin-bottom: 2px;
+    color: var(--label-secondary);
+    font-size: 13px;
+    font-weight: 400;
   }
 
   .facts dd {
     margin: 0;
-    line-height: 1.4;
+    font-size: 15px;
+    line-height: 1.35;
   }
 
   .facts a {
-    color: var(--link);
+    color: var(--blue);
+    text-decoration: none;
   }
 
   .actions {
     position: sticky;
     bottom: -28px;
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    display: flex;
+    flex-wrap: wrap;
     gap: 8px;
-    margin: 20px -22px -28px;
-    padding: 12px 22px max(18px, env(safe-area-inset-bottom));
-    background: linear-gradient(180deg, rgba(255, 253, 247, 0), var(--paper) 18%);
+    margin: 18px -22px -28px;
+    padding: 14px 22px max(18px, env(safe-area-inset-bottom));
+    /* Ends on the panel's composited colour (0.93 white over the page grey) so
+       the sticky bar leaves no band where the fade lands. */
+    background: linear-gradient(180deg, rgba(254, 254, 254, 0), #fefefe 26%);
   }
 
+  /* Tinted disc + caption beneath — the Apple Maps place-card action button. */
   .actions a,
   .actions .share-action,
   .actions .picker-toggle {
     display: grid;
-    min-height: 42px;
-    place-items: center;
+    justify-items: center;
+    align-content: start;
+    gap: 5px;
+    width: 76px; /* fits the longest caption ("Google Maps") on one line */
+    padding: 0;
     border: 0;
-    border-radius: var(--r-s);
-    color: #fff;
-    background: var(--ink);
+    background: transparent;
+    color: var(--blue);
     text-decoration: none;
-    font-weight: 800;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -0.005em;
     cursor: pointer;
+  }
+
+  .action-icon {
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    border-radius: var(--r-full);
+    color: var(--blue);
+    background: var(--blue-tint);
+  }
+
+  /* Directions is the primary action: filled system blue. */
+  .actions .primary .action-icon {
+    color: #fff;
+    background: var(--blue);
+  }
+
+  .actions .picker-toggle.open .action-icon {
+    color: #fff;
+    background: var(--blue);
+  }
+
+  /* Caption sits on one line under the disc — the caret rides with the word. */
+  .action-label {
+    display: block;
+  }
+
+  .caret {
+    font-size: 10px;
+    line-height: 1;
   }
 
   .actions .citymapper-action {
@@ -534,19 +653,24 @@
   }
 
   .list-panel header {
-    padding-bottom: 14px;
-    border-bottom: 1px solid var(--hairline);
-    margin-bottom: 6px;
+    padding-bottom: 12px;
+    border-bottom: 0.5px solid var(--separator);
+    margin-bottom: 2px;
   }
 
   .list-panel header h1 {
     font-size: 28px;
+    font-weight: 700;
+  }
+
+  .list-panel .eyebrow {
+    margin-right: 0;
   }
 
   .list-panel .sub {
-    margin: 6px 0 0;
-    color: var(--ink-mute);
-    font-size: 13px;
+    margin: 4px 0 0;
+    color: var(--label-secondary);
+    font-size: 15px;
   }
 
   .in-view {
@@ -560,34 +684,35 @@
     align-items: center;
     gap: 10px;
     width: 100%;
-    padding: 10px 2px;
+    padding: 11px 2px;
     border: 0;
-    border-bottom: 1px solid var(--line-soft);
+    border-bottom: 0.5px solid var(--separator);
     background: transparent;
-    color: var(--ink);
+    color: var(--label);
     text-align: left;
     cursor: pointer;
   }
 
   .in-view button:hover {
-    background: var(--parch);
+    background: var(--fill-tertiary);
   }
 
   .row-main {
     display: grid;
-    gap: 2px;
+    gap: 1px;
     min-width: 0;
     flex: 1 1 auto;
   }
 
   .row-main strong {
-    font-size: 14px;
-    line-height: 1.2;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.25;
   }
 
   .row-address {
-    color: var(--ink-faint);
-    font-size: 12px;
+    color: var(--label-secondary);
+    font-size: 13px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -595,26 +720,30 @@
 
   .row-side {
     flex: 0 0 auto;
-    color: var(--ink-mute);
-    font-size: 12px;
-    font-weight: 700;
+    color: var(--label-secondary);
+    font-size: 13px;
+    font-weight: 400;
   }
 
   .row-side.price {
-    padding: 3px 6px;
-    border-radius: var(--r-s);
-    background: var(--chip);
-    color: var(--ink-soft);
+    padding: 0;
+    background: transparent;
+  }
+
+  .row-chevron {
+    flex: 0 0 auto;
+    color: var(--label-tertiary);
   }
 
   .list-more,
   .list-empty {
     margin: 12px 0 0;
-    color: var(--ink-mute);
+    color: var(--label-secondary);
     font-size: 13px;
   }
 
   @media (max-width: 820px) {
+    /* Bottom sheet: 28px top corners, glass, grabber, big soft lift. */
     .details-panel {
       position: fixed;
       left: 0;
@@ -625,13 +754,13 @@
       flex-direction: column;
       height: auto;
       max-height: min(56dvh, 470px);
-      padding: 14px 14px max(8px, env(safe-area-inset-bottom));
-      border-top: 1px solid rgba(23, 32, 28, 0.16);
+      padding: 6px 16px max(8px, env(safe-area-inset-bottom));
+      border-top: 0;
       border-left: 0;
-      border-radius: var(--r-m) var(--r-m) 0 0;
+      border-radius: var(--r-sheet) var(--r-sheet) 0 0;
       transform: translateY(100%);
-      transition: transform 180ms ease;
-      box-shadow: 0 -18px 38px rgba(27, 31, 28, 0.2);
+      transition: transform 320ms cubic-bezier(0.32, 0.72, 0, 1);
+      box-shadow: 0 -0.5px 0 rgba(0, 0, 0, 0.06), 0 -16px 44px rgba(0, 0, 0, 0.18);
     }
 
     .details-panel.open {
@@ -642,10 +771,27 @@
       display: none;
     }
 
+    .sheet-grabber {
+      display: block;
+      order: -1;
+      flex: 0 0 auto;
+      align-self: center;
+      width: 36px;
+      height: 5px;
+      margin: 0 0 8px;
+      border-radius: var(--r-full);
+      background: rgba(60, 60, 67, 0.22);
+    }
+
+    .close-button {
+      top: 12px;
+      right: 12px;
+    }
+
     .details-panel h1 {
       padding-right: 34px;
       font-size: 22px;
-      line-height: 1.06;
+      line-height: 1.1;
     }
 
     /* Mobile: stack the dish prefix / suffix above and below the name. */
@@ -660,23 +806,18 @@
     }
 
     .details-panel .eyebrow {
-      margin: 0 42px 6px 0;
-      font-size: 10px;
+      margin: 0 42px 4px 0;
+      font-size: 12px;
     }
 
     .details-panel .meta-row {
-      gap: 5px;
-      margin: 9px 0 8px;
-    }
-
-    .details-panel .meta-row span {
-      padding: 4px 7px;
-      font-size: 11px;
+      margin: 5px 0 3px;
+      font-size: 14px;
     }
 
     .details-panel .address {
       margin-bottom: 9px;
-      font-size: 13px;
+      font-size: 14px;
     }
 
     /* One bounded scroll for the whole description list (not a scroll per review). */
@@ -714,7 +855,7 @@
       bottom: 0;
       height: 1.7em;
       pointer-events: none;
-      background: linear-gradient(180deg, rgba(255, 253, 247, 0), var(--paper) 82%);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.85) 82%);
     }
 
     .descriptions-scrollbar {
@@ -725,7 +866,7 @@
       bottom: 2px;
       width: 3px;
       border-radius: var(--r-full);
-      background: rgba(23, 32, 28, 0.08);
+      background: transparent;
       pointer-events: none;
     }
 
@@ -735,7 +876,7 @@
       right: 0;
       min-height: 18%;
       border-radius: var(--r-full);
-      background: rgba(23, 32, 28, 0.46);
+      background: rgba(60, 60, 67, 0.35);
     }
 
     .details-panel .picker-menu {
@@ -748,12 +889,14 @@
 
     .details-panel .facts {
       order: 8;
-      gap: 8px;
-      font-size: 13px;
     }
 
     .details-panel .facts div {
-      padding-top: 8px;
+      padding: 9px 0;
+    }
+
+    .details-panel .facts dd {
+      font-size: 14px;
     }
 
     .actions {
@@ -761,9 +904,10 @@
       order: 6;
       flex: 0 0 auto; /* keep full height — don't let the picker squish the buttons */
       display: flex;
+      flex-wrap: nowrap;
       overflow-x: auto;
-      gap: 6px;
-      margin: 2px 0 10px;
+      gap: 8px;
+      margin: 4px 0 10px;
       padding: 0 2px 2px;
       background: transparent;
       overscroll-behavior-x: contain;
@@ -779,11 +923,14 @@
     .actions .share-action,
     .actions .picker-toggle {
       flex: 0 0 auto;
-      min-width: 82px;
-      min-height: 38px;
-      padding: 0 10px;
-      font-size: 12px;
+      width: 64px;
+      font-size: 11px;
       white-space: nowrap;
+    }
+
+    .action-icon {
+      width: 44px;
+      height: 44px;
     }
 
     .actions .citymapper-action {

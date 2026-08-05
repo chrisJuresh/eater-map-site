@@ -53,16 +53,33 @@
     <div class="results-panel" bind:this={panelEl} onscroll={measure}>
       {#each app.searchResults as result (result.id)}
         <button type="button" onclick={() => onSelect(result)}>
-          <strong>{result.name}</strong>
-          <span>{result.address}</span>
+          <!-- Leading glyph disc, as on every Apple Maps result row. -->
+          <span class="row-glyph" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="15" height="15">
+              <path
+                d="M12 21.5s7-6.1 7-11.2A7 7 0 105 10.3c0 5.1 7 11.2 7 11.2z"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linejoin="round"
+              />
+              <circle cx="12" cy="10" r="2.4" fill="currentColor" />
+            </svg>
+          </span>
+          <span class="row-text">
+            <strong>{result.name}</strong>
+            <span>{result.address}</span>
+          </span>
         </button>
       {/each}
       {#if showPlaceRow}
         <button class="place-row" type="button" onclick={onGoToSearch}>
-          <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
-            <circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2" />
-            <line x1="15.5" y1="15.5" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-          </svg>
+          <span class="row-glyph tinted" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="15" height="15">
+              <circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2" />
+              <line x1="15.5" y1="15.5" x2="21" y2="21" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+            </svg>
+          </span>
           <span class="place-label">Go to place “{app.query.trim()}”</span>
         </button>
       {/if}
@@ -92,10 +109,12 @@
     width: 100%;
     max-height: 100%;
     overflow: auto;
-    border: 1px solid var(--line-soft);
-    border-radius: var(--r-s);
-    background: var(--surface-solid);
-    box-shadow: var(--shadow-3);
+    border: 0;
+    border-radius: var(--r-card);
+    background: var(--glass-thick);
+    -webkit-backdrop-filter: var(--glass-filter);
+    backdrop-filter: var(--glass-filter);
+    box-shadow: var(--glass-rim), var(--elev-2);
     pointer-events: auto;
   }
 
@@ -104,41 +123,68 @@
   }
 
   .results-panel button {
-    display: grid;
-    gap: 3px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
     width: 100%;
-    padding: 10px 12px;
+    padding: 10px 14px;
     border: 0;
-    border-bottom: 1px solid var(--line-soft);
     text-align: left;
-    color: var(--ink);
+    color: var(--label);
     background: transparent;
     cursor: pointer;
+    /* Separators inset past the leading glyph, iOS list style. */
+    background-image: linear-gradient(var(--separator), var(--separator));
+    background-size: calc(100% - 52px) 0.5px;
+    background-position: 52px 100%;
+    background-repeat: no-repeat;
   }
 
   .results-panel button:hover {
-    background: var(--parch);
+    background-color: rgba(120, 120, 128, 0.1);
   }
 
   .results-panel button:last-child {
-    border-bottom: 0;
+    background-image: none;
   }
 
-  .results-panel span {
-    color: var(--ink-faint);
-    font-size: 12px;
-  }
-
-  .place-row {
-    display: flex !important;
-    align-items: center;
-    gap: 8px;
-    font-weight: 700;
-    color: var(--link) !important;
-  }
-
-  .place-row svg {
+  .row-glyph {
     flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    border-radius: var(--r-full);
+    color: var(--label-secondary);
+    background: var(--fill-secondary);
+  }
+
+  .row-glyph.tinted {
+    color: var(--blue);
+    background: var(--blue-tint);
+  }
+
+  .row-text {
+    display: grid;
+    gap: 1px;
+    min-width: 0;
+  }
+
+  .results-panel strong {
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.25;
+  }
+
+  .results-panel .row-text span {
+    color: var(--label-secondary);
+    font-size: 13px;
+    line-height: 1.3;
+  }
+
+  .results-panel .place-row {
+    font-weight: var(--control-weight);
+    color: var(--blue);
   }
 
   .place-label {
@@ -146,8 +192,8 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    color: inherit !important;
-    font-size: inherit !important;
+    color: inherit;
+    font-size: 15px;
   }
 
   @media (max-width: 820px) {
@@ -172,12 +218,12 @@
 
     .results-panel button {
       height: 56px;
-      padding: 8px 12px;
+      padding: 8px 14px;
       overflow: hidden;
     }
 
     .results-panel strong,
-    .results-panel span {
+    .results-panel .row-text span {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -186,12 +232,12 @@
     .search-results-scrollbar {
       display: block;
       position: absolute;
-      top: 3px;
-      right: 3px;
-      bottom: 3px;
+      top: 6px;
+      right: 4px;
+      bottom: 6px;
       width: 3px;
       border-radius: var(--r-full);
-      background: rgba(23, 32, 28, 0.08);
+      background: transparent;
       pointer-events: none;
     }
 
@@ -201,7 +247,7 @@
       right: 0;
       min-height: 18%;
       border-radius: var(--r-full);
-      background: rgba(23, 32, 28, 0.46);
+      background: rgba(60, 60, 67, 0.35);
     }
   }
 </style>

@@ -4,8 +4,20 @@
 </script>
 
 <div class="zoom-controls" aria-label="Zoom controls">
-  <button type="button" onclick={() => onZoom(1)} aria-label="Zoom in">+</button>
-  <button type="button" onclick={() => onZoom(-1)} aria-label="Zoom out">-</button>
+  <!-- Zoom pair share one glass capsule split by a hairline, as on Apple Maps. -->
+  <div class="zoom-pair">
+    <button type="button" onclick={() => onZoom(1)} aria-label="Zoom in">
+      <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true">
+        <path d="M12 4.6v14.8M4.6 12h14.8" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" />
+      </svg>
+    </button>
+    <span class="divider" aria-hidden="true"></span>
+    <button type="button" onclick={() => onZoom(-1)} aria-label="Zoom out">
+      <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true">
+        <path d="M4.6 12h14.8" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" />
+      </svg>
+    </button>
+  </div>
   <button
     class="location-button"
     class:active={Boolean(app.userLocation)}
@@ -14,13 +26,15 @@
     aria-label="Show current location"
     title={app.locationStatus || 'Show current location'}
   >
-    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-      <circle cx="12" cy="12" r="6.4" fill="none" stroke="currentColor" stroke-width="2" />
-      <circle cx="12" cy="12" r="2.4" fill="currentColor" />
-      <line x1="12" y1="2" x2="12" y2="5.2" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-      <line x1="12" y1="18.8" x2="12" y2="22" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-      <line x1="2" y1="12" x2="5.2" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-      <line x1="18.8" y1="12" x2="22" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+    <!-- SF Symbol "location": hollow arrow, filled solid while tracking. -->
+    <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true">
+      <path
+        d="M20.6 3.4L4.1 10.2c-1 .4-.9 1.9.2 2.1l6.4 1.4c.4.1.7.4.8.8l1.4 6.4c.2 1.1 1.7 1.2 2.1.2L21.8 4.6c.3-.8-.4-1.5-1.2-1.2z"
+        fill={app.userLocation ? 'currentColor' : 'none'}
+        stroke="currentColor"
+        stroke-width="1.9"
+        stroke-linejoin="round"
+      />
     </svg>
   </button>
 </div>
@@ -32,8 +46,24 @@
     right: 12px;
     top: calc(max(12px, env(safe-area-inset-top)) + var(--control-h) + 12px);
     display: grid;
-    gap: 6px;
+    justify-items: end;
+    gap: 10px;
     z-index: 9;
+  }
+
+  .zoom-pair {
+    display: grid;
+    border-radius: var(--r-full);
+    background: var(--glass);
+    -webkit-backdrop-filter: var(--glass-filter);
+    backdrop-filter: var(--glass-filter);
+    box-shadow: var(--glass-rim), var(--elev-1);
+  }
+
+  .divider {
+    height: 0.5px;
+    margin: 0 9px;
+    background: var(--separator-strong);
   }
 
   .zoom-controls button {
@@ -41,20 +71,23 @@
     place-items: center;
     width: var(--control-h-sm);
     height: var(--control-h-sm);
-    border: 1px solid var(--line);
-    border-radius: var(--r-s);
-    color: var(--ink);
-    background: var(--surface);
-    box-shadow: var(--shadow-2);
+    border: 0;
+    color: var(--label);
+    background: transparent;
     cursor: pointer;
-    font-size: 20px;
-    font-weight: var(--control-weight);
     line-height: 1;
   }
 
-  .location-button.active {
-    color: #fff;
-    background: var(--blue);
-    border-color: var(--blue);
+  .zoom-controls .location-button {
+    border-radius: var(--r-full);
+    background: var(--glass);
+    -webkit-backdrop-filter: var(--glass-filter);
+    backdrop-filter: var(--glass-filter);
+    box-shadow: var(--glass-rim), var(--elev-1);
+  }
+
+  /* Tracking: the arrow itself goes system blue — the glass stays glass. */
+  .zoom-controls .location-button.active {
+    color: var(--blue);
   }
 </style>

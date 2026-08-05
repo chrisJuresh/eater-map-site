@@ -45,7 +45,7 @@
     bottom: max(12px, env(safe-area-inset-bottom));
     min-width: 96px;
     z-index: 9;
-    color: var(--ink);
+    color: var(--label);
   }
 
   .roadmap-menu > button {
@@ -53,43 +53,55 @@
     width: 100%;
     height: var(--control-h-sm);
     place-items: center;
-    padding: 0 12px;
-    border: 1px solid var(--line);
-    border-radius: var(--r-s);
-    background: var(--surface);
-    box-shadow: var(--shadow-2);
+    padding: 0 16px;
+    border: 0;
+    border-radius: var(--r-full);
+    background: var(--glass);
+    -webkit-backdrop-filter: var(--glass-filter);
+    backdrop-filter: var(--glass-filter);
+    box-shadow: var(--glass-rim), var(--elev-1);
     cursor: pointer;
     font-size: var(--control-font);
     font-weight: var(--control-weight);
     line-height: 1;
-    color: inherit;
+    color: var(--blue);
   }
 
+  /* Open: the glass takes a system-blue tint rather than going solid. */
   .roadmap-menu > button.open {
     color: #fff;
-    background: var(--ink);
+    background: var(--blue);
   }
 
+  /* iOS context menu: thick glass, hairline-separated rows, 14px corners. */
   .roadmap-menu ul {
     position: absolute;
     right: 0;
-    bottom: calc(var(--control-h-sm) + 8px);
+    bottom: calc(var(--control-h-sm) + 10px);
     display: grid;
-    gap: 7px;
     width: min(320px, calc(100vw - 24px));
     max-height: min(55vh, 430px);
     margin: 0;
-    padding: 12px 14px 12px 26px;
+    padding: 0;
     overflow: auto;
-    border: 1px solid var(--line-soft);
-    border-radius: var(--r-s);
-    background: var(--surface-solid);
-    box-shadow: var(--shadow-3);
+    list-style: none;
+    border: 0;
+    border-radius: var(--r-menu);
+    background: var(--glass-thick);
+    -webkit-backdrop-filter: var(--glass-filter);
+    backdrop-filter: var(--glass-filter);
+    box-shadow: var(--glass-rim), var(--elev-2);
   }
 
   .roadmap-menu li {
-    font-size: 13px;
-    line-height: 1.25;
+    padding: 11px 14px;
+    border-bottom: 0.5px solid var(--separator);
+    font-size: 15px;
+    line-height: 1.3;
+  }
+
+  .roadmap-menu li:last-child {
+    border-bottom: 0;
   }
 
   @media (max-width: 820px) {
@@ -98,7 +110,7 @@
     }
 
     .roadmap-menu > button {
-      padding: 0 10px;
+      padding: 0 12px;
     }
   }
 </style>
