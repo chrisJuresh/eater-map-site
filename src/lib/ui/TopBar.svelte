@@ -1,6 +1,6 @@
 <script>
-  /** Search + Reset + offline/install chip, floating over the map. */
-  let { app, onGoToSearch, onReset, onInstall } = $props();
+  /** Search + offline/install chip, floating over the map. */
+  let { app, onGoToSearch, onInstall } = $props();
 
   let topbarEl;
 
@@ -43,7 +43,6 @@
       </button>
     {/if}
   </label>
-  <button class="reset-button" type="button" onclick={onReset}>Reset</button>
   {#if !app.isStandalone}
     <button
       class="offline-button"
@@ -74,8 +73,8 @@
 
 <style>
   /* Flex, not grid: the offline chip is absent in the installed app, and an
-     empty grid track still reserves its gap — which left Reset 8px short of the
-     right edge the zoom/locate stack lines up on. */
+     empty grid track still reserves its gap — which left the chip 8px short of
+     the right edge the zoom/locate stack lines up on. */
   .topbar {
     position: absolute;
     top: max(12px, env(safe-area-inset-top));
@@ -89,7 +88,6 @@
   }
 
   .search,
-  .reset-button,
   .offline-button {
     pointer-events: auto;
   }
@@ -166,7 +164,6 @@
     color: var(--label-secondary);
   }
 
-  .reset-button,
   .offline-button {
     display: inline-flex;
     align-items: center;
@@ -190,15 +187,11 @@
     white-space: nowrap;
   }
 
-  /* Once the search capsule hits its max width, the buttons stay pinned to the
+  /* Once the search capsule hits its max width, the chip stays pinned to the
      right edge rather than trailing the field. */
-  .reset-button {
-    min-width: 62px;
-    margin-left: auto;
-  }
-
   .offline-button {
     min-width: 96px;
+    margin-left: auto;
     color: var(--label);
   }
 
@@ -225,13 +218,9 @@
   }
 
   @media (max-width: 820px) {
-    .reset-button,
-    .offline-button {
-      padding: 0 12px;
-    }
-
     .offline-button {
       min-width: 88px;
+      padding: 0 12px;
     }
   }
 </style>

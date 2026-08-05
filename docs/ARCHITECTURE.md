@@ -36,7 +36,7 @@ src/
                           zoom; spiderfy fans a stack onto an even ring
       MapView.svelte      Map lifecycle, events, geolocation, camera API
     ui/
-      TopBar.svelte       Search + Reset + offline/install chip
+      TopBar.svelte       Search + offline/install chip
       SearchResults.svelte  Dropdown + "Go to place" geocode row
       ZoomControls.svelte   +/− capsule and locate (arrow, blue while tracking)
       PriceFilter.svelte    Segmented All/$/$$/$$$/$$$$
@@ -63,7 +63,11 @@ src/
   domain-restricted, safe in the bundle), unbounded, minZoom 2. Swap follows
   the browser's online/offline events.
 - **Interaction**: clicking selects the nearest marker (never zooms); an empty
-  tap shows the rail-lines popup. The spiderfy fan is **selection-driven**: while
+  tap shows the rail-lines popup, anchored to the tapped lng/lat (re-projected
+  on every `move`) so it travels with the map rather than the viewport — hover
+  stays with the cursor. There is no Reset button: the locate control is the
+  only camera reset, flying to the live location when there is one and re-fitting
+  the London home view when location is unavailable or denied. The spiderfy fan is **selection-driven**: while
   a stacked restaurant is selected AND zoom ≥ 14, its stack fans onto one even
   ring of thumb-sized targets (legs to the origin), following the map. A "stack"
   is markers whose drawn centres OVERLAP on screen (within `SPIDER_OVERLAP_PX`),
@@ -86,7 +90,7 @@ src/
   a picker; differing phones a list; the fullest address wins. Header shows the
   deduped restaurant count (`stats.restaurantCount`), not raw appearances.
 - **Map chrome scale**: every floating control uses the `--control-*` tokens in
-  `app.css` — `--control-h` (48px: search field, Reset, offline chip),
+  `app.css` — `--control-h` (48px: search field, offline chip),
   `--control-h-sm` (44px, the iOS minimum target: zoom, price filter, roadmap)
   and one label style (`--control-font` 15px / `--control-weight` 590). Heights
   are set on the element (never derived from padding) so a row stays flush

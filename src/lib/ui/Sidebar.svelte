@@ -347,7 +347,7 @@
           <p class="list-more">+ {listOverflow.toLocaleString()} more in view — zoom in to narrow down</p>
         {/if}
       {:else}
-        <p class="list-empty">No restaurants in this view — zoom out or press Reset.</p>
+        <p class="list-empty">No restaurants in this view — zoom out or move the map.</p>
       {/if}
     </div>
   {/if}

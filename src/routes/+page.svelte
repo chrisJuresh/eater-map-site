@@ -167,13 +167,6 @@
     if (app.searchResults.length) selectFromSearch(app.searchResults[0]);
   }
 
-  function reset() {
-    app.closeDetails();
-    app.query = '';
-    app.priceFilter = 'all';
-    mapView?.resetView();
-  }
-
   async function install() {
     if (deferredInstallPrompt) {
       deferredInstallPrompt.prompt();
@@ -205,7 +198,7 @@
       <div class="state-pill error">{app.loadError}</div>
     {/if}
 
-    <TopBar {app} onGoToSearch={goToSearch} onReset={reset} onInstall={install} />
+    <TopBar {app} onGoToSearch={goToSearch} onInstall={install} />
     <SearchResults {app} onSelect={selectFromSearch} onGoToSearch={goToSearch} />
     <ZoomControls {app} onZoom={(d) => mapView?.zoomBy(d)} onLocate={() => mapView?.locate({ restart: true })} />
     <PriceFilter {app} />
