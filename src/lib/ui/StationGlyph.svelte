@@ -20,8 +20,21 @@
    *  knockout in a solid colour is the usual trick, but these controls are glass
    *  over a moving map, so the seam would show; masking leaves the gap
    *  transparent and the blur behind it intact. Gap and slash are the same line,
-   *  the gap drawn fat — 94 against 44 — to leave clear air either side. */
-  let { size = 19, slashed = false } = $props();
+   *  the gap drawn fat — 94 against 44 — to leave clear air either side.
+   *
+   *  21 where every other control glyph is 19, because this one is solid and
+   *  the location arrow above it is not. At a matched 19 the train carried half
+   *  again the arrow's ink — 30% of its box against 20% — and still read as the
+   *  smaller of the two: a hollow outline claims the space it encloses, a filled
+   *  mass claims only itself. It is also the narrower shape, 12.3px of ink to
+   *  the arrow's 14.6 square.
+   *
+   *  Matching the two on mean extent lands at 20, and on width at 23 — the
+   *  spread is because the train is tall where the arrow is square, so no one
+   *  number satisfies both axes. 21 takes the geometric match and pushes a
+   *  little past it, which is the part the measurements cannot give you: the
+   *  arrow is hollow, and hollow reads big. */
+  let { size = 21, slashed = false } = $props();
 
   const uid = $props.id();
   const cut = 'M238-185L722-669';
