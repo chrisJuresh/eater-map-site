@@ -15,11 +15,11 @@
     OFFLINE_MAX_BOUNDS,
     ONLINE_TILE_URL,
     SEARCH_ZOOM,
-    STATION_SEARCH_PX,
     clamp
   } from '../constants.js';
   import { buildLocalStyle, buildOnlineStyle, LINE_QUERY_LAYERS, STATION_LAYER } from './style.js';
   import { MarkerRenderer } from './markers.js';
+  import { loadStations, stationsNow, stationsWithin } from '../stations.js';
 
   /**
    * @type {{ app: import('../state.svelte.js').AppState,
@@ -32,6 +32,7 @@
   let markerCanvas;
   let map;
   let mapReady = $state(false);
+  let stationsLoaded = $state(0); // bumps when /stations.json lands, to re-derive open popups
   let renderer;
   let resizeObserver;
   let locationWatchId = null;
@@ -103,11 +104,10 @@
     map.on('styledata', () => renderer.schedule());
     map.on('move', () => {
       renderer.schedule();
-      // Both popups are pinned to a place on the map, so re-project them every
+      // The popups are pinned to a place on the map, so re-project them every
       // frame of the camera move. (A desktop drag also fires mousemove, which
-      // re-reads the lines under the cursor and wins — as hover should.)
-      if (app.linesPopup) app.linesPopup = placeLines(app.linesPopup);
-      if (app.hoverLines) app.hoverLines = placeLines(app.hoverLines);
+      // re-reads the point under the cursor and wins — as hover should.)
+      replacePopups();
     });
     map.on('moveend', () => {
       renderer.schedule();
@@ -120,18 +120,23 @@
     map.on('movestart', (event) => {
       if (event.originalEvent) mapWasInteractedWith = true;
     });
-    // A restaurant and a line can sit under the same point: selecting one does
-    // not hide the other, so the popup lists whatever lines are under the tap
-    // either way (it is pointer-events:none, so it never eats the next tap).
+    // The popup is rooted where the tap landed: on the restaurant if one was
+    // selected, otherwise on the point itself when that point is on the rail
+    // network. Selecting therefore clears any tap-rooted popup — the new
+    // selection owns the root. (The popup is pointer-events:none, so it never
+    // eats the next tap.)
     map.on('click', (event) => {
       const action = renderer.activate(event.point, { touch: isTouch(event) });
-      if (action?.type === 'select') app.select(action.restaurant);
-      app.linesPopup = linesAt(event.point);
+      if (action?.type === 'select') {
+        app.linesPopup = null;
+        app.select(action.restaurant);
+        return;
+      }
+      app.linesPopup = railUnder(event.point) ? stationsPopupAt(event.point) : null;
     });
-    // Desktop hover: live line identification (touch devices rely on tap above).
-    // Same rule as the click — lines show whether or not a restaurant is under
-    // the cursor. hitTest is non-mutating, so hovering never disturbs the
-    // tap-cycle state.
+    // Desktop hover: the stations around whatever the cursor is over (touch
+    // devices rely on the tap above). hitTest is non-mutating, so hovering never
+    // disturbs the tap-cycle state.
     map.on('touchstart', () => {
       touchSyntheticMove = true;
       app.hoverLines = null; // the tap owns the popup from here
@@ -142,9 +147,12 @@
         touchSyntheticMove = false;
         return;
       }
+      // A restaurant and a line can share a point, and one must not hide the
+      // other: rail under the cursor opens the popup either way.
       const overRestaurant = Boolean(renderer.hitTest(event.point));
-      app.hoverLines = linesAt(event.point);
-      map.getCanvas().style.cursor = overRestaurant || app.hoverLines ? 'pointer' : '';
+      const overRail = railUnder(event.point);
+      app.hoverLines = overRail ? stationsPopupAt(event.point) : null;
+      map.getCanvas().style.cursor = overRestaurant || overRail ? 'pointer' : '';
     });
     map.on('mouseout', () => (app.hoverLines = null));
 
@@ -154,6 +162,12 @@
       renderer?.schedule();
     });
     resizeObserver.observe(mapEl);
+
+    // Walk distances need every station, including the ones off screen — a small
+    // list of its own, fetched once alongside the map.
+    loadStations().then((stations) => {
+      if (stations.length) stationsLoaded += 1;
+    });
 
     locate();
 
@@ -176,6 +190,19 @@
       renderer?.schedule();
       settleSoon();
     }
+  });
+
+  // A selected restaurant roots the popup on itself: the stations you could walk
+  // to from its door, with what runs from each. Re-derived on every selection
+  // change, and again once the station list has actually loaded.
+  $effect(() => {
+    const restaurant = app.selected;
+    stationsLoaded;
+    if (!mapReady) return;
+    app.selectionLines =
+      restaurant && Number.isFinite(restaurant.lat) && Number.isFinite(restaurant.lon)
+        ? stationsPopup({ lng: restaurant.lon, lat: restaurant.lat, title: restaurant.nameCore || restaurant.name })
+        : null;
   });
 
   // Keep the fan in sync with the selection: a stacked selection at close zoom is
@@ -226,67 +253,52 @@
     }
   }
 
-  // Nearest station dot to a screen point, within STATION_SEARCH_PX. Measured in
-  // screen space (project each candidate back) so the closest one wins, not
-  // whichever the query happened to return first.
-  function stationNear(point) {
-    if (!map.getLayer(STATION_LAYER)) return null;
-    const box = [
-      [point.x - STATION_SEARCH_PX, point.y - STATION_SEARCH_PX],
-      [point.x + STATION_SEARCH_PX, point.y + STATION_SEARCH_PX]
-    ];
-    let closest = null;
-    let closestDistance = Infinity;
-    for (const feature of map.queryRenderedFeatures(box, { layers: [STATION_LAYER] })) {
-      const name = feature.properties?.name;
-      const at = feature.geometry?.coordinates;
-      if (!name || !Array.isArray(at) || !Number.isFinite(at[0]) || !Number.isFinite(at[1])) continue;
-      const screen = map.project(at);
-      const distance = Math.hypot(screen.x - point.x, screen.y - point.y);
-      if (distance < closestDistance) {
-        closestDistance = distance;
-        closest = name;
-      }
-    }
-    return closest;
-  }
-
-  // Rail/tube lines under a screen point, deduped by name (for the popup).
-  function linesAt(point) {
-    if (!map) return null;
-    const availableLayers = LINE_QUERY_LAYERS.filter((id) => map.getLayer(id));
-    if (!availableLayers.length) return null;
+  // Is there rail under this screen point? Only decides WHETHER a tap on the
+  // bare map opens the popup — what it lists comes from the root point, not from
+  // the features hit here.
+  function railUnder(point) {
+    if (!map) return false;
+    const layers = [...LINE_QUERY_LAYERS, STATION_LAYER].filter((id) => map.getLayer(id));
+    if (!layers.length) return false;
     const box = [
       [point.x - LINES_HIT_PX, point.y - LINES_HIT_PX],
       [point.x + LINES_HIT_PX, point.y + LINES_HIT_PX]
     ];
-    const features = map.queryRenderedFeatures(box, { layers: availableLayers });
-    const seen = new Set();
-    const items = [];
-    for (const feature of features) {
-      const name = feature.properties.line || 'National Rail';
-      if (seen.has(name)) continue;
-      seen.add(name);
-      items.push({ name, color: feature.properties.color || '#41476b' });
-      if (items.length >= 8) break;
-    }
-    if (!items.length) return null;
-    // Anchor to the geographic point, not the screen point, so the popup rides
-    // the map when it is panned or zoomed.
-    const anchor = map.unproject(point);
-    // Resolved once, at the point that opened the popup — panning re-places the
-    // popup but must not re-pick the station out from under it.
-    return placeLines({ lng: anchor.lng, lat: anchor.lat, station: stationNear(point), items });
+    return map.queryRenderedFeatures(box, { layers }).length > 0;
   }
 
-  // Screen placement for a map-anchored lines popup. Flipped so it stays inside
-  // the map near the right/bottom edges.
-  function placeLines(entry) {
+  // The popup for a root place: every station within a walk of it, each with the
+  // lines that serve it. Anchored to the root's lng/lat, not to the screen point,
+  // so it rides the map when panned or zoomed.
+  function stationsPopup(root) {
+    if (!map || !Number.isFinite(root?.lng) || !Number.isFinite(root?.lat)) return null;
+    const near = stationsWithin({ lat: root.lat, lon: root.lng }, stationsNow());
+    if (!near.length) return null;
+    return placePopup({ ...root, stations: near });
+  }
+
+  function stationsPopupAt(point) {
+    const anchor = map.unproject(point);
+    return stationsPopup({ lng: anchor.lng, lat: anchor.lat });
+  }
+
+  // Screen placement for a map-anchored popup. Flipped so it stays inside the
+  // map near the right/bottom edges — the height depends on how many stations
+  // are listed, so estimate it rather than assume one size.
+  function placePopup(entry) {
     const { x, y } = map.project([entry.lng, entry.lat]);
     const container = map.getContainer();
     const w = container.clientWidth;
     const h = container.clientHeight;
-    return { ...entry, x, y, w, h, flipX: x > w - 252, flipY: y > h - 160 };
+    const height = 16 + (entry.title ? 22 : 0) + entry.stations.length * 44;
+    return { ...entry, x, y, w, h, flipX: x > w - 272, flipY: y > h - height };
+  }
+
+  // Re-place every open popup: the camera moved, so their anchors did too.
+  function replacePopups() {
+    if (app.selectionLines) app.selectionLines = placePopup(app.selectionLines);
+    if (app.linesPopup) app.linesPopup = placePopup(app.linesPopup);
+    if (app.hoverLines) app.hoverLines = placePopup(app.hoverLines);
   }
 
   // ---- Exported camera / location API -----------------------------------------

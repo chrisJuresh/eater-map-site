@@ -73,6 +73,7 @@ Asset regeneration scripts (each needs internet once; outputs are committed):
 pnpm build:basemap   # extract offline PMTiles from Protomaps daily builds + fonts/sprites
                      # (tunable: DETAIL_MAXZOOM, default 14; GB_MAXZOOM, default 9)
 pnpm build:tube      # rebuild the rail-network GeoJSON from OpenStreetMap Overpass
+pnpm build:stations  # rebuild the station list (lines per station) — run after build:tube
 pnpm export:data     # rebuild the public dataset from the scrape database (Python)
 pnpm dedupe:data     # re-run the restaurant dedupe (dry-run without --write)
 ```
@@ -91,6 +92,7 @@ src/
   service-worker.js       Offline precache with progress + PMTiles Range slicing
 static/basemap/           Bundled offline vector tiles, fonts, sprites
 static/tube-lines.geojson Colour-coded rail network (generated)
+static/stations.json      Stations + the lines serving each, for the walk popup (generated)
 docs/ARCHITECTURE.md      Module map + rendering/interaction invariants
 DEPLOYMENT.md             Vercel, domains, basemap and data build notes
 ```
