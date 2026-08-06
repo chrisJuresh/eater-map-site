@@ -41,6 +41,8 @@ const BASE_OPACITY = ['interpolate', ['linear'], ['zoom'], 10, 0.29, 16, 0.5];
 
 /** Layers queried (top-first) for the "which lines are here?" popup. */
 export const LINE_QUERY_LAYERS = ['rail-tfl', 'rail-nr', 'rail-base'];
+/** Station dots — queried for the station that heads the lines popup. */
+export const STATION_LAYER = 'rail-stations';
 
 const RAIL_LAYERS = [
   {
@@ -86,7 +88,7 @@ const RAIL_LAYERS = [
 
 // Station dots (bundled) — always visible.
 const STATION_DOT_LAYER = {
-  id: 'rail-stations',
+  id: STATION_LAYER,
   type: 'circle',
   source: 'tube',
   filter: ['==', ['get', 'station'], true],

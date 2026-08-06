@@ -65,7 +65,9 @@ src/
   the browser's online/offline events.
 - **Interaction**: clicking selects the nearest marker (never zooms). Every tap
   also lists the rail lines under it — a restaurant and a line can share a
-  point, and selecting one must not hide the other. The popup is
+  point, and selecting one must not hide the other. The popup is headed by the
+  station nearest the tap (within `STATION_SEARCH_PX` on SCREEN, so the reach
+  scales with zoom; resolved once, at open, never re-picked while panning) and is
   anchored to the tapped lng/lat (re-projected
   on every `move`) so it travels with the map rather than the viewport. Hover is
   gated on `(hover: hover)` and swallows the one synthetic mousemove a tap emits
@@ -105,7 +107,11 @@ src/
   translucent fill (`--glass`, `--glass-thick`, `--glass-sheet`,
   `--glass-sheet-float`) over `--glass-filter` (blur + saturation), a specular
   rim (`--glass-rim`: bright inner top edge plus a 0.5px outer hairline) and a
-  soft ambient shadow (`--elev-1..3`). Controls are capsules (`--r-full`), menus
+  soft ambient shadow (`--elev-1..3`). **Blur radius must stay narrower than the
+  pane**: a wide blur under a small pane averages the whole backdrop into one
+  flat tint, so the glass reads as a single colour instead of picking up what is
+  behind each part of it — small floating panes (the lines popup) use
+  `--glass-filter-fine`, big ones the heavy filter. Controls are capsules (`--r-full`), menus
   14px, popovers 20px, the mobile sheet 28px with a grabber. The mobile sheet
   floats over the live map, so it is a true glass material — `--glass-sheet-float`
   (0.6) over the heavier `--glass-filter-heavy` blur (which carries a brightness
