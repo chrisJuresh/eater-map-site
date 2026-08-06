@@ -2,15 +2,54 @@
   /** "What can I get from here?" — the stations within a walk of the popup's
    *  root (a selected restaurant, or the point tapped on the rail network),
    *  each headed by its walk time and followed by the lines that serve it. */
+  import { POPUP_EDGE_PAD, clamp } from '../constants.js';
+
   let { app } = $props();
 
   const popup = $derived(app.activeLines);
+
+  let el = $state(null);
+  let nudge = $state({ x: 0, y: 0 });
+  // Real size, remeasured only when the content (or the map's width) could have
+  // changed it — panning re-places the popup every frame and reading the layout
+  // there would force a reflow per frame.
+  let measured = { key: '', width: 0, height: 0 };
+  const sizeKey = $derived(
+    popup ? `${popup.w}|${popup.title ?? ''}|${popup.stations.map((s) => `${s.name}:${s.lines.length}`).join(',')}` : ''
+  );
+
+  // placePopup only estimates the height, and on a phone a flipped popup can
+  // still hang off the left edge — a 260px pane needs 260px of room on the side
+  // it flips to, which a 375px screen rarely has. So once the pane's real size is
+  // known, pull it back inside the free band. Anchoring survives: this shifts the
+  // pane by a few px, it does not detach it from its root.
+  $effect(() => {
+    const p = popup;
+    if (!p || !el) {
+      nudge = { x: 0, y: 0 };
+      return;
+    }
+    if (measured.key !== sizeKey) {
+      measured = { key: sizeKey, width: el.offsetWidth, height: el.offsetHeight };
+    }
+    const { width, height } = measured;
+    const top = app.mapBandTop;
+    const bottom = app.mapBandBottom || p.h;
+    // Where the anchored styles put it, before this nudge.
+    const left = p.flipX ? p.x - 14 - width : p.x + 14;
+    const y = p.flipY ? p.y - 14 - height : p.y + 14;
+    nudge = {
+      x: clamp(left, POPUP_EDGE_PAD, Math.max(POPUP_EDGE_PAD, p.w - POPUP_EDGE_PAD - width)) - left,
+      y: clamp(y, top + POPUP_EDGE_PAD, Math.max(top + POPUP_EDGE_PAD, bottom - POPUP_EDGE_PAD - height)) - y
+    };
+  });
 </script>
 
 {#if popup}
   <div
     class="lines-popup"
-    style={`${popup.flipX ? `right: ${popup.w - popup.x}px;` : `left: ${popup.x}px;`} ${popup.flipY ? `bottom: ${popup.h - popup.y}px;` : `top: ${popup.y}px;`} transform: translate(${popup.flipX ? -14 : 14}px, ${popup.flipY ? -14 : 14}px);`}
+    bind:this={el}
+    style={`${popup.flipX ? `right: ${popup.w - popup.x}px;` : `left: ${popup.x}px;`} ${popup.flipY ? `bottom: ${popup.h - popup.y}px;` : `top: ${popup.y}px;`} transform: translate(${(popup.flipX ? -14 : 14) + nudge.x}px, ${(popup.flipY ? -14 : 14) + nudge.y}px);`}
     aria-hidden="true"
   >
     {#if popup.title}
@@ -39,6 +78,11 @@
   .lines-popup {
     position: absolute;
     z-index: 13;
+    /* max-content, not shrink-to-fit: anchored by `left`/`right`, the pane would
+       otherwise be squeezed by whatever room is left on that side, so the same
+       list would wrap (and stand taller) at one anchor than at another. Its size
+       has to depend on its content alone — the nudge below measures it. */
+    width: max-content;
     max-width: min(260px, calc(100vw - 20px));
     display: flex;
     flex-direction: column;

@@ -10,6 +10,14 @@ export const SEARCH_ZOOM = 15;
 /** Zoom where coarse GB tiles hand off to the detailed restaurant-area tiles. */
 export const BASEMAP_HANDOFF_ZOOM = 9;
 export const HOME_VIEW_PADDING = 32;
+/** The 820px CSS breakpoint in JS: below it the chrome stacks OVER the map
+ *  (search dropdown on top, details as a bottom sheet) instead of beside it. */
+export const MOBILE_LAYOUT_MAX_WIDTH = 820;
+/** Gap between the chrome above (search dropdown, else the top bar) and a
+ *  jumped-to restaurant. Centring the marker buries it — and the stations popup
+ *  hanging off it — under the mobile sheet, so a jump lands it just below the
+ *  panel it came from: results, restaurant, stations, details, top to bottom. */
+export const JUMP_MARKER_TOP_GAP = 26;
 
 // ---- Search / lists ----------------------------------------------------------
 export const SEARCH_LIMIT = 80;
@@ -76,6 +84,8 @@ export const STATION_REACH_BANDS = [
 /** But always reach at least this far: a station on the doorstep should not
  *  hide one a few minutes on, only a genuinely long walk. */
 export const STATION_MINUTES_FLOOR = 9;
+/** Keep the popup this far inside the free band's edges once measured. */
+export const POPUP_EDGE_PAD = 10;
 
 // ---- Canvas markers ----------------------------------------------------------
 export const MARKER_PADDING = 48;

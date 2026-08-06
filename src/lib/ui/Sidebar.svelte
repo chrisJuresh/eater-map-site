@@ -63,6 +63,7 @@
   const phones = $derived(selected?.phones?.length ? selected.phones : selected?.phone ? [selected.phone] : []);
   const guideCount = $derived(guideLinks.length);
 
+  let sheetEl = $state(null);
   let openPicker = $state(null); // 'eater' | 'website' | null
   const togglePicker = (which) => (openPicker = openPicker === which ? null : which);
   const prettyUrl = (u) => String(u || '').replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/$/, '');
@@ -99,6 +100,23 @@
     }
     descriptions.length;
     measureDescriptions();
+  });
+
+  // ---- Sheet coverage ------------------------------------------------------------
+  // Mobile only: report the top edge of the bottom sheet, so the stations popup
+  // can stay above it. Measured from the layout height rather than the rect —
+  // the sheet slides in over 320ms and the rect would report a moving edge.
+  $effect(() => {
+    const panel = sheetEl;
+    if (!panel || !app.mobileLayout || !selected) {
+      app.detailsSheetTop = 0;
+      return;
+    }
+    const measure = () => (app.detailsSheetTop = Math.max(0, Math.round(window.innerHeight - panel.offsetHeight)));
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(panel);
+    return () => observer.disconnect();
   });
 
   // ---- Share ---------------------------------------------------------------------
@@ -144,7 +162,7 @@
   }
 </script>
 
-<aside class:open={selected} class="details-panel">
+<aside class:open={selected} class="details-panel" bind:this={sheetEl}>
   <!-- Mobile only: the sheet grabber every iOS sheet carries. -->
   <span class="sheet-grabber" aria-hidden="true"></span>
   {#if selected}

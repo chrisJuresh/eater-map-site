@@ -16,8 +16,12 @@
       hasMore = false;
       scrollbar = { top: 0, height: 100 };
       measuredSearchText = '';
+      app.searchPanelBottom = 0;
       return;
     }
+    // Our bottom edge is where the map's free band starts on mobile: selecting a
+    // result flies the restaurant to just below this row of results.
+    app.searchPanelBottom = Math.ceil(panelEl.getBoundingClientRect().bottom);
     const maxScroll = Math.max(0, panelEl.scrollHeight - panelEl.clientHeight);
     hasMore = maxScroll > 1;
     const thumbHeight = hasMore ? clampPct((panelEl.clientHeight / panelEl.scrollHeight) * 100, 18, 100) : 100;

@@ -4,10 +4,16 @@
 
   let topbarEl;
 
-  // Report our height so the results dropdown can position below us.
+  // Report our height so the results dropdown can position below us, and our
+  // bottom edge so the camera can drop a jumped-to restaurant just under it when
+  // no dropdown is open.
   $effect(() => {
     if (!topbarEl) return;
-    const measure = () => (app.topbarHeight = Math.ceil(topbarEl.getBoundingClientRect().height));
+    const measure = () => {
+      const box = topbarEl.getBoundingClientRect();
+      app.topbarHeight = Math.ceil(box.height);
+      app.topbarBottom = Math.ceil(box.bottom);
+    };
     measure();
     const observer = new ResizeObserver(measure);
     observer.observe(topbarEl);
