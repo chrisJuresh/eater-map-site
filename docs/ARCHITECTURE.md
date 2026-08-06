@@ -103,7 +103,17 @@ src/
   anchor than at another. When the band is shorter than the pane (a phone with
   four search rows above and the sheet below) the pane starts at the top of the
   band and overflows behind the sheet — the list is nearest-first, so the rows
-  that survive are the ones that matter. Hover is
+  that survive are the ones that matter. Fitting is a decision taken when the
+  camera is under OUR control (a fly to a search result) or the root changes, and
+  the pane then HOLDS it: `replacePopups` only re-projects while the move has an
+  `originalEvent`, so under the user's hands the pane rides the map rigidly and a
+  dot dragged off the screen takes its stations with it. Re-fitting every frame
+  instead made the pane crawl away from its dot, cling to the band's edge, and
+  then snap once the dot was gone. Nothing is fitted at all unless the root is
+  inside the band, or a pane whose root is off screen would be stranded against
+  an edge (`placePopup`'s `inBand`, `fit`; `LinesPopup`'s `fitKey`). The root's
+  name is a CAPTION, not a heading — the details sheet already names the place, so
+  it is 11px in the same grey as the walk times, with no rule under it. Hover is
   gated on `(hover: hover)` and swallows the one synthetic mousemove a tap emits
   — otherwise touch leaves a hover popup stuck to the screen that `activeLines`
   prefers over the tapped one, with no `mouseout` to clear it.

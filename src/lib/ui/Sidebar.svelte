@@ -219,12 +219,10 @@
       {#if selected.knowBeforeYouGo}<div><dt>Know First</dt><dd>{selected.knowBeforeYouGo}</dd></div>{/if}
       {#if selected.outdoorSeating}<div><dt>Outdoor</dt><dd>{selected.outdoorSeating}</dd></div>{/if}
       {#if selected.additionalLocationNotes}<div><dt>More Locations</dt><dd>{selected.additionalLocationNotes}</dd></div>{/if}
-      {#if phones.length === 1}
-        <div><dt>Phone</dt><dd><a href={`tel:${phones[0]}`}>{phones[0]}</a></dd></div>
-      {:else if phones.length > 1}
+      {#if phones.length}
         <div>
-          <dt>Phones</dt>
-          <dd class="phone-list">{#each phones as p (p)}<a href={`tel:${p}`}>{p}</a>{/each}</dd>
+          <dt>{phones.length === 1 ? 'Phone' : 'Phones'}</dt>
+          <dd class="phone-list">{#each phones as p, i (p)}{#if i}{', '}{/if}<a href={`tel:${p}`}>{p}</a>{/each}</dd>
         </div>
       {/if}
     </dl>
@@ -520,14 +518,13 @@
     display: none;
   }
 
-  /* Multiple phones / picker menu (differing links across merged guides). */
-  .phone-list {
-    display: grid;
-    gap: 2px;
-  }
-
+  /* Multiple phones / picker menu (differing links across merged guides).
+     Numbers run on, comma-separated, and wrap only at those commas: a row each
+     spent a line of the sheet on something two numbers say side by side, and a
+     number broken across lines at its own spaces stops reading as one number. */
   .phone-list a {
     color: var(--blue);
+    white-space: nowrap;
   }
 
   /* Desktop: float above everything, just over the sticky actions bar, so you

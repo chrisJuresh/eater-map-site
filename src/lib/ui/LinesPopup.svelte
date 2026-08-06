@@ -3,6 +3,7 @@
    *  root (a selected restaurant, or the point tapped on the rail network),
    *  each headed by its walk time and followed by the lines that serve it. */
   import { POPUP_EDGE_PAD, clamp } from '../constants.js';
+  import StationGlyph from './StationGlyph.svelte';
 
   let { app } = $props();
 
@@ -14,21 +15,31 @@
   // changed it — panning re-places the popup every frame and reading the layout
   // there would force a reflow per frame.
   let measured = { key: '', width: 0, height: 0 };
+  let fitted = ''; // the fit key this nudge was taken for
   const sizeKey = $derived(
     popup ? `${popup.w}|${popup.title ?? ''}|${popup.stations.map((s) => `${s.name}:${s.lines.length}`).join(',')}` : ''
+  );
+  // Everything the nudge depends on EXCEPT the anchor's position: while the pane
+  // rides the map (see replacePopups), only x/y change, and the fit it was given
+  // is the one it keeps.
+  const fitKey = $derived(
+    popup ? `${popup.fit}|${sizeKey}|${popup.flipX}|${popup.flipY}|${app.mapBandTop}|${app.mapBandBottom}` : ''
   );
 
   // placePopup only estimates the height, and on a phone a flipped popup can
   // still hang off the left edge — a 260px pane needs 260px of room on the side
   // it flips to, which a 375px screen rarely has. So once the pane's real size is
   // known, pull it back inside the free band. Anchoring survives: this shifts the
-  // pane by a few px, it does not detach it from its root.
+  // pane by a few px at the moment it is placed, it does not follow it around.
   $effect(() => {
     const p = popup;
-    if (!p || !el) {
+    if (!p || !el || !p.inBand) {
       nudge = { x: 0, y: 0 };
+      fitted = '';
       return;
     }
+    if (fitted === fitKey) return; // riding: hold the fit already taken
+    fitted = fitKey;
     if (measured.key !== sizeKey) {
       measured = { key: sizeKey, width: el.offsetWidth, height: el.offsetHeight };
     }
@@ -53,7 +64,13 @@
     aria-hidden="true"
   >
     {#if popup.title}
-      <span class="root">{popup.title}</span>
+      <span class="root">
+        <!-- The same glyph as the control that silences the pane, so the button
+             and what it hides are visibly the same thing. Grey with the caption:
+             it labels the column of times, it does not announce itself. -->
+        <StationGlyph size={13} />
+        <span class="root-name">{popup.title}</span>
+      </span>
     {/if}
     {#each popup.stations as station}
       <div class="station">
@@ -77,7 +94,14 @@
 <style>
   .lines-popup {
     position: absolute;
-    z-index: 13;
+    /* Map furniture, not chrome: one step above the markers it hangs off and
+       below every control on the map (attribution 8, the corner controls 9, the
+       top bar 10, the search results 12, the details sheet 30). The pane is
+       placed to keep clear of them, but the camera can carry its root under any
+       of them, and glass sliding under glass is the honest way for that to look —
+       it reads as the map moving, where drawing over the search field reads as a
+       bug and vanishing on contact reads as a glitch. */
+    z-index: 3;
     /* max-content, not shrink-to-fit: anchored by `left`/`right`, the pane would
        otherwise be squeezed by whatever room is left on that side, so the same
        list would wrap (and stand taller) at one anchor than at another. Its size
@@ -105,13 +129,37 @@
   }
 
   /* What the list is measured from, when that is a place with a name (a selected
-     restaurant). Hairline separator only — a filled header would paint over the
-     glass and go white wherever the map is coloured. */
+     restaurant). The details sheet already names it, so this is a caption, not a
+     heading: the same small grey as the walk times, so it reads as the label of
+     the column of times rather than competing with the station names. No rule
+     under it — a hairline under 11px of grey weighs more than the text.
+     It sits closer to the first station than the stations sit to each other: the
+     column gap separates one station's block from the next, and spending all of
+     it plus both lines' leading between the caption and the name it captions read
+     as a hole, and stood the pane taller than its content asked for. */
   .root {
-    padding-bottom: 5px;
-    border-bottom: 0.5px solid var(--separator);
-    font-size: 14px;
+    display: flex;
+    /* Centred on the glyph, not on the baseline: the glyph is a box, and hanging
+       it off the baseline of 11px text leaves it floating above the row. */
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
+    font-size: 11px;
     font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: 0.01em;
+    color: var(--label-secondary);
+    margin-bottom: -3px;
+  }
+
+  /* The glyph holds its size; the name is what gives way when the pane is at its
+     260px cap. */
+  .root :global(svg) {
+    flex: 0 0 auto;
+  }
+
+  .root-name {
+    min-width: 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
