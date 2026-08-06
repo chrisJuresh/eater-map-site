@@ -41,6 +41,8 @@
   let mapWasInteractedWith = false;
   let styleMode = ''; // 'online' | 'local'
   let settleFrame = 0;
+  let userMove = false; // is the camera moving in the user's hands, or under ours?
+  let popupFit = 0; // generation of the popups' placement decision
 
   onMount(() => {
     const protocol = new Protocol();
@@ -119,6 +121,9 @@
     });
     map.on('idle', () => settleSoon());
     map.on('movestart', (event) => {
+      // A move with an originalEvent is a drag, a pinch or a wheel: the user's
+      // hands, so the open popups ride rather than re-fit until it ends.
+      userMove = Boolean(event.originalEvent);
       if (event.originalEvent) mapWasInteractedWith = true;
     });
     // The popup is rooted where the tap landed: on the restaurant if one was
@@ -292,24 +297,46 @@
     return { top, bottom: Math.max(top + 1, app.mapBandBottom || h) };
   }
 
-  // Screen placement for a map-anchored popup. Flipped so it stays inside the
-  // free band near the right/bottom edges — the height depends on how many
-  // stations are listed, so estimate it rather than assume one size. The popup
-  // then nudges itself the last few px once it knows its real size.
+  // Screen placement for a map-anchored popup: which side of the root it opens
+  // on, flipped so it stays inside the free band near the right/bottom edges. The
+  // height depends on how many stations are listed, so estimate it rather than
+  // assume one size; the popup nudges itself the last few px once it knows its
+  // real size. `fit` marks the generation of that decision — LinesPopup re-fits
+  // when it changes and holds the fit it has when it doesn't.
+  //
+  // None of it applies unless the root is inside the band. Fitting a pane whose
+  // root is off screen would strand it against an edge, listing the stations
+  // around a dot that is nowhere to be seen.
   function placePopup(entry) {
     const { x, y } = map.project([entry.lng, entry.lat]);
     const container = map.getContainer();
     const w = container.clientWidth;
     const h = container.clientHeight;
-    const height = 16 + (entry.title ? 22 : 0) + entry.stations.length * 44;
-    return { ...entry, x, y, w, h, flipX: x > w - 272, flipY: y > freeBand().bottom - height };
+    const band = freeBand();
+    const height = 16 + (entry.title ? 14 : 0) + entry.stations.length * 44;
+    const inBand = x >= 0 && x <= w && y >= band.top && y <= band.bottom;
+    popupFit += 1;
+    return { ...entry, x, y, w, h, inBand, fit: popupFit, flipX: x > w - 272, flipY: inBand && y > band.bottom - height };
   }
 
-  // Re-place every open popup: the camera moved, so their anchors did too.
+  // Same pane, new anchor: re-project it and change nothing else, so it rides the
+  // map rigidly. A viewport that changed shape is not a ride — re-decide there.
+  function ridePopup(entry) {
+    const container = map.getContainer();
+    if (container.clientWidth !== entry.w || container.clientHeight !== entry.h) return placePopup(entry);
+    const { x, y } = map.project([entry.lng, entry.lat]);
+    return { ...entry, x, y };
+  }
+
+  // Re-place every open popup: the camera moved, so their anchors did too. Under
+  // OUR camera (a fly to a search result) they re-fit as they go; in the user's
+  // hands they only ride. Re-fitting mid-drag is what made a pane crawl away from
+  // its dot and cling to the band's edge after the dot had left the screen.
   function replacePopups() {
-    if (app.selectionLines) app.selectionLines = placePopup(app.selectionLines);
-    if (app.linesPopup) app.linesPopup = placePopup(app.linesPopup);
-    if (app.hoverLines) app.hoverLines = placePopup(app.hoverLines);
+    const place = userMove ? ridePopup : placePopup;
+    if (app.selectionLines) app.selectionLines = place(app.selectionLines);
+    if (app.linesPopup) app.linesPopup = place(app.linesPopup);
+    if (app.hoverLines) app.hoverLines = place(app.hoverLines);
   }
 
   // ---- Exported camera / location API -----------------------------------------

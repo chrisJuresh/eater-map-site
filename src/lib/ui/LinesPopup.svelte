@@ -14,21 +14,31 @@
   // changed it — panning re-places the popup every frame and reading the layout
   // there would force a reflow per frame.
   let measured = { key: '', width: 0, height: 0 };
+  let fitted = ''; // the fit key this nudge was taken for
   const sizeKey = $derived(
     popup ? `${popup.w}|${popup.title ?? ''}|${popup.stations.map((s) => `${s.name}:${s.lines.length}`).join(',')}` : ''
+  );
+  // Everything the nudge depends on EXCEPT the anchor's position: while the pane
+  // rides the map (see replacePopups), only x/y change, and the fit it was given
+  // is the one it keeps.
+  const fitKey = $derived(
+    popup ? `${popup.fit}|${sizeKey}|${popup.flipX}|${popup.flipY}|${app.mapBandTop}|${app.mapBandBottom}` : ''
   );
 
   // placePopup only estimates the height, and on a phone a flipped popup can
   // still hang off the left edge — a 260px pane needs 260px of room on the side
   // it flips to, which a 375px screen rarely has. So once the pane's real size is
   // known, pull it back inside the free band. Anchoring survives: this shifts the
-  // pane by a few px, it does not detach it from its root.
+  // pane by a few px at the moment it is placed, it does not follow it around.
   $effect(() => {
     const p = popup;
-    if (!p || !el) {
+    if (!p || !el || !p.inBand) {
       nudge = { x: 0, y: 0 };
+      fitted = '';
       return;
     }
+    if (fitted === fitKey) return; // riding: hold the fit already taken
+    fitted = fitKey;
     if (measured.key !== sizeKey) {
       measured = { key: sizeKey, width: el.offsetWidth, height: el.offsetHeight };
     }
@@ -105,13 +115,15 @@
   }
 
   /* What the list is measured from, when that is a place with a name (a selected
-     restaurant). Hairline separator only — a filled header would paint over the
-     glass and go white wherever the map is coloured. */
+     restaurant). The details sheet already names it, so this is a caption, not a
+     heading: the same small grey as the walk times, so it reads as the label of
+     the column of times rather than competing with the station names. No rule
+     under it — a hairline under 11px of grey weighs more than the text. */
   .root {
-    padding-bottom: 5px;
-    border-bottom: 0.5px solid var(--separator);
-    font-size: 14px;
+    font-size: 11px;
     font-weight: 600;
+    letter-spacing: 0.01em;
+    color: var(--label-secondary);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
