@@ -26,8 +26,12 @@
     aria-label="Show current location"
     title={app.locationStatus || 'Show current location'}
   >
-    <!-- SF Symbol "location": hollow arrow, filled solid while tracking. -->
-    <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true">
+    <!-- SF Symbol "location": hollow arrow, filled solid while tracking.
+         The dart's ink measures x [3.41, 21.87] / y [3.33, 21.79], so it
+         centres on ~12.6, not the 12 the box does — it hung down-right by half
+         a pixel beside the zoom glyphs, which ARE centred on 12. Pan the
+         viewBox by that 0.6 rather than rewrite every coordinate. -->
+    <svg viewBox="0.6 0.6 24 24" width="19" height="19" aria-hidden="true">
       <path
         d="M20.6 3.4L4.1 10.2c-1 .4-.9 1.9.2 2.1l6.4 1.4c.4.1.7.4.8.8l1.4 6.4c.2 1.1 1.7 1.2 2.1.2L21.8 4.6c.3-.8-.4-1.5-1.2-1.2z"
         fill={app.userLocation ? 'currentColor' : 'none'}
