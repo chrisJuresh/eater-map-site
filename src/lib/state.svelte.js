@@ -37,8 +37,12 @@ export class AppState {
   // Map-derived UI state
   visibleMarkerCount = $state(0);
   inView = $state([]); // settled list of restaurants in the current viewport
-  hoverLines = $state(null); // { x, y, w, h, flipX, flipY, station, items:[{name,color}] }
+  // Stations-within-a-walk popup, in the order they win: the cursor's, the last
+  // tap's, then the selected restaurant's. Payload:
+  // { lng, lat, title?, x, y, w, h, flipX, flipY, stations:[{name,minutes,lines}] }
+  hoverLines = $state(null);
   linesPopup = $state(null);
+  selectionLines = $state(null);
   topbarHeight = $state(56);
 
   // Derived
@@ -49,7 +53,7 @@ export class AppState {
   downloadPercent = $derived(
     this.downloadTotal ? Math.min(100, Math.round((this.downloadLoaded / this.downloadTotal) * 100)) : 0
   );
-  activeLines = $derived(this.hoverLines || this.linesPopup);
+  activeLines = $derived(this.hoverLines || this.linesPopup || this.selectionLines);
 
   setRestaurants(restaurants, stats) {
     this.restaurants = restaurants;

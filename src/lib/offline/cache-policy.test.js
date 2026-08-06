@@ -241,6 +241,7 @@ describe('isAllowedRuntimeCache', () => {
     expect(isAllowedRuntimeCache('/data/restaurants.json')).toBe(true);
     expect(isAllowedRuntimeCache('/basemap/sprites/light.png')).toBe(true);
     expect(isAllowedRuntimeCache('/tube-lines.geojson')).toBe(true);
+    expect(isAllowedRuntimeCache('/stations.json')).toBe(true);
     expect(isAllowedRuntimeCache('/_app/immutable/chunks/x.js')).toBe(true);
     expect(isAllowedRuntimeCache('/some/tracking/beacon')).toBe(false);
     expect(isAllowedRuntimeCache('/search?q=whatever')).toBe(false);

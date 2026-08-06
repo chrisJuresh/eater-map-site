@@ -50,13 +50,32 @@ export const LONDON_BOUNDS = {
 /** Charing Cross — the traditional centre of London, used to sort the entries list. */
 export const CENTRAL_LONDON = { lat: 51.5074, lon: -0.1278 };
 
-// ---- Lines popup -------------------------------------------------------------
-/** Half-size of the box queried for rail lines under a tap/cursor (screen px). */
+// ---- Stations popup ----------------------------------------------------------
+/** Half-size of the box queried for rail lines under a tap/cursor (screen px).
+ *  Only decides WHETHER a tap on the bare map opens the popup — what it lists is
+ *  worked out from the root point, not from this hit. */
 export const LINES_HIT_PX = 6;
-/** How far (screen px) the lines popup looks for the station to head itself with.
- *  Screen-space, so it scales with zoom: far out, "nearest" stays meaningful; up
- *  close, only a station genuinely by the tap qualifies. */
-export const STATION_SEARCH_PX = 110;
+/** The walk the popup covers: every station you could reach on foot in this long. */
+export const WALK_MINUTES_MAX = 20;
+/** Unhurried pace, ~4.8 km/h. */
+export const WALK_METRES_PER_MINUTE = 80;
+/** Streets are not crow-flies. Straight-line distance × this ≈ the walk. */
+export const WALK_ROUTE_FACTOR = 1.3;
+/** Central London has ~14 stations inside the radius — list the nearest few. */
+export const STATION_LIST_MAX = 6;
+// How far the list reaches, given the walk to the NEAREST station: the closer
+// that first station, the less a long walk is worth against it. First band whose
+// `under` the nearest walk falls below wins, so keep them in ascending order and
+// leave the last one open-ended. A band caps the walk either absolutely
+// (`ceiling`) or relative to the nearest station (`delta`).
+export const STATION_REACH_BANDS = [
+  { under: 5, delta: 5 }, // nearest 4 min → nothing over 9
+  { under: 10, ceiling: 15 }, // nearest 6 min → nothing over 15
+  { under: Infinity, delta: 6 } // nearest 12 min → nothing over 18
+];
+/** But always reach at least this far: a station on the doorstep should not
+ *  hide one a few minutes on, only a genuinely long walk. */
+export const STATION_MINUTES_FLOOR = 9;
 
 // ---- Canvas markers ----------------------------------------------------------
 export const MARKER_PADDING = 48;

@@ -28,7 +28,7 @@ const SHELL_STATIC = /^\/(manifest\.webmanifest|favicon\.[a-z0-9]+|icons\/)/;
 // Paths this worker is allowed to populate at runtime. A catch-all cache would
 // let arbitrary query-unique responses accumulate until the next release.
 const RUNTIME_CACHEABLE = ['/_app/', '/basemap/', '/data/', '/icons/'];
-const RUNTIME_CACHEABLE_EXACT = new Set(['/', '/manifest.webmanifest', '/tube-lines.geojson']);
+const RUNTIME_CACHEABLE_EXACT = new Set(['/', '/manifest.webmanifest', '/tube-lines.geojson', '/stations.json']);
 
 // Assets whose URL already contains a content hash, so a cached copy can never
 // be wrong for that URL.

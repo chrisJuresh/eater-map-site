@@ -26,6 +26,8 @@ src/
     links.js              Google Maps / Citymapper (Android intent) / share URLs
     geocode.js            Nominatim URL builder + fetch (GB, London-biased)
     urlState.js           ?r=<id> + #zoom/lat/lon parse/serialize
+    stations.js           /stations.json (lazy, once) + the pure walk maths:
+                          which stations are within N minutes of a point
     map/
       style.js            Basemap styles: offline pmtiles (gb + detail) and
                           online Protomaps API; recolouring (black place labels,
@@ -41,7 +43,8 @@ src/
       SearchResults.svelte  Dropdown + "Go to place" geocode row
       ZoomControls.svelte   +/− capsule and locate (arrow, blue while tracking)
       PriceFilter.svelte    Segmented All/$/$$/$$$/$$$$
-      LinesPopup.svelte     Rail lines under cursor/finger
+      LinesPopup.svelte     Stations within a walk of the popup's root, each
+                            with the lines that serve it
       RoadmapMenu.svelte    Planned-features menu (bottom right)
       Sidebar.svelte        Desktop: details OR in-view list; mobile: details
                             bottom sheet
@@ -63,16 +66,38 @@ src/
   bounded to GB with a viewport-fit min zoom; online = Protomaps API (key is
   domain-restricted, safe in the bundle), unbounded, minZoom 2. Swap follows
   the browser's online/offline events.
-- **Interaction**: clicking selects the nearest marker (never zooms). Every tap
-  also lists the rail lines under it — a restaurant and a line can share a
-  point, and selecting one must not hide the other. The popup is headed by the
-  station nearest the tap (within `STATION_SEARCH_PX` on SCREEN, so the reach
-  scales with zoom; resolved once, at open, never re-picked while panning) and is
-  anchored to the tapped lng/lat (re-projected
-  on every `move`) so it travels with the map rather than the viewport. Hover is
+- **Stations popup**: the popup answers "what can I get from here?" — every
+  station within `WALK_MINUTES_MAX` on foot of a ROOT place, nearest first, each
+  with its walk time and the lines that serve it. The root is the selected
+  restaurant when there is one (`selectionLines`), and otherwise the point
+  tapped/hovered on the rail network (`linesPopup` / `hoverLines`); they take
+  precedence hover → tap → selection, and selecting clears the tap-rooted one so
+  the new selection owns the root. Walk time is crow-flies × `WALK_ROUTE_FACTOR`
+  at `WALK_METRES_PER_MINUTE`; the list is capped at `STATION_LIST_MAX` because
+  central London has ~14 inside the radius. Three cuts make the list say
+  something new on every row: a line already reachable from a CLOSER station is
+  dropped from the further one's row; a station left with nothing new is dropped
+  entirely (walking past Leicester Square to Covent Garden for the same
+  Piccadilly line buys nothing, and the freed slot goes to a station that does
+  add something); and nothing past `reachMinutes()` is shown at all. That reach
+  is measured from the NEAREST station, not the root, and tightens as that
+  station gets closer — one on the doorstep makes a long walk pointless.
+  `STATION_REACH_BANDS` states each band the way it was specified, as an
+  absolute `ceiling` or a `delta` past the nearest: +5 under 5 minutes (nearest
+  4 → 9), a flat 15 under 10 (nearest 6 → 15), +6 from there (nearest 12 → 18),
+  with the 20-minute radius as the outer bound. `STATION_MINUTES_FLOOR` then
+  holds the reach at 9 minutes minimum, so a station underfoot never hides one
+  a few minutes on. The suburbs still get a list rather than a single row. What is UNDER the tap only decides
+  whether the popup opens, never what it lists — a 20-minute walk reaches past
+  the viewport, so the stations come from `/stations.json` (all of them, off
+  screen included), not from `queryRenderedFeatures`. A restaurant and a line can
+  share a point, and selecting one must not hide the other. The popup is anchored
+  to the root's lng/lat (re-projected on every `move`) so it travels with the map
+  rather than the viewport. Hover is
   gated on `(hover: hover)` and swallows the one synthetic mousemove a tap emits
   — otherwise touch leaves a hover popup stuck to the screen that `activeLines`
-  prefers over the tapped one, with no `mouseout` to clear it. There is no Reset button: the locate control is the
+  prefers over the tapped one, with no `mouseout` to clear it.
+- **Interaction**: clicking selects the nearest marker (never zooms). There is no Reset button: the locate control is the
   only camera reset, flying to the live location when there is one and re-fitting
   the London home view when location is unavailable or denied. The spiderfy fan is **selection-driven**: while
   a stacked restaurant is selected AND zoom ≥ 14, its stack fans onto one even
