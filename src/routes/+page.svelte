@@ -1,7 +1,7 @@
 <script>
   import { onMount } from 'svelte';
   import { replaceState } from '$app/navigation';
-  import { MOBILE_SEARCH_VISIBLE_RESULTS } from '$lib/constants.js';
+  import { MOBILE_LAYOUT_MAX_WIDTH, MOBILE_SEARCH_VISIBLE_RESULTS } from '$lib/constants.js';
   import { loadRestaurants } from '$lib/data.js';
   import { geocodePlace } from '$lib/geocode.js';
   import { buildAppUrl, parseUrlState, serializeView } from '$lib/urlState.js';
@@ -27,7 +27,14 @@
   let pendingRestaurantId = urlState.restaurantId;
   let deferredInstallPrompt = null;
 
+  // The one place the 820px breakpoint is read in JS: the components that float
+  // over the map on this layout report what they cover, and the camera keeps a
+  // jumped-to restaurant clear of it.
+  const mobileLayoutQuery =
+    typeof window !== 'undefined' ? window.matchMedia(`(max-width: ${MOBILE_LAYOUT_MAX_WIDTH}px)`) : null;
+
   if (typeof navigator !== 'undefined') {
+    app.mobileLayout = mobileLayoutQuery?.matches ?? false;
     app.isAndroid = /Android/i.test(navigator.userAgent || '');
     app.isIos = /iPad|iPhone|iPod/i.test(navigator.userAgent || '') && !window.MSStream;
     app.isStandalone = window.matchMedia?.('(display-mode: standalone)').matches || navigator.standalone === true;
@@ -36,6 +43,7 @@
 
   onMount(() => {
     const onConnectivityChange = () => (app.online = navigator.onLine);
+    const onLayoutChange = (event) => (app.mobileLayout = event.matches);
     const onBeforeInstallPrompt = (event) => {
       event.preventDefault();
       deferredInstallPrompt = event;
@@ -72,6 +80,7 @@
 
     window.addEventListener('online', onConnectivityChange);
     window.addEventListener('offline', onConnectivityChange);
+    mobileLayoutQuery?.addEventListener('change', onLayoutChange);
     window.addEventListener('beforeinstallprompt', onBeforeInstallPrompt);
     window.addEventListener('appinstalled', onAppInstalled);
     window.addEventListener('keydown', onKeyDown);
@@ -87,6 +96,7 @@
     return () => {
       window.removeEventListener('online', onConnectivityChange);
       window.removeEventListener('offline', onConnectivityChange);
+      mobileLayoutQuery?.removeEventListener('change', onLayoutChange);
       window.removeEventListener('beforeinstallprompt', onBeforeInstallPrompt);
       window.removeEventListener('appinstalled', onAppInstalled);
       window.removeEventListener('keydown', onKeyDown);

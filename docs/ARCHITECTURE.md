@@ -93,10 +93,34 @@ src/
   screen included), not from `queryRenderedFeatures`. A restaurant and a line can
   share a point, and selecting one must not hide the other. The popup is anchored
   to the root's lng/lat (re-projected on every `move`) so it travels with the map
-  rather than the viewport. Hover is
+  rather than the viewport. It is laid out inside the **free band** (see below),
+  and after the estimate in `placePopup` picks a side it measures itself and
+  nudges back inside that band — a 260px pane needs 260px of room on the side it
+  flips to, which a 375px screen does not have, and the mobile sheet covers the
+  bottom two fifths. It is sized `width: max-content` for that measurement to
+  mean anything: anchored by `left`/`right`, shrink-to-fit would let the room
+  left on that side change the wrapping, so the same list stood taller at one
+  anchor than at another. When the band is shorter than the pane (a phone with
+  four search rows above and the sheet below) the pane starts at the top of the
+  band and overflows behind the sheet — the list is nearest-first, so the rows
+  that survive are the ones that matter. Hover is
   gated on `(hover: hover)` and swallows the one synthetic mousemove a tap emits
   — otherwise touch leaves a hover popup stuck to the screen that `activeLines`
   prefers over the tapped one, with no `mouseout` to clear it.
+- **Free band / jump target**: below the 820px breakpoint (`app.mobileLayout`)
+  the chrome floats OVER the map, so the strip left free runs from the search
+  dropdown's bottom edge — the top bar's, with no dropdown open — down to the top
+  of the details sheet. Each of those components measures itself into `AppState`
+  (`searchPanelBottom`, `topbarBottom`, `detailsSheetTop`) and `mapBandTop` /
+  `mapBandBottom` state the band; desktop's chrome sits beside the map, so there
+  the band is the whole container. Flying to a restaurant therefore does NOT
+  centre it on mobile: dead centre is exactly where the sheet is, which buried
+  both the marker and the stations popup hanging off it. It lands
+  `JUMP_MARKER_TOP_GAP` below the band's top instead (never past the band's
+  middle), reading top to bottom as search results → restaurant → stations popup
+  → details sheet. Horizontally it stays centred. The offset goes through
+  `easeTo`/`flyTo`, not `jumpTo` — only the animated moves take an `offset`, and
+  a zero duration makes `easeTo` the instant one.
 - **Interaction**: clicking selects the nearest marker (never zooms). There is no Reset button: the locate control is the
   only camera reset, flying to the live location when there is one and re-fitting
   the London home view when location is unavailable or denied. The spiderfy fan is **selection-driven**: while

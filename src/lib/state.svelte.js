@@ -44,6 +44,14 @@ export class AppState {
   linesPopup = $state(null);
   selectionLines = $state(null);
   topbarHeight = $state(56);
+  // Chrome that covers the map, measured by the components that draw it. Map
+  // container px (the map fills the viewport's top-left corner in both layouts).
+  // 0 = not on screen.
+  topbarBottom = $state(0);
+  searchPanelBottom = $state(0);
+  detailsSheetTop = $state(0);
+  /** Below the 820px breakpoint the chrome floats OVER the map. */
+  mobileLayout = $state(false);
 
   // Derived
   searchText = $derived(this.query.trim().toLowerCase());
@@ -54,6 +62,12 @@ export class AppState {
     this.downloadTotal ? Math.min(100, Math.round((this.downloadLoaded / this.downloadTotal) * 100)) : 0
   );
   activeLines = $derived(this.hoverLines || this.linesPopup || this.selectionLines);
+  // The strip of map no chrome is covering — where a jumped-to restaurant and
+  // its stations popup have to fit. Desktop's chrome sits beside the map (or in
+  // a narrow gutter), so the whole container is free; mobile's is stacked over
+  // it. A 0 bottom means nothing covers it: callers substitute the container.
+  mapBandTop = $derived(this.mobileLayout ? this.searchPanelBottom || this.topbarBottom : 0);
+  mapBandBottom = $derived(this.mobileLayout ? this.detailsSheetTop : 0);
 
   setRestaurants(restaurants, stats) {
     this.restaurants = restaurants;

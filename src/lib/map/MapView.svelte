@@ -6,6 +6,7 @@
   import {
     GB_FIT_BOUNDS,
     HOME_VIEW_PADDING,
+    JUMP_MARKER_TOP_GAP,
     LINES_HIT_PX,
     LOCATION_ZOOM,
     LONDON_BOUNDS,
@@ -282,16 +283,26 @@
     return stationsPopup({ lng: anchor.lng, lat: anchor.lat });
   }
 
+  // The strip of map nothing is covering, in container px. On mobile the chrome
+  // floats over the map, so the popup and the jump target have to live between
+  // the search dropdown (or the top bar) and the details sheet.
+  function freeBand() {
+    const h = map.getContainer().clientHeight;
+    const top = clamp(app.mapBandTop, 0, h);
+    return { top, bottom: Math.max(top + 1, app.mapBandBottom || h) };
+  }
+
   // Screen placement for a map-anchored popup. Flipped so it stays inside the
-  // map near the right/bottom edges — the height depends on how many stations
-  // are listed, so estimate it rather than assume one size.
+  // free band near the right/bottom edges — the height depends on how many
+  // stations are listed, so estimate it rather than assume one size. The popup
+  // then nudges itself the last few px once it knows its real size.
   function placePopup(entry) {
     const { x, y } = map.project([entry.lng, entry.lat]);
     const container = map.getContainer();
     const w = container.clientWidth;
     const h = container.clientHeight;
     const height = 16 + (entry.title ? 22 : 0) + entry.stations.length * 44;
-    return { ...entry, x, y, w, h, flipX: x > w - 272, flipY: y > h - height };
+    return { ...entry, x, y, w, h, flipX: x > w - 272, flipY: y > freeBand().bottom - height };
   }
 
   // Re-place every open popup: the camera moved, so their anchors did too.
@@ -315,13 +326,31 @@
     homeViewApplied = true;
   }
 
+  // Where a jumped-to restaurant should land, as an offset from the container
+  // centre. Dead centre is right where the mobile sheet is, which buries both the
+  // marker and the stations popup hanging off it — so on that layout the marker
+  // goes just under the panel above instead, leaving the rest of the band for the
+  // popup. Never past the middle of the band, however little of it there is.
+  function jumpOffset() {
+    if (!app.mobileLayout) return [0, 0];
+    const band = freeBand();
+    const target = Math.min(band.top + JUMP_MARKER_TOP_GAP, (band.top + band.bottom) / 2);
+    return [0, Math.round(target - map.getContainer().clientHeight / 2)];
+  }
+
   export function flyToRestaurant(restaurant, { jump = false } = {}) {
     if (!map || !Number.isFinite(restaurant?.lat) || !Number.isFinite(restaurant?.lon)) return;
     mapWasInteractedWith = true;
     homeViewApplied = true;
-    const zoom = Math.max(map.getZoom(), SEARCH_ZOOM);
-    if (jump) map.jumpTo({ center: [restaurant.lon, restaurant.lat], zoom });
-    else map.flyTo({ center: [restaurant.lon, restaurant.lat], zoom });
+    // easeTo, not jumpTo, for the instant case: only the animated moves take an
+    // `offset`, and a zero duration makes easeTo one of them.
+    const camera = {
+      center: [restaurant.lon, restaurant.lat],
+      zoom: Math.max(map.getZoom(), SEARCH_ZOOM),
+      offset: jumpOffset()
+    };
+    if (jump) map.easeTo({ ...camera, duration: 0 });
+    else map.flyTo(camera);
   }
 
   export function flyToPlace(place) {
