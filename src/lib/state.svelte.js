@@ -43,6 +43,9 @@ export class AppState {
   hoverLines = $state(null);
   linesPopup = $state(null);
   selectionLines = $state(null);
+  /** Turning the popup off is for the map you are looking at now, not a setting:
+   *  it lives in memory only, so every load starts with the stations shown. */
+  stationsPopupEnabled = $state(true);
   topbarHeight = $state(56);
   // Chrome that covers the map, measured by the components that draw it. Map
   // container px (the map fills the viewport's top-left corner in both layouts).
@@ -61,7 +64,11 @@ export class AppState {
   downloadPercent = $derived(
     this.downloadTotal ? Math.min(100, Math.round((this.downloadLoaded / this.downloadTotal) * 100)) : 0
   );
-  activeLines = $derived(this.hoverLines || this.linesPopup || this.selectionLines);
+  // Switched off, the roots stay where they are and simply stop being drawn — so
+  // switching back on shows the stations for whatever is still selected.
+  activeLines = $derived(
+    this.stationsPopupEnabled ? this.hoverLines || this.linesPopup || this.selectionLines : null
+  );
   // The strip of map no chrome is covering — where a jumped-to restaurant and
   // its stations popup have to fit. Desktop's chrome sits beside the map (or in
   // a narrow gutter), so the whole container is free; mobile's is stacked over

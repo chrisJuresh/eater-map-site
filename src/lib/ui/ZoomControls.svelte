@@ -1,5 +1,8 @@
 <script>
-  /** Zoom in/out + locate, stacked on the right edge of the map. */
+  /** Zoom in/out, locate, and the stations popup's switch, stacked on the right
+   *  edge of the map. */
+  import TramGlyph from './TramGlyph.svelte';
+
   let { app, onZoom, onLocate } = $props();
 </script>
 
@@ -27,14 +30,14 @@
     title={app.locationStatus || 'Show current location'}
   >
     <!-- SF Symbol "location": hollow arrow, filled solid while tracking.
-         The untouched viewBox is correct — confirmed by eye at render size with
-         a slider rig, against every alternative below. Do NOT "centre" it:
-         the measurements tempt you three different ways and all of them are
-         wrong here. Bounding-box centre is 12.64/12.56 (suggests panning 0.6),
-         area centroid 13.87/11.33 and stroke centroid 13.62/11.58 (suggest
-         panning ~1.75/-0.55). Panning by any of them reads visibly off. -->
+         Centred on its mass, not its bounding box. The box centre is 12.64/12.56
+         — near enough to the middle — but the arrow's long tip reaches up-right
+         while the weight sits down-left, so a box-centred arrow reads as shoved
+         into the top-right corner. The area centroid is 13.92/11.28 and the
+         stroke centroid 13.62/11.58; the translate below splits them. -->
     <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true">
       <path
+        transform="translate(-1.75 0.55)"
         d="M20.6 3.4L4.1 10.2c-1 .4-.9 1.9.2 2.1l6.4 1.4c.4.1.7.4.8.8l1.4 6.4c.2 1.1 1.7 1.2 2.1.2L21.8 4.6c.3-.8-.4-1.5-1.2-1.2z"
         fill={app.userLocation ? 'currentColor' : 'none'}
         stroke="currentColor"
@@ -42,6 +45,20 @@
         stroke-linejoin="round"
       />
     </svg>
+  </button>
+  <!-- Silence the stations popup for a while, when you want to read the map and
+       not the list. A toggle, so aria-pressed carries the state and the label
+       stays put; the glyph is struck through while it is off. -->
+  <button
+    class="stations-button"
+    class:off={!app.stationsPopupEnabled}
+    type="button"
+    onclick={() => (app.stationsPopupEnabled = !app.stationsPopupEnabled)}
+    aria-label="Nearby stations"
+    aria-pressed={app.stationsPopupEnabled}
+    title={app.stationsPopupEnabled ? 'Hide nearby stations' : 'Show nearby stations'}
+  >
+    <TramGlyph slashed={!app.stationsPopupEnabled} />
   </button>
 </div>
 
@@ -84,7 +101,9 @@
     line-height: 1;
   }
 
-  .zoom-controls .location-button {
+  /* Each single control is its own glass disc, the zoom pair's capsule split. */
+  .zoom-controls .location-button,
+  .zoom-controls .stations-button {
     border-radius: var(--r-full);
     background: var(--glass);
     -webkit-backdrop-filter: var(--glass-filter);
@@ -95,5 +114,11 @@
   /* Tracking: the arrow itself goes system blue — the glass stays glass. */
   .zoom-controls .location-button.active {
     color: var(--blue);
+  }
+
+  /* Off is the quieter state, so it reads as switched off rather than broken:
+     the same grey the popup gives its walk times. */
+  .zoom-controls .stations-button.off {
+    color: var(--label-secondary);
   }
 </style>

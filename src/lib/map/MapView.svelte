@@ -306,7 +306,8 @@
   //
   // None of it applies unless the root is inside the band. Fitting a pane whose
   // root is off screen would strand it against an edge, listing the stations
-  // around a dot that is nowhere to be seen.
+  // around a dot that is nowhere to be seen — it slides under the chrome instead
+  // (the pane sits below every control in the stack; see LinesPopup's z-index).
   function placePopup(entry) {
     const { x, y } = map.project([entry.lng, entry.lat]);
     const container = map.getContainer();

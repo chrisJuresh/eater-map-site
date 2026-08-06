@@ -3,6 +3,7 @@
    *  root (a selected restaurant, or the point tapped on the rail network),
    *  each headed by its walk time and followed by the lines that serve it. */
   import { POPUP_EDGE_PAD, clamp } from '../constants.js';
+  import TramGlyph from './TramGlyph.svelte';
 
   let { app } = $props();
 
@@ -63,7 +64,13 @@
     aria-hidden="true"
   >
     {#if popup.title}
-      <span class="root">{popup.title}</span>
+      <span class="root">
+        <!-- The same tram as the control that silences the pane, so the button
+             and what it hides are visibly the same thing. Grey with the caption:
+             it labels the column of times, it does not announce itself. -->
+        <TramGlyph size={13} stroke={2.4} />
+        <span class="root-name">{popup.title}</span>
+      </span>
     {/if}
     {#each popup.stations as station}
       <div class="station">
@@ -87,7 +94,14 @@
 <style>
   .lines-popup {
     position: absolute;
-    z-index: 13;
+    /* Map furniture, not chrome: one step above the markers it hangs off and
+       below every control on the map (attribution 8, the corner controls 9, the
+       top bar 10, the search results 12, the details sheet 30). The pane is
+       placed to keep clear of them, but the camera can carry its root under any
+       of them, and glass sliding under glass is the honest way for that to look —
+       it reads as the map moving, where drawing over the search field reads as a
+       bug and vanishing on contact reads as a glitch. */
+    z-index: 3;
     /* max-content, not shrink-to-fit: anchored by `left`/`right`, the pane would
        otherwise be squeezed by whatever room is left on that side, so the same
        list would wrap (and stand taller) at one anchor than at another. Its size
@@ -118,12 +132,34 @@
      restaurant). The details sheet already names it, so this is a caption, not a
      heading: the same small grey as the walk times, so it reads as the label of
      the column of times rather than competing with the station names. No rule
-     under it — a hairline under 11px of grey weighs more than the text. */
+     under it — a hairline under 11px of grey weighs more than the text.
+     It sits closer to the first station than the stations sit to each other: the
+     column gap separates one station's block from the next, and spending all of
+     it plus both lines' leading between the caption and the name it captions read
+     as a hole, and stood the pane taller than its content asked for. */
   .root {
+    display: flex;
+    /* Centred on the glyph, not on the baseline: the tram is a box, and hanging
+       it off the baseline of 11px text leaves it floating above the row. */
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
     font-size: 11px;
     font-weight: 600;
+    line-height: 1.15;
     letter-spacing: 0.01em;
     color: var(--label-secondary);
+    margin-bottom: -3px;
+  }
+
+  /* The glyph holds its size; the name is what gives way when the pane is at its
+     260px cap. */
+  .root :global(svg) {
+    flex: 0 0 auto;
+  }
+
+  .root-name {
+    min-width: 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
