@@ -62,8 +62,10 @@ src/
   bounded to GB with a viewport-fit min zoom; online = Protomaps API (key is
   domain-restricted, safe in the bundle), unbounded, minZoom 2. Swap follows
   the browser's online/offline events.
-- **Interaction**: clicking selects the nearest marker (never zooms); an empty
-  tap shows the rail-lines popup, anchored to the tapped lng/lat (re-projected
+- **Interaction**: clicking selects the nearest marker (never zooms). Every tap
+  also lists the rail lines under it — a restaurant and a line can share a
+  point, and selecting one must not hide the other. The popup is
+  anchored to the tapped lng/lat (re-projected
   on every `move`) so it travels with the map rather than the viewport. Hover is
   gated on `(hover: hover)` and swallows the one synthetic mousemove a tap emits
   — otherwise touch leaves a hover popup stuck to the screen that `activeLines`

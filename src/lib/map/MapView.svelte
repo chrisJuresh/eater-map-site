@@ -118,20 +118,18 @@
     map.on('movestart', (event) => {
       if (event.originalEvent) mapWasInteractedWith = true;
     });
+    // A restaurant and a line can sit under the same point: selecting one does
+    // not hide the other, so the popup lists whatever lines are under the tap
+    // either way (it is pointer-events:none, so it never eats the next tap).
     map.on('click', (event) => {
       const action = renderer.activate(event.point, { touch: isTouch(event) });
-      if (action?.type === 'select') {
-        app.select(action.restaurant);
-        app.linesPopup = null; // restaurant takes priority
-      } else {
-        app.linesPopup = linesAt(event.point);
-      }
+      if (action?.type === 'select') app.select(action.restaurant);
+      app.linesPopup = linesAt(event.point);
     });
     // Desktop hover: live line identification (touch devices rely on tap above).
-    // A restaurant and a line can sit under the cursor at once — show the line popup
-    // regardless (it is pointer-events:none, so clicks still fall through to select
-    // the restaurant, which the click handler prioritises). hitTest is non-mutating,
-    // so hovering never disturbs the tap-cycle state.
+    // Same rule as the click — lines show whether or not a restaurant is under
+    // the cursor. hitTest is non-mutating, so hovering never disturbs the
+    // tap-cycle state.
     map.on('touchstart', () => {
       touchSyntheticMove = true;
       app.hoverLines = null; // the tap owns the popup from here
