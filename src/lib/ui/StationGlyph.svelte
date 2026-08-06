@@ -31,10 +31,12 @@
    *
    *  Matching the two on mean extent lands at 20, and on width at 23 — the
    *  spread is because the train is tall where the arrow is square, so no one
-   *  number satisfies both axes. 21 takes the geometric match and pushes a
-   *  little past it, which is the part the measurements cannot give you: the
-   *  arrow is hollow, and hollow reads big. */
-  let { size = 21, slashed = false } = $props();
+   *  number satisfies both axes. 22 all but squares the widths, 14.2 against
+   *  14.6, and lets the height run over: the arrow is hollow, and hollow reads
+   *  big, so the solid shape has to be given more than parity to hold its own.
+   *  This is the top of the useful range — past it the train starts to outweigh
+   *  the zoom pair, which is a different problem from the one being fixed. */
+  let { size = 22, slashed = false } = $props();
 
   const uid = $props.id();
   const cut = 'M238-185L722-669';
