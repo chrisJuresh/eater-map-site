@@ -27,14 +27,20 @@
   --glass-thick: rgba(255, 255, 255, 0.84);
   --glass-sheet: rgba(255, 255, 255, 0.93);
   /* The mobile sheet floats over the live map (the desktop panel sits over the
-     page background), so it is a true glass material: thinner fill, heavier
-     blur to keep body copy legible over whatever is beneath it. */
-  --glass-sheet-float: rgba(255, 255, 255, 0.74);
+     page background), so it is a true glass material: a thin fill carried by a
+     heavy blur. The brightness lift is what stops a thin fill reading grey —
+     it is the light the pane itself catches, and it keeps body copy legible
+     over whatever is beneath. */
+  --glass-sheet-float: rgba(255, 255, 255, 0.6);
   --glass-filter: saturate(180%) blur(30px);
-  --glass-filter-heavy: saturate(190%) blur(44px);
+  --glass-filter-heavy: saturate(210%) brightness(1.08) blur(56px);
   /* Specular rim: bright top-inner edge + a 0.5px outer hairline. */
   --glass-rim: inset 0 0.5px 0 rgba(255, 255, 255, 0.95), inset 0 0 0 0.5px rgba(255, 255, 255, 0.4),
     0 0 0 0.5px rgba(0, 0, 0, 0.05);
+  /* A thicker pane catches more light: a full 1px top edge, a brighter inner
+     hairline all round, and a faint bounce off the bottom lip. */
+  --glass-rim-strong: inset 0 1px 0 rgba(255, 255, 255, 0.98), inset 0 0 0 0.5px rgba(255, 255, 255, 0.6),
+    inset 0 -0.5px 0 rgba(255, 255, 255, 0.32), 0 0 0 0.5px rgba(0, 0, 0, 0.06);
 
   --elev-1: 0 1px 2px rgba(0, 0, 0, 0.06), 0 4px 12px rgba(0, 0, 0, 0.08);
   --elev-2: 0 2px 6px rgba(0, 0, 0, 0.07), 0 12px 32px rgba(0, 0, 0, 0.12);
