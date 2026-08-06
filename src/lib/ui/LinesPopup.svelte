@@ -3,7 +3,7 @@
    *  root (a selected restaurant, or the point tapped on the rail network),
    *  each headed by its walk time and followed by the lines that serve it. */
   import { POPUP_EDGE_PAD, clamp } from '../constants.js';
-  import TramGlyph from './TramGlyph.svelte';
+  import StationGlyph from './StationGlyph.svelte';
 
   let { app } = $props();
 
@@ -65,10 +65,10 @@
   >
     {#if popup.title}
       <span class="root">
-        <!-- The same tram as the control that silences the pane, so the button
+        <!-- The same glyph as the control that silences the pane, so the button
              and what it hides are visibly the same thing. Grey with the caption:
              it labels the column of times, it does not announce itself. -->
-        <TramGlyph size={13} stroke={2.4} />
+        <StationGlyph size={13} />
         <span class="root-name">{popup.title}</span>
       </span>
     {/if}
@@ -139,7 +139,7 @@
      as a hole, and stood the pane taller than its content asked for. */
   .root {
     display: flex;
-    /* Centred on the glyph, not on the baseline: the tram is a box, and hanging
+    /* Centred on the glyph, not on the baseline: the glyph is a box, and hanging
        it off the baseline of 11px text leaves it floating above the row. */
     align-items: center;
     gap: 4px;

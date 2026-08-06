@@ -1,7 +1,7 @@
 <script>
   /** Zoom in/out, locate, and the stations popup's switch, stacked on the right
    *  edge of the map. */
-  import TramGlyph from './TramGlyph.svelte';
+  import StationGlyph from './StationGlyph.svelte';
 
   let { app, onZoom, onLocate } = $props();
 </script>
@@ -58,7 +58,7 @@
     aria-pressed={app.stationsPopupEnabled}
     title={app.stationsPopupEnabled ? 'Hide nearby stations' : 'Show nearby stations'}
   >
-    <TramGlyph slashed={!app.stationsPopupEnabled} />
+    <StationGlyph slashed={!app.stationsPopupEnabled} />
   </button>
 </div>
 
