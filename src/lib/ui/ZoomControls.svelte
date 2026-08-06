@@ -27,14 +27,18 @@
     title={app.locationStatus || 'Show current location'}
   >
     <!-- SF Symbol "location": hollow arrow, filled solid while tracking.
-         Optically centred, which is NOT its bounding box: the notch in the tail
-         strips area off the lower-left, so the dart's mass (area centroid
-         13.87, 11.33 — stroke 13.62, 11.58) sits up-right of centre while its
-         bbox centre (12.64, 12.56) sits down-right. Both agree it hangs right,
-         so pan the viewBox to the midpoint of the two, 1.2; vertically they
-         disagree in sign and cancel, so leave y alone. Panning beats rewriting
-         every coordinate. The zoom glyphs are symmetric and need none of this. -->
-    <svg viewBox="1.2 0 24 24" width="19" height="19" aria-hidden="true">
+         Centred on its MASS, not its bounding box — the eye weighs ink, and the
+         notch in the tail strips area off the lower-left, so the dart's mass
+         sits up-right of the box centre (area centroid 13.87, 11.33; stroke
+         centroid 13.62, 11.58, the outline state). Panning the viewBox to the
+         mean of those two leaves both states within 0.1px of centre; the bbox
+         centre (12.64, 12.56) is a red herring that reads visibly up-right.
+         The resulting extent is lopsided — the thin tip leaves more slack on
+         its side — which is correct here: the viewport has no visible edge,
+         only the 44px circle does. Zoom glyphs are symmetric and need none of
+         this. Tuned by eye at render size; adjust these two numbers, not the
+         path. -->
+    <svg viewBox="1.75 -0.55 24 24" width="19" height="19" aria-hidden="true">
       <path
         d="M20.6 3.4L4.1 10.2c-1 .4-.9 1.9.2 2.1l6.4 1.4c.4.1.7.4.8.8l1.4 6.4c.2 1.1 1.7 1.2 2.1.2L21.8 4.6c.3-.8-.4-1.5-1.2-1.2z"
         fill={app.userLocation ? 'currentColor' : 'none'}
