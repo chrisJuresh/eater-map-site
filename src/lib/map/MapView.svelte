@@ -6,6 +6,7 @@
   import {
     GB_FIT_BOUNDS,
     HOME_VIEW_PADDING,
+    LINES_HIT_PX,
     LOCATION_ZOOM,
     LONDON_BOUNDS,
     MAX_ZOOM,
@@ -14,9 +15,10 @@
     OFFLINE_MAX_BOUNDS,
     ONLINE_TILE_URL,
     SEARCH_ZOOM,
+    STATION_SEARCH_PX,
     clamp
   } from '../constants.js';
-  import { buildLocalStyle, buildOnlineStyle, LINE_QUERY_LAYERS } from './style.js';
+  import { buildLocalStyle, buildOnlineStyle, LINE_QUERY_LAYERS, STATION_LAYER } from './style.js';
   import { MarkerRenderer } from './markers.js';
 
   /**
@@ -224,14 +226,39 @@
     }
   }
 
+  // Nearest station dot to a screen point, within STATION_SEARCH_PX. Measured in
+  // screen space (project each candidate back) so the closest one wins, not
+  // whichever the query happened to return first.
+  function stationNear(point) {
+    if (!map.getLayer(STATION_LAYER)) return null;
+    const box = [
+      [point.x - STATION_SEARCH_PX, point.y - STATION_SEARCH_PX],
+      [point.x + STATION_SEARCH_PX, point.y + STATION_SEARCH_PX]
+    ];
+    let closest = null;
+    let closestDistance = Infinity;
+    for (const feature of map.queryRenderedFeatures(box, { layers: [STATION_LAYER] })) {
+      const name = feature.properties?.name;
+      const at = feature.geometry?.coordinates;
+      if (!name || !Array.isArray(at) || !Number.isFinite(at[0]) || !Number.isFinite(at[1])) continue;
+      const screen = map.project(at);
+      const distance = Math.hypot(screen.x - point.x, screen.y - point.y);
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closest = name;
+      }
+    }
+    return closest;
+  }
+
   // Rail/tube lines under a screen point, deduped by name (for the popup).
   function linesAt(point) {
     if (!map) return null;
     const availableLayers = LINE_QUERY_LAYERS.filter((id) => map.getLayer(id));
     if (!availableLayers.length) return null;
     const box = [
-      [point.x - 6, point.y - 6],
-      [point.x + 6, point.y + 6]
+      [point.x - LINES_HIT_PX, point.y - LINES_HIT_PX],
+      [point.x + LINES_HIT_PX, point.y + LINES_HIT_PX]
     ];
     const features = map.queryRenderedFeatures(box, { layers: availableLayers });
     const seen = new Set();
@@ -247,7 +274,9 @@
     // Anchor to the geographic point, not the screen point, so the popup rides
     // the map when it is panned or zoomed.
     const anchor = map.unproject(point);
-    return placeLines({ lng: anchor.lng, lat: anchor.lat, items });
+    // Resolved once, at the point that opened the popup — panning re-places the
+    // popup but must not re-pick the station out from under it.
+    return placeLines({ lng: anchor.lng, lat: anchor.lat, station: stationNear(point), items });
   }
 
   // Screen placement for a map-anchored lines popup. Flipped so it stays inside

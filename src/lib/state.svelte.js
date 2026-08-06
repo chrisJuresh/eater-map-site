@@ -37,7 +37,7 @@ export class AppState {
   // Map-derived UI state
   visibleMarkerCount = $state(0);
   inView = $state([]); // settled list of restaurants in the current viewport
-  hoverLines = $state(null); // { x, y, w, h, flipX, flipY, items:[{name,color}] }
+  hoverLines = $state(null); // { x, y, w, h, flipX, flipY, station, items:[{name,color}] }
   linesPopup = $state(null);
   topbarHeight = $state(56);
 

@@ -50,6 +50,14 @@ export const LONDON_BOUNDS = {
 /** Charing Cross — the traditional centre of London, used to sort the entries list. */
 export const CENTRAL_LONDON = { lat: 51.5074, lon: -0.1278 };
 
+// ---- Lines popup -------------------------------------------------------------
+/** Half-size of the box queried for rail lines under a tap/cursor (screen px). */
+export const LINES_HIT_PX = 6;
+/** How far (screen px) the lines popup looks for the station to head itself with.
+ *  Screen-space, so it scales with zoom: far out, "nearest" stays meaningful; up
+ *  close, only a station genuinely by the tap qualifies. */
+export const STATION_SEARCH_PX = 110;
+
 // ---- Canvas markers ----------------------------------------------------------
 export const MARKER_PADDING = 48;
 export const MARKER_SPRITE_PADDING = 10;

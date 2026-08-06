@@ -34,6 +34,12 @@
   --glass-sheet-float: rgba(255, 255, 255, 0.6);
   --glass-filter: saturate(180%) blur(30px);
   --glass-filter-heavy: saturate(210%) brightness(1.08) blur(56px);
+  /* Small floating panes need a blur NARROWER than the pane itself. A 30–56px
+     radius on a pane only a couple of hundred px across averages the whole
+     backdrop into one flat tint, so the glass reads as a single colour instead
+     of picking up what sits behind each part of it. The extra saturation keeps
+     the (now local) colour vivid through the fill. */
+  --glass-filter-fine: saturate(220%) brightness(1.04) blur(9px);
   /* Specular rim: bright top-inner edge + a 0.5px outer hairline. */
   --glass-rim: inset 0 0.5px 0 rgba(255, 255, 255, 0.95), inset 0 0 0 0.5px rgba(255, 255, 255, 0.4),
     0 0 0 0.5px rgba(0, 0, 0, 0.05);

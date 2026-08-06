@@ -11,6 +11,9 @@
     style={`${lines.flipX ? `right: ${lines.w - lines.x}px;` : `left: ${lines.x}px;`} ${lines.flipY ? `bottom: ${lines.h - lines.y}px;` : `top: ${lines.y}px;`} transform: translate(${lines.flipX ? -14 : 14}px, ${lines.flipY ? -14 : 14}px);`}
     aria-hidden="true"
   >
+    {#if lines.station}
+      <span class="station">{lines.station}</span>
+    {/if}
     {#each lines.items as item}
       <span class="line-chip">
         <span class="line-swatch" style={`background: ${item.color};`}></span>
@@ -30,18 +33,33 @@
     gap: 3px;
     padding: 8px 11px;
     border-radius: var(--r-menu);
-    /* Same liquid glass as the rest of the map chrome: thin fill over the heavy
-       blur (it floats on the live map, so the lines beneath must not read
-       through), the shared specular rim, then the ambient lift. */
+    /* Liquid glass, but on the FINE filter: this pane is small, and a blur wider
+       than the pane averages the map behind it into one flat colour. The tight
+       radius lets each part of the glass pick up the part of the map under it —
+       a red line beneath the left edge tints the left edge. */
     background: var(--glass);
-    -webkit-backdrop-filter: var(--glass-filter-heavy);
-    backdrop-filter: var(--glass-filter-heavy);
+    -webkit-backdrop-filter: var(--glass-filter-fine);
+    backdrop-filter: var(--glass-filter-fine);
     border: 0;
     box-shadow: var(--glass-rim), var(--elev-2);
     pointer-events: none;
     font-size: 13px;
     font-weight: 500;
     color: var(--label);
+  }
+
+  /* The nearest station heads the list: what you tapped, before which lines run
+     through it. Hairline separator only (a filled header would paint over the
+     glass and go white wherever the map is coloured). */
+  .station {
+    padding-bottom: 4px;
+    margin-bottom: 1px;
+    border-bottom: 0.5px solid var(--separator);
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .line-chip {

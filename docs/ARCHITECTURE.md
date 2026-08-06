@@ -10,10 +10,11 @@ src/
   app.css                 Design tokens (iOS system palette + glass materials)
                           and global base
   app.html                PWA meta / manifest / icons
-  service-worker.js       Offline precache (streaming progress messages) +
-                          HTTP-Range slicing so .pmtiles reads work from cache
+  service-worker.js       Offline lifecycle: verified shell install, background
+                          map pack (streaming progress messages), HTTP-Range
+                          slicing so .pmtiles reads work from cache
   routes/
-    +layout.svelte        css import, Vercel analytics, SW registration
+    +layout.svelte        css import, Vercel analytics, SW lifecycle owner
     +layout.js            prerender = true, ssr = false
     +page.svelte          Thin composition root: AppState, URL deep links,
                           connectivity/install listeners, action handlers
@@ -64,7 +65,9 @@ src/
   the browser's online/offline events.
 - **Interaction**: clicking selects the nearest marker (never zooms). Every tap
   also lists the rail lines under it — a restaurant and a line can share a
-  point, and selecting one must not hide the other. The popup is
+  point, and selecting one must not hide the other. The popup is headed by the
+  station nearest the tap (within `STATION_SEARCH_PX` on SCREEN, so the reach
+  scales with zoom; resolved once, at open, never re-picked while panning) and is
   anchored to the tapped lng/lat (re-projected
   on every `move`) so it travels with the map rather than the viewport. Hover is
   gated on `(hover: hover)` and swallows the one synthetic mousemove a tap emits
@@ -104,7 +107,11 @@ src/
   translucent fill (`--glass`, `--glass-thick`, `--glass-sheet`,
   `--glass-sheet-float`) over `--glass-filter` (blur + saturation), a specular
   rim (`--glass-rim`: bright inner top edge plus a 0.5px outer hairline) and a
-  soft ambient shadow (`--elev-1..3`). Controls are capsules (`--r-full`), menus
+  soft ambient shadow (`--elev-1..3`). **Blur radius must stay narrower than the
+  pane**: a wide blur under a small pane averages the whole backdrop into one
+  flat tint, so the glass reads as a single colour instead of picking up what is
+  behind each part of it — small floating panes (the lines popup) use
+  `--glass-filter-fine`, big ones the heavy filter. Controls are capsules (`--r-full`), menus
   14px, popovers 20px, the mobile sheet 28px with a grabber. The mobile sheet
   floats over the live map, so it is a true glass material — `--glass-sheet-float`
   (0.6) over the heavier `--glass-filter-heavy` blur (which carries a brightness
@@ -122,11 +129,25 @@ src/
   light-only: the basemap has no dark style, so dark chrome would fight it.
 - **Entries list** (desktop idle panel): ordered `$$`, `$`, `$$$`, `$$$$`, then
   the unpriced rest — each group by distance from central London.
-- **Offline**: the service worker precaches app shell + data + basemap with
-  byte progress (`precache-progress/done/idle` messages) and serves pmtiles
-  Range requests from cache. `.pmtiles` are committed as plain Git binaries
-  (NOT LFS — Vercel serves LFS pointer stubs). Detail tiles stay ≤ z14 to fit
-  GitHub's 100 MB file limit.
+- **Offline**: two versioned cache generations, two tiers.
+  `eater-shell-<version>` (HTML, `_app`, icons, manifest) installs synchronously
+  and is verified — install fails rather than let a half-built shell take over.
+  `eater-pack-<version>` (data, rail, basemap ≈ 85 MB) downloads in the
+  background with byte progress (`precache-progress/done/error/idle` messages),
+  and only "promotes" — dropping the previous generation — once every entry
+  verifies, so an interrupted upgrade keeps the last known-good map.
+  Navigations are **network-first** with a bounded wait (instant from cache when
+  the device reports offline); hashed assets are cache-first. pmtiles Range
+  requests are sliced from the cached copy.
+- **Updates**: `src/lib/offline/client.js` is the single registration owner
+  (SvelteKit's automatic registration is off — see `svelte.config.js`). It
+  registers with `updateViaCache: 'none'`, promotes any waiting worker, and
+  reloads the tab once when control passes to a different build. Keeping HTML
+  network-first is what stops a stale build pinning a browser: a cache-first
+  shell serves old HTML that re-arms the worker, and reloading never escapes it.
+  Policy lives in `src/lib/offline/cache-policy.js` and is unit tested.
+- `.pmtiles` are committed as plain Git binaries (NOT LFS — Vercel serves LFS
+  pointer stubs). Detail tiles stay ≤ z14 to fit GitHub's 100 MB file limit.
 
 ## URL state
 
