@@ -64,8 +64,10 @@ src/
   the browser's online/offline events.
 - **Interaction**: clicking selects the nearest marker (never zooms); an empty
   tap shows the rail-lines popup, anchored to the tapped lng/lat (re-projected
-  on every `move`) so it travels with the map rather than the viewport — hover
-  stays with the cursor. There is no Reset button: the locate control is the
+  on every `move`) so it travels with the map rather than the viewport. Hover is
+  gated on `(hover: hover)` and swallows the one synthetic mousemove a tap emits
+  — otherwise touch leaves a hover popup stuck to the screen that `activeLines`
+  prefers over the tapped one, with no `mouseout` to clear it. There is no Reset button: the locate control is the
   only camera reset, flying to the live location when there is one and re-fitting
   the London home view when location is unavailable or denied. The spiderfy fan is **selection-driven**: while
   a stacked restaurant is selected AND zoom ≥ 14, its stack fans onto one even
