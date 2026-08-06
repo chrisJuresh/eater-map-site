@@ -36,7 +36,7 @@ src/
                           zoom; spiderfy fans a stack onto an even ring
       MapView.svelte      Map lifecycle, events, geolocation, camera API
     ui/
-      TopBar.svelte       Search + Reset + offline/install chip
+      TopBar.svelte       Search + offline/install chip
       SearchResults.svelte  Dropdown + "Go to place" geocode row
       ZoomControls.svelte   +/− capsule and locate (arrow, blue while tracking)
       PriceFilter.svelte    Segmented All/$/$$/$$$/$$$$
@@ -63,7 +63,11 @@ src/
   domain-restricted, safe in the bundle), unbounded, minZoom 2. Swap follows
   the browser's online/offline events.
 - **Interaction**: clicking selects the nearest marker (never zooms); an empty
-  tap shows the rail-lines popup. The spiderfy fan is **selection-driven**: while
+  tap shows the rail-lines popup, anchored to the tapped lng/lat (re-projected
+  on every `move`) so it travels with the map rather than the viewport — hover
+  stays with the cursor. There is no Reset button: the locate control is the
+  only camera reset, flying to the live location when there is one and re-fitting
+  the London home view when location is unavailable or denied. The spiderfy fan is **selection-driven**: while
   a stacked restaurant is selected AND zoom ≥ 14, its stack fans onto one even
   ring of thumb-sized targets (legs to the origin), following the map. A "stack"
   is markers whose drawn centres OVERLAP on screen (within `SPIDER_OVERLAP_PX`),
@@ -86,18 +90,23 @@ src/
   a picker; differing phones a list; the fullest address wins. Header shows the
   deduped restaurant count (`stats.restaurantCount`), not raw appearances.
 - **Map chrome scale**: every floating control uses the `--control-*` tokens in
-  `app.css` — `--control-h` (48px: search field, Reset, offline chip),
+  `app.css` — `--control-h` (48px: search field, offline chip),
   `--control-h-sm` (44px, the iOS minimum target: zoom, price filter, roadmap)
   and one label style (`--control-font` 15px / `--control-weight` 590). Heights
   are set on the element (never derived from padding) so a row stays flush
   whatever it holds, and neighbours (zoom top, results dropdown, attribution)
   offset from the tokens rather than hardcoded pixels.
 - **Visual language (iOS 26 / Apple Maps)**: chrome is "liquid glass" — a
-  translucent fill (`--glass`, `--glass-thick`, `--glass-sheet`) over
-  `--glass-filter` (blur + saturation), a specular rim (`--glass-rim`: bright
-  inner top edge plus a 0.5px outer hairline) and a soft ambient shadow
-  (`--elev-1..3`). Controls are capsules (`--r-full`), menus 14px, popovers
-  20px, the mobile sheet 28px with a grabber. Colour is the iOS light-appearance
+  translucent fill (`--glass`, `--glass-thick`, `--glass-sheet`,
+  `--glass-sheet-float`) over `--glass-filter` (blur + saturation), a specular
+  rim (`--glass-rim`: bright inner top edge plus a 0.5px outer hairline) and a
+  soft ambient shadow (`--elev-1..3`). Controls are capsules (`--r-full`), menus
+  14px, popovers 20px, the mobile sheet 28px with a grabber. The mobile sheet
+  floats over the live map, so it is a true glass material — `--glass-sheet-float`
+  (0.74) over the heavier `--glass-filter-heavy` blur, plus the rim — where the
+  desktop panel sits over the page background and stays near-opaque
+  (`--glass-sheet`, 0.93). Scrims inside the sheet (the descriptions fade) end
+  on the sheet's own fill, never flat white. Colour is the iOS light-appearance
   system palette (`--label*`, `--separator*`, `--fill-*`, `--blue` #007AFF);
   actions are blue, never filled ink. Type is SF Pro via `-apple-system` at iOS
   sizes (17 body / 15 subhead / 13 footnote) with negative tracking. Deliberately

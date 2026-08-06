@@ -26,7 +26,12 @@
   --glass: rgba(255, 255, 255, 0.7);
   --glass-thick: rgba(255, 255, 255, 0.84);
   --glass-sheet: rgba(255, 255, 255, 0.93);
+  /* The mobile sheet floats over the live map (the desktop panel sits over the
+     page background), so it is a true glass material: thinner fill, heavier
+     blur to keep body copy legible over whatever is beneath it. */
+  --glass-sheet-float: rgba(255, 255, 255, 0.74);
   --glass-filter: saturate(180%) blur(30px);
+  --glass-filter-heavy: saturate(190%) blur(44px);
   /* Specular rim: bright top-inner edge + a 0.5px outer hairline. */
   --glass-rim: inset 0 0.5px 0 rgba(255, 255, 255, 0.95), inset 0 0 0 0.5px rgba(255, 255, 255, 0.4),
     0 0 0 0.5px rgba(0, 0, 0, 0.05);
@@ -44,7 +49,7 @@
   /* Floating map chrome (top bar, zoom, price, roadmap) shares one scale so every
      control in a row is the same height and every label the same size/weight.
      44px is the iOS minimum touch target. */
-  --control-h: 48px; /* top bar: search field, Reset, offline chip */
+  --control-h: 48px; /* top bar: search field, offline chip */
   --control-h-sm: 44px; /* secondary: zoom, price filter, roadmap */
   --control-font: 15px;
   --control-weight: 590; /* SF semibold */

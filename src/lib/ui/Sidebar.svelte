@@ -284,7 +284,11 @@
               <path d="M3.7 9.4h16.6M3.7 14.6h16.6" stroke="currentColor" stroke-width="1.6" />
             </svg>
           </span>
-          <span class="action-label">Website <span class="caret" aria-hidden="true">⌄</span></span>
+          <span class="action-label"
+            >Website<svg class="caret" viewBox="0 0 12 8" aria-hidden="true">
+              <path d="M1.5 2.1L6 6.1l4.5-4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+            </svg></span
+          >
         </button>
       {/if}
       {#if guideLinks.length === 1}
@@ -305,7 +309,11 @@
               <path d="M19.6 4.6h-5.2A2.4 2.4 0 0012 7v12a2 2 0 012-1.6h5.6z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
             </svg>
           </span>
-          <span class="action-label">Eater <span class="caret" aria-hidden="true">⌄</span></span>
+          <span class="action-label"
+            >Eater<svg class="caret" viewBox="0 0 12 8" aria-hidden="true">
+              <path d="M1.5 2.1L6 6.1l4.5-4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+            </svg></span
+          >
         </button>
       {/if}
     </div>
@@ -339,7 +347,7 @@
           <p class="list-more">+ {listOverflow.toLocaleString()} more in view — zoom in to narrow down</p>
         {/if}
       {:else}
-        <p class="list-empty">No restaurants in this view — zoom out or press Reset.</p>
+        <p class="list-empty">No restaurants in this view — zoom out or move the map.</p>
       {/if}
     </div>
   {/if}
@@ -627,14 +635,32 @@
     background: var(--blue);
   }
 
-  /* Caption sits on one line under the disc — the caret rides with the word. */
+  /* Caption sits on one line under the disc — the caret rides with the word,
+     centred on it rather than hanging off the baseline. */
   .action-label {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
   }
 
+  /* Sized in em so it tracks the 12px/11px caption, and scaled to the cap
+     height of the word beside it. */
   .caret {
-    font-size: 10px;
-    line-height: 1;
+    flex: 0 0 auto;
+    width: 0.82em;
+    height: 0.55em;
+  }
+
+  /* Flipped on the path, not the <svg>: a CSS transform on an outer SVG element
+     is ignored (SVG root transform semantics). */
+  .caret path {
+    transform-origin: 50% 50%;
+    transition: transform 160ms ease;
+  }
+
+  .actions .picker-toggle.open .caret path {
+    transform: rotate(180deg);
   }
 
   .actions .citymapper-action {
@@ -758,9 +784,14 @@
       border-top: 0;
       border-left: 0;
       border-radius: var(--r-sheet) var(--r-sheet) 0 0;
+      /* Liquid glass over the map: thin fill + heavy blur, the same specular rim
+         the rest of the chrome carries, then the ambient lift. */
+      background: var(--glass-sheet-float);
+      -webkit-backdrop-filter: var(--glass-filter-heavy);
+      backdrop-filter: var(--glass-filter-heavy);
       transform: translateY(100%);
       transition: transform 320ms cubic-bezier(0.32, 0.72, 0, 1);
-      box-shadow: 0 -0.5px 0 rgba(0, 0, 0, 0.06), 0 -16px 44px rgba(0, 0, 0, 0.18);
+      box-shadow: var(--glass-rim), 0 -16px 44px rgba(0, 0, 0, 0.18);
     }
 
     .details-panel.open {
@@ -855,7 +886,8 @@
       bottom: 0;
       height: 1.7em;
       pointer-events: none;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.85) 82%);
+      /* Fades into the sheet's own material, not a flat white band over it. */
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0), var(--glass-sheet-float) 82%);
     }
 
     .descriptions-scrollbar {

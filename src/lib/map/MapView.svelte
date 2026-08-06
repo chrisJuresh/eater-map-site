@@ -93,7 +93,12 @@
       settleSoon();
     });
     map.on('styledata', () => renderer.schedule());
-    map.on('move', () => renderer.schedule());
+    map.on('move', () => {
+      renderer.schedule();
+      // The tapped popup is pinned to its place on the map, so re-project it
+      // every frame of the camera move (hover stays with the cursor instead).
+      if (app.linesPopup) app.linesPopup = placeLines(app.linesPopup);
+    });
     map.on('moveend', () => {
       renderer.schedule();
       settleSoon();
@@ -224,11 +229,20 @@
       if (items.length >= 8) break;
     }
     if (!items.length) return null;
-    // Flip the popup so it stays inside the map near the right/bottom edges.
+    // Anchor to the geographic point, not the screen point, so the popup rides
+    // the map when it is panned or zoomed.
+    const anchor = map.unproject(point);
+    return placeLines({ lng: anchor.lng, lat: anchor.lat, items });
+  }
+
+  // Screen placement for a map-anchored lines popup. Flipped so it stays inside
+  // the map near the right/bottom edges.
+  function placeLines(entry) {
+    const { x, y } = map.project([entry.lng, entry.lat]);
     const container = map.getContainer();
     const w = container.clientWidth;
     const h = container.clientHeight;
-    return { x: point.x, y: point.y, w, h, flipX: point.x > w - 252, flipY: point.y > h - 160, items };
+    return { ...entry, x, y, w, h, flipX: x > w - 252, flipY: y > h - 160 };
   }
 
   // ---- Exported camera / location API -----------------------------------------
@@ -280,14 +294,12 @@
     map.easeTo({ zoom: clamp(map.getZoom() + delta, map.getMinZoom(), MAX_ZOOM), duration: 200 });
   }
 
-  export function resetView() {
-    renderer?.collapseSpider();
-    if (app.userLocation) {
-      setLocationView(app.userLocation);
-    } else {
-      homeViewApplied = false;
-      applyFallbackHomeView();
-    }
+  // Re-fit the home view even though one was applied already. This is what the
+  // locate button falls back to when there is no location to fly to, so it
+  // doubles as the "get me back to the whole map" reset.
+  function returnToHomeView() {
+    homeViewApplied = false;
+    applyFallbackHomeView();
   }
 
   function setLocationView(location) {
@@ -297,8 +309,12 @@
   }
 
   export function locate(options = {}) {
+    // An explicit press is also the app's reset: drop the fan, and if there is
+    // no location (unsupported, denied, timed out) fall back to the home view.
+    if (options.restart) renderer?.collapseSpider();
     if (!navigator.geolocation) {
       app.locationStatus = 'Location unavailable';
+      if (options.restart) returnToHomeView();
       return;
     }
     if (app.userLocation) setLocationView(app.userLocation);
@@ -321,7 +337,10 @@
       (error) => {
         app.locationStatus = error.message || 'Location unavailable';
         stopLocationTracking();
-        applyFallbackHomeView();
+        // On the automatic first attempt this only fills an unset view; a
+        // deliberate press re-fits the home view even if one is already applied.
+        if (options.restart) returnToHomeView();
+        else applyFallbackHomeView();
       },
       { enableHighAccuracy: true, maximumAge: 10000, timeout: 15000 }
     );

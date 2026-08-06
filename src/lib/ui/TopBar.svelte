@@ -1,6 +1,6 @@
 <script>
-  /** Search + Reset + offline/install chip, floating over the map. */
-  let { app, onGoToSearch, onReset, onInstall } = $props();
+  /** Search + offline/install chip, floating over the map. */
+  let { app, onGoToSearch, onInstall } = $props();
 
   let topbarEl;
 
@@ -43,7 +43,6 @@
       </button>
     {/if}
   </label>
-  <button class="reset-button" type="button" onclick={onReset}>Reset</button>
   {#if !app.isStandalone}
     <button
       class="offline-button"
@@ -73,20 +72,22 @@
 </div>
 
 <style>
+  /* Flex, not grid: the offline chip is absent in the installed app, and an
+     empty grid track still reserves its gap — which left the chip 8px short of
+     the right edge the zoom/locate stack lines up on. */
   .topbar {
     position: absolute;
     top: max(12px, env(safe-area-inset-top));
     left: 12px;
     right: 12px;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto auto;
+    display: flex;
+    align-items: center;
     gap: 8px;
     z-index: 10;
     pointer-events: none;
   }
 
   .search,
-  .reset-button,
   .offline-button {
     pointer-events: auto;
   }
@@ -97,6 +98,8 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    flex: 1 1 auto;
+    min-width: 0;
     height: var(--control-h);
     max-width: 560px;
     padding: 0 14px;
@@ -161,11 +164,11 @@
     color: var(--label-secondary);
   }
 
-  .reset-button,
   .offline-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    flex: 0 0 auto;
     gap: 7px;
     height: var(--control-h);
     padding: 0 16px;
@@ -184,12 +187,11 @@
     white-space: nowrap;
   }
 
-  .reset-button {
-    min-width: 62px;
-  }
-
+  /* Once the search capsule hits its max width, the chip stays pinned to the
+     right edge rather than trailing the field. */
   .offline-button {
     min-width: 96px;
+    margin-left: auto;
     color: var(--label);
   }
 
@@ -216,17 +218,9 @@
   }
 
   @media (max-width: 820px) {
-    .topbar {
-      grid-template-columns: minmax(0, 1fr) 62px auto;
-    }
-
-    .reset-button,
-    .offline-button {
-      padding: 0 12px;
-    }
-
     .offline-button {
       min-width: 88px;
+      padding: 0 12px;
     }
   }
 </style>

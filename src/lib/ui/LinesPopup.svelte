@@ -30,11 +30,14 @@
     gap: 3px;
     padding: 8px 11px;
     border-radius: var(--r-menu);
-    background: var(--glass-thick);
-    -webkit-backdrop-filter: var(--glass-filter);
-    backdrop-filter: var(--glass-filter);
+    /* Same liquid glass as the rest of the map chrome: thin fill over the heavy
+       blur (it floats on the live map, so the lines beneath must not read
+       through), the shared specular rim, then the ambient lift. */
+    background: var(--glass);
+    -webkit-backdrop-filter: var(--glass-filter-heavy);
+    backdrop-filter: var(--glass-filter-heavy);
     border: 0;
-    box-shadow: var(--glass-rim), var(--elev-1);
+    box-shadow: var(--glass-rim), var(--elev-2);
     pointer-events: none;
     font-size: 13px;
     font-weight: 500;
