@@ -27,11 +27,14 @@
     title={app.locationStatus || 'Show current location'}
   >
     <!-- SF Symbol "location": hollow arrow, filled solid while tracking.
-         The dart's ink measures x [3.41, 21.87] / y [3.33, 21.79], so it
-         centres on ~12.6, not the 12 the box does — it hung down-right by half
-         a pixel beside the zoom glyphs, which ARE centred on 12. Pan the
-         viewBox by that 0.6 rather than rewrite every coordinate. -->
-    <svg viewBox="0.6 0.6 24 24" width="19" height="19" aria-hidden="true">
+         Optically centred, which is NOT its bounding box: the notch in the tail
+         strips area off the lower-left, so the dart's mass (area centroid
+         13.87, 11.33 — stroke 13.62, 11.58) sits up-right of centre while its
+         bbox centre (12.64, 12.56) sits down-right. Both agree it hangs right,
+         so pan the viewBox to the midpoint of the two, 1.2; vertically they
+         disagree in sign and cancel, so leave y alone. Panning beats rewriting
+         every coordinate. The zoom glyphs are symmetric and need none of this. -->
+    <svg viewBox="1.2 0 24 24" width="19" height="19" aria-hidden="true">
       <path
         d="M20.6 3.4L4.1 10.2c-1 .4-.9 1.9.2 2.1l6.4 1.4c.4.1.7.4.8.8l1.4 6.4c.2 1.1 1.7 1.2 2.1.2L21.8 4.6c.3-.8-.4-1.5-1.2-1.2z"
         fill={app.userLocation ? 'currentColor' : 'none'}
