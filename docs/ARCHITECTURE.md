@@ -107,10 +107,15 @@ src/
   soft ambient shadow (`--elev-1..3`). Controls are capsules (`--r-full`), menus
   14px, popovers 20px, the mobile sheet 28px with a grabber. The mobile sheet
   floats over the live map, so it is a true glass material — `--glass-sheet-float`
-  (0.74) over the heavier `--glass-filter-heavy` blur, plus the rim — where the
+  (0.6) over the heavier `--glass-filter-heavy` blur (which carries a brightness
+  lift, so a thin fill does not read grey), plus `--glass-rim-strong` — where the
   desktop panel sits over the page background and stays near-opaque
-  (`--glass-sheet`, 0.93). Scrims inside the sheet (the descriptions fade) end
-  on the sheet's own fill, never flat white. Colour is the iOS light-appearance
+  (`--glass-sheet`, 0.93). **Nothing inside the floating sheet may paint an
+  opaque fill**: a fill composites on top of the already-composited glass and
+  goes white wherever the map is coloured (a scrim over the sea stayed white
+  while the sheet went blue). The descriptions fade is therefore a
+  `mask-image` on the scrolling text, not a gradient over it, and the mobile
+  action bar drops the desktop scrim for `background: transparent`. Colour is the iOS light-appearance
   system palette (`--label*`, `--separator*`, `--fill-*`, `--blue` #007AFF);
   actions are blue, never filled ink. Type is SF Pro via `-apple-system` at iOS
   sizes (17 body / 15 subhead / 13 footnote) with negative tracking. Deliberately

@@ -878,16 +878,15 @@
       line-height: 1.42;
     }
 
-    .details-panel .descriptions-shell.can-scroll-down::after {
-      content: '';
-      position: absolute;
-      left: 0;
-      right: 9px;
-      bottom: 0;
-      height: 1.7em;
-      pointer-events: none;
-      /* Fades into the sheet's own material, not a flat white band over it. */
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0), var(--glass-sheet-float) 82%);
+    /* Fade the TEXT out, never paint a scrim over it. A white gradient here
+       composites a second fill on top of the sheet's glass (0.6 over 0.6 reads
+       ~0.84), so over water the band stayed white while the sheet around it
+       took the map's blue. Masking removes ink instead of adding paint, so the
+       glass beneath keeps whatever it is tinted. The custom scrollbar is a
+       sibling of this element, so it stays crisp — hence no right inset. */
+    .details-panel .descriptions-shell.can-scroll-down .descriptions {
+      -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - 1.7em), transparent);
+      mask-image: linear-gradient(180deg, #000 calc(100% - 1.7em), transparent);
     }
 
     .descriptions-scrollbar {
