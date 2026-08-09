@@ -60,16 +60,24 @@ src/
   always above regular ones; a selected restaurant renders above everything.
   Zoom detail tiers at 12/14; duplicate coordinates fan out into rings.
 - **Rail overlay**: navy base of every track; National Rail (operator brand
-  colours) below TfL lines; opacity zoom-fades (10→0.58×, 13→0.82×, 16→1×) so
-  parallel tracks don't read opaque when zoomed out; station dots always
-  visible; basemap place labels render ABOVE the lines, in near-black. Those
-  fades are picked by eye, so `/tune` puts a slider on them: `pnpm dev`, open
-  `/tune`, and it scales every rail line's opacity live (100% = what `style.js`
-  ships, the readout gives the effective value at the current zoom for a line
-  with no `opacity` of its own). It is DEV ONLY — `prerender = false` keeps it out
-  of the built site and the page is behind `import.meta.env.DEV`, so the
-  deployment has no /tune to serve; nothing found there is live until the number
-  is written into `style.js`.
+  colours) below TfL lines; station dots always visible; basemap place labels
+  render ABOVE the lines, in near-black. Lines are fully OPAQUE — nothing shows
+  through anything, because lines sharing a physical track are drawn side by side
+  instead of on top of each other. `data-pipeline/scripts/rail-stack.mjs` splits
+  the geometry at build time: a stretch carried by N lines becomes N features,
+  each baked with `wf` = 1/N of the full width and `of` = that band's offset from
+  the track centre, so two lines take half the width each and four a quarter, and
+  the N bands together fill exactly the stroke one line alone would have had.
+  `style.js` multiplies both factors into the zoom width curve. The shared ways
+  are chained end to end first (flipping any digitised backwards) because
+  `line-offset` follows the line's own direction — without that a colour would
+  jump to the other side of the track mid-run. The navy base keeps its zoom fade
+  (10→0.29, 16→0.5); it is the underlay of every track, not a line. `/tune` still
+  puts a slider over rail opacity for eyeballing (`pnpm dev`, open `/tune`); at
+  100% the lines are opaque, so it can only dim. It is DEV ONLY — `prerender =
+  false` keeps it out of the built site and the page is behind
+  `import.meta.env.DEV`, so the deployment has no /tune to serve; nothing found
+  there is live until the number is written into `style.js`.
 - **Basemaps**: offline = bundled pmtiles (GB coarse ≤z9 + detail ≥z9, background
   layer removed so undownloaded voids show the CSS "offline" watermark),
   bounded to GB with a viewport-fit min zoom; online = Protomaps API (key is

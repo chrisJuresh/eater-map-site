@@ -9,7 +9,9 @@
 //   base:false, tfl:bool -> a colour-coded line; tfl=true for Tube/DLR/Overground/
 //                           Elizabeth/Tram/Cable car (drawn ON TOP of National Rail)
 //   station:true         -> a station point (drawn as an always-visible dot)
-//   color, line, opacity
+//   color, line
+//   wf, of               -> on shared track only: the band's share of the full
+//                           width and its offset from the track centre (rail-stack.mjs)
 //
 // Needs internet once. Usage: node data-pipeline/scripts/build-tube.mjs
 
@@ -29,6 +31,7 @@ import {
   S,
   W
 } from './rail-lines.mjs';
+import { splitSharedCorridors } from './rail-stack.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const OUT = join(ROOT, 'static', 'tube-lines.geojson');
@@ -74,8 +77,7 @@ async function main() {
   const stationsJson = await overpass(STATIONS_QUERY);
 
   const base = [];
-  const nr = [];
-  const tfl = [];
+  const coloured = [];
 
   for (const el of waysJson.elements || []) {
     if (el.type !== 'way' || !Array.isArray(el.geometry)) continue;
@@ -83,9 +85,9 @@ async function main() {
     const coords = el.geometry.filter(Boolean).map((p) => [round(p.lon), round(p.lat)]);
     if (coords.length < 2) continue;
     if (t.aerialway) {
-      tfl.push({
+      coloured.push({
         type: 'Feature',
-        properties: { base: false, tfl: true, color: CABLE_CAR_COLOR, opacity: 0.6, line: 'IFS Cloud Cable Car' },
+        properties: { base: false, tfl: true, color: CABLE_CAR_COLOR, line: 'IFS Cloud Cable Car' },
         geometry: { type: 'LineString', coordinates: coords }
       });
       continue;
@@ -100,7 +102,7 @@ async function main() {
 
   // Merge every route relation into ONE feature per colour, drawing each physical
   // track (OSM way) only once — otherwise the many overlapping route variants of a
-  // line stack up and the translucency reads as fully opaque.
+  // line stack up and the shared-track split below counts the same line N times.
   const byColor = new Map();
   for (const el of routesJson.elements || []) {
     if (el.type !== 'relation') continue;
@@ -109,7 +111,7 @@ async function main() {
     const label = routeLabel(el.tags, line.tfl);
     let group = byColor.get(line.color);
     if (!group) {
-      group = { tfl: line.tfl, opacity: line.opacity, label, ways: new Set(), parts: [] };
+      group = { tfl: line.tfl, label, ways: new Set(), parts: [] };
       byColor.set(line.color, group);
     }
     for (const m of el.members || []) {
@@ -122,12 +124,18 @@ async function main() {
   }
   for (const [color, group] of byColor) {
     if (!group.parts.length) continue;
-    (group.tfl ? tfl : nr).push({
+    coloured.push({
       type: 'Feature',
-      properties: { base: false, tfl: group.tfl, color, opacity: group.opacity, line: group.label },
+      properties: { base: false, tfl: group.tfl, color, line: group.label },
       geometry: { type: 'MultiLineString', coordinates: group.parts }
     });
   }
+
+  // Lines sharing a physical track become side-by-side bands, so none is hidden
+  // under another and none has to be translucent to show through.
+  const split = splitSharedCorridors(coloured);
+  const nr = split.filter((f) => !f.properties.tfl);
+  const tfl = split.filter((f) => f.properties.tfl);
 
   const stations = [];
   const seenStation = new Set();

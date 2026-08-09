@@ -67,7 +67,8 @@
   });
 
   // What the slider actually produces, mirroring the expressions in style.js:
-  // the zoom fade between the tuned stops, times the feature opacity, clamped.
+  // the lines are flat opaque (they are drawn side by side rather than stacked,
+  // so nothing needs to show through), the base still fades between its stops.
   function lerp(z, stops) {
     const first = stops[0];
     const last = stops[stops.length - 1];
@@ -81,10 +82,7 @@
     return last[1];
   }
 
-  const FEATURE_DEFAULT = 0.6; // the `coalesce` fallback in style.js
-  const lineEffective = $derived(
-    Math.min(1, FEATURE_DEFAULT * lerp(zoom, [[10, 0.58], [13, 0.82], [16, 1]]) * scale)
-  );
+  const lineEffective = $derived(Math.min(1, scale));
   const baseEffective = $derived(Math.min(1, lerp(zoom, [[10, 0.29], [16, 0.5]]) * scale));
 </script>
 
@@ -115,8 +113,8 @@
           <div><dt>base</dt><dd>{baseEffective.toFixed(3)}</dd></div>
         </dl>
         <p class="hint">
-          Effective at this zoom, for a line with no <code>opacity</code> of its own.
-          100% is the tuned value in <code>style.js</code>.
+          Effective at this zoom. 100% is what <code>style.js</code> ships — lines are
+          opaque there, so the slider can only dim them.
         </p>
 
         <div class="row">
