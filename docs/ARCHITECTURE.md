@@ -18,6 +18,8 @@ src/
     +layout.js            prerender = true, ssr = false
     +page.svelte          Thin composition root: AppState, URL deep links,
                           connectivity/install listeners, action handlers
+    tune/+page.svelte     Dev-only harness: the real map with a slider over the
+                          opacity of every rail line (see below)
   lib/
     constants.js          EVERY tuned constant (zooms, bounds, opacities, keys)
     state.svelte.js       AppState (runes class): data, filters, selection,
@@ -60,7 +62,14 @@ src/
 - **Rail overlay**: navy base of every track; National Rail (operator brand
   colours) below TfL lines; opacity zoom-fades (10→0.58×, 13→0.82×, 16→1×) so
   parallel tracks don't read opaque when zoomed out; station dots always
-  visible; basemap place labels render ABOVE the lines, in near-black.
+  visible; basemap place labels render ABOVE the lines, in near-black. Those
+  fades are picked by eye, so `/tune` puts a slider on them: `pnpm dev`, open
+  `/tune`, and it scales every rail line's opacity live (100% = what `style.js`
+  ships, the readout gives the effective value at the current zoom for a line
+  with no `opacity` of its own). It is DEV ONLY — `prerender = false` keeps it out
+  of the built site and the page is behind `import.meta.env.DEV`, so the
+  deployment has no /tune to serve; nothing found there is live until the number
+  is written into `style.js`.
 - **Basemaps**: offline = bundled pmtiles (GB coarse ≤z9 + detail ≥z9, background
   layer removed so undownloaded voids show the CSS "offline" watermark),
   bounded to GB with a viewport-fit min zoom; online = Protomaps API (key is

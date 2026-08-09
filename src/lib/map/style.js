@@ -26,18 +26,33 @@ const LINE_WIDTH = ['interpolate', ['linear'], ['zoom'], 6, 1, 10, 2, 13, 3.2, 1
 // zoom curve inside another expression), with the per-feature opacity applied
 // in each output stop.
 const FEATURE_OPACITY = ['coalesce', ['get', 'opacity'], 0.6];
-const LINE_OPACITY = [
+// `scale` is 1 everywhere in the app — the dev-only /tune page is the only caller
+// that moves it, so both curves are built rather than stated as constants. The
+// product is clamped because a feature carries its own opacity as data, which
+// cannot be capped up front; at scale 1 nothing reaches the clamp.
+const railFade = (k, scale) => ['min', 1, ['*', FEATURE_OPACITY, k * scale]];
+const lineOpacity = (scale = 1) => [
   'interpolate',
   ['linear'],
   ['zoom'],
   10,
-  ['*', FEATURE_OPACITY, 0.58],
+  railFade(0.58, scale),
   13,
-  ['*', FEATURE_OPACITY, 0.82],
+  railFade(0.82, scale),
   16,
-  FEATURE_OPACITY
+  railFade(1, scale)
 ];
-const BASE_OPACITY = ['interpolate', ['linear'], ['zoom'], 10, 0.29, 16, 0.5];
+const baseOpacity = (scale = 1) => [
+  'interpolate',
+  ['linear'],
+  ['zoom'],
+  10,
+  Math.min(1, 0.29 * scale),
+  16,
+  Math.min(1, 0.5 * scale)
+];
+const LINE_OPACITY = lineOpacity();
+const BASE_OPACITY = baseOpacity();
 
 /** Layers queried (top-first) for the "which lines are here?" popup. */
 export const LINE_QUERY_LAYERS = ['rail-tfl', 'rail-nr', 'rail-base'];
@@ -85,6 +100,18 @@ const RAIL_LAYERS = [
     }
   }
 ];
+
+/**
+ * Rebuild every rail line layer's opacity at `scale` (1 = the tuned values).
+ * Only the dev-only /tune page calls this; it is dropped from production builds
+ * along with that page. Re-apply after a `setStyle` — the swap rebuilds the paint.
+ */
+export function setRailOpacityScale(map, scale) {
+  const builders = { 'rail-base': baseOpacity, 'rail-nr': lineOpacity, 'rail-tfl': lineOpacity };
+  for (const [id, build] of Object.entries(builders)) {
+    if (map?.getLayer(id)) map.setPaintProperty(id, 'line-opacity', build(scale));
+  }
+}
 
 // Station dots (bundled) — always visible.
 const STATION_DOT_LAYER = {
