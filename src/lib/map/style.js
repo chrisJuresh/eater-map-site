@@ -19,25 +19,56 @@ const ATTRIBUTION =
 // routes on top. Always visible so the whole network shows even at low zoom
 // (Protomaps omits most rail from low-zoom tiles and never colour-codes it).
 const TUBE_SOURCE = { type: 'geojson', data: '/tube-lines.geojson' };
-const LINE_WIDTH = ['interpolate', ['linear'], ['zoom'], 6, 1, 10, 2, 13, 3.2, 16, 5];
-// Parallel up/down tracks overlap when zoomed out and double the apparent
-// opacity; fade lines out at low zoom so translucency looks consistent. The
-// zoom interpolate must be the OUTERMOST expression (MapLibre forbids nesting a
-// zoom curve inside another expression), with the per-feature opacity applied
-// in each output stop.
-const FEATURE_OPACITY = ['coalesce', ['get', 'opacity'], 0.6];
-const LINE_OPACITY = [
+// Lines are opaque; where several share a track they are drawn as bands side by
+// side rather than stacked, so nothing has to show through anything. The builder
+// bakes two numbers on each shared feature (data-pipeline/scripts/rail-stack.mjs):
+// `wf` is that line's 1/N share of the full width, and `oi` is which band it is,
+// counted in band widths out from the track centre. Both are absent on the vast
+// majority of the network, which is a single line running full width down the
+// middle.
+//
+// A band never goes below MIN_BAND: at low zoom the whole stroke is only a pixel
+// or two, and a quarter of that renders as a smear the colour cannot be read from
+// — the point of the split is lost exactly where the most lines are sharing. Under
+// that floor the stack widens instead of each band thinning, which is why the
+// offset is measured in bands rather than baked as a fraction of the stroke. The
+// floor is keyed off `wf`, so a line running alone keeps its tuned width.
+const MIN_BAND = 1.25;
+const BAND_WIDTH = ['coalesce', ['get', 'wf'], 1];
+const BAND_INDEX = ['coalesce', ['get', 'oi'], 0];
+const BAND_FLOOR = ['case', ['has', 'wf'], MIN_BAND, 0];
+// The zoom interpolate must be the OUTERMOST expression (MapLibre forbids nesting
+// a zoom curve inside another), so the band maths is repeated in every stop.
+const railBand = (px) => ['max', ['*', px, BAND_WIDTH], BAND_FLOOR];
+const railCurve = (stop) => [
+  'interpolate',
+  ['linear'],
+  ['zoom'],
+  6,
+  stop(1),
+  10,
+  stop(2),
+  13,
+  stop(3.2),
+  16,
+  stop(5)
+];
+const LINE_WIDTH = railCurve((px) => railBand(px));
+const LINE_OFFSET = railCurve((px) => ['*', railBand(px), BAND_INDEX]);
+// `scale` is 1 everywhere in the app — the dev-only /tune page is the only caller
+// that moves it, so the curves are built rather than stated as constants.
+const lineOpacity = (scale = 1) => Math.min(1, scale);
+const baseOpacity = (scale = 1) => [
   'interpolate',
   ['linear'],
   ['zoom'],
   10,
-  ['*', FEATURE_OPACITY, 0.58],
-  13,
-  ['*', FEATURE_OPACITY, 0.82],
+  Math.min(1, 0.29 * scale),
   16,
-  FEATURE_OPACITY
+  Math.min(1, 0.5 * scale)
 ];
-const BASE_OPACITY = ['interpolate', ['linear'], ['zoom'], 10, 0.29, 16, 0.5];
+const LINE_OPACITY = lineOpacity();
+const BASE_OPACITY = baseOpacity();
 
 /** Layers queried (top-first) for the "which lines are here?" popup. */
 export const LINE_QUERY_LAYERS = ['rail-tfl', 'rail-nr', 'rail-base'];
@@ -68,6 +99,7 @@ const RAIL_LAYERS = [
     paint: {
       'line-color': ['coalesce', ['get', 'color'], '#666666'],
       'line-width': LINE_WIDTH,
+      'line-offset': LINE_OFFSET,
       'line-opacity': LINE_OPACITY
     }
   },
@@ -81,10 +113,23 @@ const RAIL_LAYERS = [
     paint: {
       'line-color': ['coalesce', ['get', 'color'], '#666666'],
       'line-width': LINE_WIDTH,
+      'line-offset': LINE_OFFSET,
       'line-opacity': LINE_OPACITY
     }
   }
 ];
+
+/**
+ * Rebuild every rail line layer's opacity at `scale` (1 = the tuned values).
+ * Only the dev-only /tune page calls this; it is dropped from production builds
+ * along with that page. Re-apply after a `setStyle` — the swap rebuilds the paint.
+ */
+export function setRailOpacityScale(map, scale) {
+  const builders = { 'rail-base': baseOpacity, 'rail-nr': lineOpacity, 'rail-tfl': lineOpacity };
+  for (const [id, build] of Object.entries(builders)) {
+    if (map?.getLayer(id)) map.setPaintProperty(id, 'line-opacity', build(scale));
+  }
+}
 
 // Station dots (bundled) — always visible.
 const STATION_DOT_LAYER = {

@@ -18,6 +18,8 @@ src/
     +layout.js            prerender = true, ssr = false
     +page.svelte          Thin composition root: AppState, URL deep links,
                           connectivity/install listeners, action handlers
+    tune/+page.svelte     Dev-only harness: the real map with a slider over the
+                          opacity of every rail line (see below)
   lib/
     constants.js          EVERY tuned constant (zooms, bounds, opacities, keys)
     state.svelte.js       AppState (runes class): data, filters, selection,
@@ -58,9 +60,32 @@ src/
   always above regular ones; a selected restaurant renders above everything.
   Zoom detail tiers at 12/14; duplicate coordinates fan out into rings.
 - **Rail overlay**: navy base of every track; National Rail (operator brand
-  colours) below TfL lines; opacity zoom-fades (10→0.58×, 13→0.82×, 16→1×) so
-  parallel tracks don't read opaque when zoomed out; station dots always
-  visible; basemap place labels render ABOVE the lines, in near-black.
+  colours) below TfL lines; station dots always visible; basemap place labels
+  render ABOVE the lines, in near-black. Lines are fully OPAQUE — nothing shows
+  through anything, because lines sharing a physical track are drawn side by side
+  instead of on top of each other. `data-pipeline/scripts/rail-stack.mjs` splits
+  the geometry at build time: a stretch carried by N lines becomes N features,
+  each baked with `wf` = 1/N of the full width and `oi` = which band it is,
+  counted in band widths out from the track centre, so two lines take half the
+  width each and four a quarter, and the N bands together fill exactly the stroke
+  one line alone would have had. `style.js` turns those into a width and offset
+  off the zoom width curve, with a `MIN_BAND` floor of 1.25px: zoomed out the
+  whole stroke is only a pixel or two, and a quarter of that is a smear no colour
+  can be read from, so under the floor the stack widens rather than each band
+  thinning. A line running alone is never floored and keeps its tuned width.
+  Direction matters, because `line-offset` follows the line's own: shared ways are
+  chained end to end (flipping any digitised backwards), then each finished path
+  is pointed down a canonical compass direction — dominant axis positive, or wound
+  counter-clockwise if it closed into a ring. Without that last step a corridor's
+  up and down tracks, which OSM digitises in their own directions of travel, put
+  each colour on opposite sides; zoomed out they land in the same pixel and the
+  colour drawn second covers the first outright. The navy base keeps its zoom fade
+  (10→0.29, 16→0.5); it is the underlay of every track, not a line. `/tune` still
+  puts a slider over rail opacity for eyeballing (`pnpm dev`, open `/tune`); at
+  100% the lines are opaque, so it can only dim. It is DEV ONLY — `prerender =
+  false` keeps it out of the built site and the page is behind
+  `import.meta.env.DEV`, so the deployment has no /tune to serve; nothing found
+  there is live until the number is written into `style.js`.
 - **Basemaps**: offline = bundled pmtiles (GB coarse ≤z9 + detail ≥z9, background
   layer removed so undownloaded voids show the CSS "offline" watermark),
   bounded to GB with a viewport-fit min zoom; online = Protomaps API (key is

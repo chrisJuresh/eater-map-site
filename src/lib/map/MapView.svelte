@@ -342,6 +342,11 @@
 
   // ---- Exported camera / location API -----------------------------------------
 
+  /** The MapLibre instance, for callers that drive the map directly (see /tune). */
+  export function getMap() {
+    return map;
+  }
+
   export function applyFallbackHomeView() {
     if (!mapReady || homeViewApplied || app.userLocation) return;
     map.fitBounds(

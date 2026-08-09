@@ -13,8 +13,6 @@ export const BBOX = `${S},${W},${N},${E}`;
 
 export const NATIONAL_RAIL_COLOR = '#41476b'; // navy base for every track
 export const CABLE_CAR_COLOR = '#e21836';
-// Greys that are hard to see get drawn more opaque (see resolveLine).
-const LOW_CONTRAST = new Set(['#a0a5a9', '#606667']);
 
 // TfL line colours, matched against the LINE NAME (e.g. "Central line"). These
 // are drawn on top of National Rail. Specific keys precede general.
@@ -135,7 +133,7 @@ export function resolveLine(tags, route) {
     /overground|underground|elizabeth|docklands|tramlink|\bdlr\b|transport for london|\btfl\b/.test(op) ||
     TFL_LINE_NAME.test(lineName);
 
-  const pick = (color, tfl) => ({ color, tfl, opacity: LOW_CONTRAST.has(color.toLowerCase()) ? 0.85 : 0.6 });
+  const pick = (color, tfl) => ({ color, tfl });
 
   if (isTfl) {
     for (const [needle, color] of LINE_RULES) if (lineName.includes(needle)) return pick(color, true);
