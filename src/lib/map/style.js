@@ -21,30 +21,40 @@ const ATTRIBUTION =
 const TUBE_SOURCE = { type: 'geojson', data: '/tube-lines.geojson' };
 // Lines are opaque; where several share a track they are drawn as bands side by
 // side rather than stacked, so nothing has to show through anything. The builder
-// bakes the two factors on each feature (see data-pipeline/scripts/rail-stack.mjs):
-// `wf` is 1/N of the full width and `of` is that band's centre, in widths, off the
-// track — so two lines take half the width each, four a quarter, and the N bands
-// together fill exactly the stroke one line would have had. Absent on the vast
+// bakes two numbers on each shared feature (data-pipeline/scripts/rail-stack.mjs):
+// `wf` is that line's 1/N share of the full width, and `oi` is which band it is,
+// counted in band widths out from the track centre. Both are absent on the vast
 // majority of the network, which is a single line running full width down the
-// middle. The zoom interpolate must be the OUTERMOST expression (MapLibre forbids
-// nesting a zoom curve inside another), so the factor is applied in every stop.
+// middle.
+//
+// A band never goes below MIN_BAND: at low zoom the whole stroke is only a pixel
+// or two, and a quarter of that renders as a smear the colour cannot be read from
+// — the point of the split is lost exactly where the most lines are sharing. Under
+// that floor the stack widens instead of each band thinning, which is why the
+// offset is measured in bands rather than baked as a fraction of the stroke. The
+// floor is keyed off `wf`, so a line running alone keeps its tuned width.
+const MIN_BAND = 1.25;
 const BAND_WIDTH = ['coalesce', ['get', 'wf'], 1];
-const BAND_OFFSET = ['coalesce', ['get', 'of'], 0];
-const railWidth = (factor) => [
+const BAND_INDEX = ['coalesce', ['get', 'oi'], 0];
+const BAND_FLOOR = ['case', ['has', 'wf'], MIN_BAND, 0];
+// The zoom interpolate must be the OUTERMOST expression (MapLibre forbids nesting
+// a zoom curve inside another), so the band maths is repeated in every stop.
+const railBand = (px) => ['max', ['*', px, BAND_WIDTH], BAND_FLOOR];
+const railCurve = (stop) => [
   'interpolate',
   ['linear'],
   ['zoom'],
   6,
-  ['*', 1, factor],
+  stop(1),
   10,
-  ['*', 2, factor],
+  stop(2),
   13,
-  ['*', 3.2, factor],
+  stop(3.2),
   16,
-  ['*', 5, factor]
+  stop(5)
 ];
-const LINE_WIDTH = railWidth(BAND_WIDTH);
-const LINE_OFFSET = railWidth(BAND_OFFSET);
+const LINE_WIDTH = railCurve((px) => railBand(px));
+const LINE_OFFSET = railCurve((px) => ['*', railBand(px), BAND_INDEX]);
 // `scale` is 1 everywhere in the app — the dev-only /tune page is the only caller
 // that moves it, so the curves are built rather than stated as constants.
 const lineOpacity = (scale = 1) => Math.min(1, scale);

@@ -17,7 +17,7 @@ describe('splitSharedCorridors', () => {
     const out = splitSharedCorridors([line('Central', '#E32017', [SHARED])]);
     expect(out).toHaveLength(1);
     expect(out[0].properties.wf).toBeUndefined();
-    expect(out[0].properties.of).toBeUndefined();
+    expect(out[0].properties.oi).toBeUndefined();
     expect(out[0].geometry.coordinates).toEqual([SHARED]);
   });
 
@@ -26,15 +26,15 @@ describe('splitSharedCorridors', () => {
       line('Circle', '#FFD300', [SHARED]),
       line('District', '#00782A', [SHARED])
     ]);
-    expect(out.map((f) => [f.properties.line, f.properties.wf, f.properties.of])).toEqual([
-      ['Circle', 0.5, -0.25],
-      ['District', 0.5, 0.25]
+    expect(out.map((f) => [f.properties.line, f.properties.wf, f.properties.oi])).toEqual([
+      ['Circle', 0.5, -0.5],
+      ['District', 0.5, 0.5]
     ]);
-    // The two bands tile exactly the width one line would have had.
-    const edges = out.flatMap((f) => [
-      f.properties.of - f.properties.wf / 2,
-      f.properties.of + f.properties.wf / 2
-    ]);
+    // At full width the two bands tile exactly the stroke one line would have had.
+    const edges = out.flatMap((f) => {
+      const band = f.properties.wf;
+      return [f.properties.oi * band - band / 2, f.properties.oi * band + band / 2];
+    });
     expect(Math.min(...edges)).toBe(-0.5);
     expect(Math.max(...edges)).toBe(0.5);
   });
@@ -44,7 +44,7 @@ describe('splitSharedCorridors', () => {
       ['A', 'B', 'C', 'D'].map((n, i) => line(n, `#00000${i}`, [SHARED]))
     );
     expect(out.map((f) => f.properties.wf)).toEqual([0.25, 0.25, 0.25, 0.25]);
-    expect(out.map((f) => f.properties.of)).toEqual([-0.375, -0.125, 0.125, 0.375]);
+    expect(out.map((f) => f.properties.oi)).toEqual([-1.5, -0.5, 0.5, 1.5]);
   });
 
   it('splits a line into its own track and the stretch it shares', () => {
@@ -75,7 +75,7 @@ describe('splitSharedCorridors', () => {
     ]);
     const circle = out.find((f) => f.properties.line === 'Circle');
     const district = out.find((f) => f.properties.line === 'District');
-    expect(circle.properties.of).toBeLessThan(district.properties.of);
+    expect(circle.properties.oi).toBeLessThan(district.properties.oi);
     expect(circle.geometry.coordinates).toHaveLength(2);
   });
 });
@@ -119,6 +119,39 @@ describe('chainParts', () => {
         [2, 0]
       ]
     ]);
+  });
+
+  it('points a whole run down its canonical direction', () => {
+    // The up and down tracks of a corridor are digitised in opposite directions;
+    // both must come back pointing the same way or the offset puts a colour left
+    // of one track and right of the other.
+    const westward = [
+      [2, 0],
+      [1, 0],
+      [0, 0]
+    ];
+    const northward = [
+      [0, 2],
+      [0, 1],
+      [0, 0]
+    ];
+    expect(chainParts([westward])).toEqual([[...westward].reverse()]);
+    expect(chainParts([northward])).toEqual([[...northward].reverse()]);
+  });
+
+  it('winds every ring the same way', () => {
+    // A corridor whose two tracks join at both ends chains into one thin ring; a
+    // bearing says nothing about those, so they are wound consistently instead.
+    const clockwise = [
+      [0, 0],
+      [0, 1],
+      [1, 1],
+      [1, 0],
+      [0, 0]
+    ];
+    expect(chainParts([clockwise])).toEqual([[...clockwise].reverse()]);
+    const counterClockwise = [...clockwise].reverse();
+    expect(chainParts([counterClockwise])).toEqual([counterClockwise]);
   });
 
   it('keeps ways that never touch apart', () => {

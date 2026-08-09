@@ -11,9 +11,10 @@
 // share that stroke — so the geometry is pre-split here and the two numbers
 // MapLibre needs are baked onto the feature:
 //   wf  width factor      1/N          (absent = 1, a line running alone)
-//   of  offset factor     the band's centre, in widths, from the track centre
+//   oi  band index        the band's centre, in BAND widths, from the track
+//                         centre: -0.5/+0.5 for a pair, -1.5..+1.5 for four
 //                         (absent = 0)
-// style.js multiplies both by the zoom width curve.
+// style.js turns those into a pixel width and offset off the zoom width curve.
 
 /** Shared track comes from ONE OSM way, so every line over it carries a
  *  byte-identical coordinate array — identity is enough to find the overlaps. */
@@ -33,11 +34,38 @@ const slotOrder = (a, b) =>
   String(a.properties.color ?? '').localeCompare(String(b.properties.color ?? ''));
 
 /**
- * Chain a corridor's ways end to end, flipping any that were digitised backwards.
- * `line-offset` is measured from the line's own direction, so without this a way
- * drawn the other way round would throw its colour to the opposite side of the
- * track halfway along a run. Ways that do not touch simply come back as separate
- * paths.
+ * Point a path along a canonical compass direction — its dominant axis positive,
+ * so everything runs west-to-east, or south-to-north where it runs more north than
+ * east. A corridor's up and down tracks are separate ways and OSM digitises each
+ * in its own direction of travel, so half of them are antiparallel; `line-offset`
+ * is measured from the line's own direction, which would put a colour left of one
+ * track and right of the other. Zoomed out the two tracks fall in the same pixel,
+ * and the colour drawn second covers the first outright.
+ */
+function orient(path) {
+  const head = path[0];
+  const tail = path[path.length - 1];
+  // A chain that comes back to where it started has no bearing to speak of — the
+  // up and down tracks of a corridor join at both ends, so they chain into one long
+  // thin ring. Wind those the same way instead, which puts each colour on a
+  // consistent side of the loop.
+  if (head[0] === tail[0] && head[1] === tail[1]) {
+    let twiceArea = 0;
+    for (let i = 1; i < path.length; i++) {
+      twiceArea += path[i - 1][0] * path[i][1] - path[i][0] * path[i - 1][1];
+    }
+    return twiceArea < 0 ? [...path].reverse() : path;
+  }
+  const dx = tail[0] - head[0];
+  const dy = tail[1] - head[1];
+  const backwards = Math.abs(dx) >= Math.abs(dy) ? dx < 0 : dy < 0;
+  return backwards ? [...path].reverse() : path;
+}
+
+/**
+ * Chain a corridor's ways end to end, flipping any that were digitised backwards,
+ * and point the finished path down its canonical direction. Ways that do not touch
+ * simply come back as separate paths.
  */
 export function chainParts(parts) {
   const unused = new Set(parts.map((_, i) => i));
@@ -72,7 +100,7 @@ export function chainParts(parts) {
     for (let prev; (prev = takeFrom(endKey(path[0]))); ) {
       path = [...[...prev].reverse().slice(0, -1), ...path];
     }
-    paths.push(path);
+    paths.push(orient(path));
   }
   return paths;
 }
@@ -138,7 +166,7 @@ export function splitSharedCorridors(features) {
         properties: {
           ...feature.properties,
           wf: round(1 / stack),
-          of: round((slot - (stack - 1) / 2) / stack)
+          oi: slot - (stack - 1) / 2
         },
         geometry: { type: 'MultiLineString', coordinates: parts }
       });

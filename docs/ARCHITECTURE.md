@@ -65,13 +65,21 @@ src/
   through anything, because lines sharing a physical track are drawn side by side
   instead of on top of each other. `data-pipeline/scripts/rail-stack.mjs` splits
   the geometry at build time: a stretch carried by N lines becomes N features,
-  each baked with `wf` = 1/N of the full width and `of` = that band's offset from
-  the track centre, so two lines take half the width each and four a quarter, and
-  the N bands together fill exactly the stroke one line alone would have had.
-  `style.js` multiplies both factors into the zoom width curve. The shared ways
-  are chained end to end first (flipping any digitised backwards) because
-  `line-offset` follows the line's own direction — without that a colour would
-  jump to the other side of the track mid-run. The navy base keeps its zoom fade
+  each baked with `wf` = 1/N of the full width and `oi` = which band it is,
+  counted in band widths out from the track centre, so two lines take half the
+  width each and four a quarter, and the N bands together fill exactly the stroke
+  one line alone would have had. `style.js` turns those into a width and offset
+  off the zoom width curve, with a `MIN_BAND` floor of 1.25px: zoomed out the
+  whole stroke is only a pixel or two, and a quarter of that is a smear no colour
+  can be read from, so under the floor the stack widens rather than each band
+  thinning. A line running alone is never floored and keeps its tuned width.
+  Direction matters, because `line-offset` follows the line's own: shared ways are
+  chained end to end (flipping any digitised backwards), then each finished path
+  is pointed down a canonical compass direction — dominant axis positive, or wound
+  counter-clockwise if it closed into a ring. Without that last step a corridor's
+  up and down tracks, which OSM digitises in their own directions of travel, put
+  each colour on opposite sides; zoomed out they land in the same pixel and the
+  colour drawn second covers the first outright. The navy base keeps its zoom fade
   (10→0.29, 16→0.5); it is the underlay of every track, not a line. `/tune` still
   puts a slider over rail opacity for eyeballing (`pnpm dev`, open `/tune`); at
   100% the lines are opaque, so it can only dim. It is DEV ONLY — `prerender =
