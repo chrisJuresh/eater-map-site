@@ -20,6 +20,11 @@ src/
                           connectivity/install listeners, action handlers
     tune/+page.svelte     Dev-only harness: the real map with a slider over the
                           opacity of every rail line (see below)
+    export/+page.svelte   Dev-only harness: the top bar, the lines popup and the
+                          details panel mounted standalone with no map, and
+                          emitted as markup plus the styles they actually use.
+                          Asked for by the portfolio, which vendors the output
+    export/collect.js     …and this is where that collection happens
   lib/
     constants.js          EVERY tuned constant (zooms, bounds, opacities, keys)
     state.svelte.js       AppState (runes class): data, filters, selection,

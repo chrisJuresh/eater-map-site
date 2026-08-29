@@ -40,17 +40,34 @@ describe('splitTopLevel', () => {
   it('leaves a value that is only a delimiter alone', () => {
     expect(splitTopLevel('', ',')).toEqual([]);
   });
+
+  it('closes a string whose last character is an ESCAPED backslash', () => {
+    // "is the previous character a backslash" reads `"a\\"` as still open and
+    // swallows everything after it into one part.
+    expect(splitSelectorList('[title="a\\\\"], .b')).toEqual(['[title="a\\\\"]', '.b']);
+    // …while a genuinely escaped quote still holds the string open.
+    expect(splitSelectorList('[title="a\\",b"], .c')).toEqual(['[title="a\\",b"]', '.c']);
+  });
 });
 
 describe('isDocumentSelector', () => {
   it('names the three ways a rule says "the page"', () => {
-    for (const part of [':root', 'html', 'body', ':root[data-x]', 'body > .a']) {
+    for (const part of [':root', 'html', 'body', ':root[data-x]', 'body.dark']) {
       expect(isDocumentSelector(part)).toBe(true);
     }
   });
 
   it('does not catch a class that merely starts with one of them', () => {
     for (const part of ['.bodyguard', '.html-thing', '.rooted']) {
+      expect(isDocumentSelector(part)).toBe(false);
+    }
+  });
+
+  it('does not catch a rule that is merely ANCHORED at the page', () => {
+    // `body.dark .panel` is a rule about .panel. Read as a document rule,
+    // everything it says would be thrown away and only its custom properties
+    // kept — silently, and only once this app grew a selector shaped like that.
+    for (const part of ['body.dark .panel', ':root .a', 'html > body .b']) {
       expect(isDocumentSelector(part)).toBe(false);
     }
   });
@@ -82,6 +99,22 @@ describe('probeSelector', () => {
   it('leaves a structural pseudo-class alone', () => {
     expect(probeSelector('li:first-child')).toBe('li:first-child');
   });
+
+  it('drops pseudo-ELEMENTS, which matches() throws on rather than declines', () => {
+    // This is the one that actually cost rules. A thrown selector is
+    // indistinguishable from one that matched nothing, so `·` between the
+    // details panel's meta items and the rule hiding the descriptions'
+    // scrollbar were both dropped from the first export with nothing said.
+    expect(probeSelector('.meta-row span + span::before')).toBe('.meta-row span + span');
+    expect(probeSelector('.descriptions::-webkit-scrollbar')).toBe('.descriptions');
+    expect(probeSelector('.a:after')).toBe('.a');
+    expect(probeSelector('.a::first-line')).toBe('.a');
+  });
+
+  it('takes a functional pseudo-element’s argument with it', () => {
+    expect(probeSelector('.a::part(handle)')).toBe('.a');
+    expect(probeSelector('.a::slotted(span)')).toBe('.a');
+  });
 });
 
 describe('freezeToViewport', () => {
@@ -101,6 +134,11 @@ describe('freezeToViewport', () => {
   it('leaves the safe area at nothing, which is what every window that is not a notched phone has', () => {
     expect(freezeToViewport('padding: max(8px, env(safe-area-inset-bottom))', viewport)).toBe('padding: max(8px, 0px)');
     expect(freezeToViewport('top: env(safe-area-inset-top, 12px)', viewport)).toBe('top: 0px');
+  });
+
+  it('does not touch a length that is text rather than a length', () => {
+    expect(freezeToViewport('content: "50vw"', viewport)).toBe('content: "50vw"');
+    expect(freezeToViewport("content: '4vh'; width: 4vh", viewport)).toBe("content: '4vh'; width: 33.76px");
   });
 
   it('does not touch a length it cannot resolve, or a word that merely ends in one', () => {

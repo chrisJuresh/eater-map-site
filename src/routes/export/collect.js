@@ -37,6 +37,13 @@ export const HOST = '.eater-cards';
  *  its commas, and a declaration list on its semicolons — because `:is(a, b)`,
  *  `[title="x, y"]` and `url(data:…;base64,…)` each break a naive split, and
  *  they break it silently. */
+/** How many backslashes immediately precede position `at`. */
+function escapes(text, at) {
+  let n = 0;
+  while (at - 1 - n >= 0 && text[at - 1 - n] === '\\') n += 1;
+  return n;
+}
+
 export function splitTopLevel(text, delimiter) {
   const parts = [];
   let depth = 0;
@@ -45,7 +52,10 @@ export function splitTopLevel(text, delimiter) {
   for (let i = 0; i < text.length; i += 1) {
     const character = text[i];
     if (quote) {
-      if (character === quote && text[i - 1] !== '\\') quote = '';
+      // Counted rather than "is the previous character a backslash", which reads
+      // `"a\\"` as an unterminated string and swallows the rest of the file: the
+      // backslash before the quote is itself escaped, so the quote closes.
+      if (character === quote && escapes(text, i) % 2 === 0) quote = '';
       continue;
     }
     if (character === '"' || character === "'") quote = character;
@@ -73,11 +83,19 @@ export const splitSelectorList = (selector) => splitTopLevel(selector, ',');
  */
 export const declarationsIn = (cssText) => splitTopLevel(cssText, ';');
 
-/** A rule that means "the page" rather than an element on it. */
-const DOCUMENT_SELECTOR = /^(?::root|html|body)\b/;
+/**
+ * A rule that means "the page" rather than an element on it.
+ *
+ * The root or the body ITSELF, and nothing descending from it: `body.dark .panel`
+ * is a rule about `.panel`, and reading it as a document rule would throw away
+ * everything it says and keep only its custom properties — silently, and only
+ * once this app grew a selector shaped like that. Anchored here it goes down the
+ * ordinary path instead, where it is judged on whether it matches.
+ */
+const DOCUMENT_SELECTOR = /^(?::root|html|body)(?:[.#:[][^\s>+~]*)?$/;
 
 export function isDocumentSelector(part) {
-  return DOCUMENT_SELECTOR.test(part);
+  return DOCUMENT_SELECTOR.test(part.trim());
 }
 
 /**
@@ -93,16 +111,35 @@ export function prefixSelector(host, part) {
   return `${host} ${part}`;
 }
 
-/** State pseudo-classes match nothing on a surface nobody is touching. Dropping
- *  the rules they gate would drop styles these components genuinely have, so the
- *  selector is TESTED without them and KEPT with them. */
 /* Longest alternative first. `focus` before `focus-visible` matches the first
  * six letters of it and leaves `-visible` behind as a selector, and `\b` between
  * a letter and a hyphen does not stop it. */
 const STATE_PSEUDO = /:(?:focus-visible|focus-within|focus|hover|active|visited|target|checked|enabled|disabled)\b/g;
 
+/* `::before`, `::-webkit-scrollbar`, and the one-colon spellings the CSSOM can
+ * still hand back. A functional one (`::part(x)`, `::slotted(x)`) takes its
+ * argument with it. */
+const PSEUDO_ELEMENT = /::[\w-]+(?:\([^()]*\))?|:(?:before|after|first-line|first-letter)\b/g;
+
+/**
+ * A selector rewritten so `Element.matches()` will answer it.
+ *
+ * TWO REASONS A RULE WOULD BE DROPPED WITHOUT THIS, and they fail differently.
+ *
+ * A state pseudo-class matches nothing on a surface nobody is touching, so the
+ * rule would simply be judged unused and left behind — but a `:hover` rule is a
+ * style these components genuinely have.
+ *
+ * A pseudo-ELEMENT is worse: `matches('.a::before')` THROWS, and a thrown
+ * selector is indistinguishable from one that matched nothing. That silently
+ * cost this export two real rules the first time it ran — the `·` between the
+ * details panel's meta items, and the rule that hides the descriptions'
+ * scrollbar — with nothing anywhere saying so.
+ *
+ * So the selector is TESTED without either and KEPT with both.
+ */
 export function probeSelector(part) {
-  return part.replace(STATE_PSEUDO, '').trim() || '*';
+  return part.replace(PSEUDO_ELEMENT, '').replace(STATE_PSEUDO, '').trim() || '*';
 }
 
 /* -------------------------------------------------------------------------- */
@@ -111,6 +148,20 @@ export function probeSelector(part) {
 
 const VIEWPORT_UNIT = /(^|[^\w.-])(-?\d*\.?\d+)(dvw|dvh|svw|svh|lvw|lvh|vmin|vmax|vw|vh)\b/gi;
 const SAFE_AREA = /env\(\s*safe-area-inset-[a-z]+\s*(?:,[^()]*)?\)/gi;
+
+/** Whether position `at` is inside a quoted run. */
+function inString(text, at) {
+  let quote = '';
+  for (let i = 0; i < at; i += 1) {
+    const character = text[i];
+    if (quote) {
+      if (character === quote && escapes(text, i) % 2 === 0) quote = '';
+    } else if (character === '"' || character === "'") {
+      quote = character;
+    }
+  }
+  return quote !== '';
+}
 
 /**
  * A declaration with every window-dependent length resolved against the window
@@ -129,9 +180,15 @@ const SAFE_AREA = /env\(\s*safe-area-inset-[a-z]+\s*(?:,[^()]*)?\)/gi;
  * for a different device.
  */
 export function freezeToViewport(value, { width, height }) {
-  return String(value)
-    .replace(SAFE_AREA, '0px')
-    .replace(VIEWPORT_UNIT, (whole, before, amount, unit) => {
+  const text = String(value).replace(SAFE_AREA, '0px');
+  return text
+    .replace(VIEWPORT_UNIT, (whole, before, amount, unit, at) => {
+      // `content: "50vw"` is four characters of text, not a length. The units
+      // are matched over the raw declaration, so the one place this can be wrong
+      // is inside a string, and that is where it is checked — at the NUMBER's
+      // position rather than the match's, since the boundary the match opens
+      // with is often the opening quote itself.
+      if (inString(text, at + before.length)) return whole;
       const lower = unit.toLowerCase();
       const basis = lower.endsWith('w')
         ? width
@@ -273,9 +330,14 @@ export function normalisation(cards) {
  * of the app at a stated size instead of a thing that reshapes itself somewhere
  * it cannot see.
  *
- * There are no `@keyframes` to carry: nothing in these three surfaces animates
- * (app.css mentions `animation` only to switch it off under reduced motion). If
- * that changes, this is where the collection would go.
+ * FOUR AT-RULES ARE PASSED OVER IN SILENCE, and each because this app has none
+ * of it: `@keyframes` (nothing in these three surfaces animates — app.css
+ * mentions `animation` only to switch it off under reduced motion),
+ * `@font-face` (the stack is the system's), `@layer` and `@container`. Each
+ * would need its own decision — a layer's ORDER travels with it, a container
+ * query is about a box rather than a window and so should be carried rather than
+ * frozen — and inventing those decisions against nothing is how a guess becomes
+ * a rule. If one appears, this is where it goes.
  */
 function eachStyleRule(rules, view, visit) {
   for (const rule of rules) {
