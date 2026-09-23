@@ -9,7 +9,7 @@
   import { AppState } from '$lib/state.svelte.js';
   import MapView from '$lib/map/MapView.svelte';
   import ZoomControls from '$lib/ui/ZoomControls.svelte';
-  import { setRailOpacityScale } from '$lib/map/style.js';
+  import { RAIL_OPACITY, setRailOpacityScale } from '$lib/map/style.js';
 
   const DEV = import.meta.env.DEV;
 
@@ -67,8 +67,8 @@
   });
 
   // What the slider actually produces, mirroring the expressions in style.js:
-  // the lines are flat opaque (they are drawn side by side rather than stacked,
-  // so nothing needs to show through), the base still fades between its stops.
+  // the lines are a flat RAIL_OPACITY (drawn side by side rather than stacked, so
+  // no line shows through another), the base fades between its stops times that.
   function lerp(z, stops) {
     const first = stops[0];
     const last = stops[stops.length - 1];
@@ -82,8 +82,8 @@
     return last[1];
   }
 
-  const lineEffective = $derived(Math.min(1, scale));
-  const baseEffective = $derived(Math.min(1, lerp(zoom, [[10, 0.32], [16, 0.5]]) * scale));
+  const lineEffective = $derived(Math.min(1, RAIL_OPACITY * scale));
+  const baseEffective = $derived(Math.min(1, lerp(zoom, [[10, 0.32], [16, 0.5]]) * RAIL_OPACITY * scale));
 </script>
 
 <svelte:head>
@@ -113,8 +113,8 @@
           <div><dt>base</dt><dd>{baseEffective.toFixed(3)}</dd></div>
         </dl>
         <p class="hint">
-          Effective at this zoom. 100% is what <code>style.js</code> ships — lines are
-          opaque there, so the slider can only dim them.
+          Effective at this zoom. 100% is what <code>style.js</code> ships (lines at
+          {RAIL_OPACITY}); the slider can take them up to fully opaque.
         </p>
 
         <div class="row">

@@ -90,6 +90,9 @@ export const POPUP_EDGE_PAD = 10;
 // ---- Canvas markers ----------------------------------------------------------
 export const MARKER_PADDING = 48;
 export const MARKER_SPRITE_PADDING = 10;
+/** Flat opacity over the whole marker layer (the selected marker stays opaque).
+ *  Composited as one layer, so a pile of dots is no darker than one. */
+export const MARKER_LAYER_OPACITY = 0.8;
 export const FULL_MARKER_ZOOM = 14;
 export const MID_MARKER_ZOOM = 12;
 

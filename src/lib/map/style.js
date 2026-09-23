@@ -22,8 +22,8 @@ const ATTRIBUTION =
 // routes on top. Always visible so the whole network shows even at low zoom
 // (Protomaps omits most rail from low-zoom tiles and never colour-codes it).
 const TUBE_SOURCE = { type: 'geojson', data: '/tube-lines.geojson' };
-// Lines are opaque; where several share a track they are drawn as bands side by
-// side rather than stacked, so nothing has to show through anything. The builder
+// Lines are at RAIL_OPACITY; where several share a track they are drawn as bands
+// side by side rather than stacked, so no line has to show through another. The builder
 // bakes two numbers on each shared feature (data-pipeline/scripts/rail-stack.mjs):
 // `wf` is that line's 1/N share of the full width, and `oi` is which band it is,
 // counted in band widths out from the track centre. Both are absent on the vast
@@ -52,17 +52,20 @@ const railCurve = (stop) => ['interpolate', ['linear'], ['zoom'], ...RAIL_ZOOMS.
 const LINE_WIDTH = railCurve((px) => railBand(px));
 const LINE_OFFSET = railCurve((px) => ['*', railBand(px), BAND_INDEX]);
 const CASING_WIDTH = railCurve((px, i) => ['+', railBand(px), 2 * CASING_PX[i]]);
+// Every rail line layer (lines, their casings and the grey base) at this share
+// of its own opacity, so the map shows through the network.
+export const RAIL_OPACITY = 0.7;
 // `scale` is 1 everywhere in the app — the dev-only /tune page is the only caller
 // that moves it, so the curves are built rather than stated as constants.
-const lineOpacity = (scale = 1) => Math.min(1, scale);
+const lineOpacity = (scale = 1) => Math.min(1, RAIL_OPACITY * scale);
 const baseOpacity = (scale = 1) => [
   'interpolate',
   ['linear'],
   ['zoom'],
   10,
-  Math.min(1, 0.32 * scale),
+  Math.min(1, 0.32 * RAIL_OPACITY * scale),
   16,
-  Math.min(1, 0.5 * scale)
+  Math.min(1, 0.5 * RAIL_OPACITY * scale)
 ];
 const LINE_OPACITY = lineOpacity();
 const BASE_OPACITY = baseOpacity();

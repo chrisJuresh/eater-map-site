@@ -1,6 +1,7 @@
 // Canvas marker overlay + spiderfy.
-// - every marker opaque and white-ringed, drawn north to south so each ring cuts
-//   the dot behind it (a pile reads as scales, not a darker blot)
+// - every marker white-ringed, drawn north to south so each ring cuts the dot
+//   behind it (a pile reads as scales, not a darker blot), and the whole layer
+//   composited at a flat MARKER_LAYER_OPACITY (0.8) so overlaps never darken
 // - the priced ("38 Best London") markers ON TOP of the regular ones
 // - the selected marker drawn above everything at full detail
 // - offscreen sprite cache keyed by price/detail/DPR
@@ -8,6 +9,7 @@
 
 import {
   FULL_MARKER_ZOOM,
+  MARKER_LAYER_OPACITY,
   MARKER_PADDING,
   MARKER_SPRITE_PADDING,
   MID_MARKER_ZOOM,
@@ -198,8 +200,22 @@ export class MarkerRenderer {
       else regularMarkers.push(marker);
     }
 
-    for (const marker of regularMarkers) this.drawMarker(ctx, marker, false, z);
-    for (const marker of pricedMarkers) this.drawMarker(ctx, marker, false, z);
+    // Every dot onto an offscreen layer, then that layer at one flat opacity, so
+    // overlapping dots do not darken each other.
+    if (!this.layerCanvas) this.layerCanvas = document.createElement('canvas');
+    const layerCanvas = this.layerCanvas;
+    if (layerCanvas.width !== targetWidth) layerCanvas.width = targetWidth;
+    if (layerCanvas.height !== targetHeight) layerCanvas.height = targetHeight;
+    const layerCtx = layerCanvas.getContext('2d');
+    if (!layerCtx) return;
+    layerCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    layerCtx.clearRect(0, 0, width, height);
+    for (const marker of regularMarkers) this.drawMarker(layerCtx, marker, false, z);
+    for (const marker of pricedMarkers) this.drawMarker(layerCtx, marker, false, z);
+    ctx.save();
+    ctx.globalAlpha = MARKER_LAYER_OPACITY;
+    ctx.drawImage(layerCanvas, 0, 0, width, height);
+    ctx.restore();
 
     if (selectedMarker) this.drawMarker(ctx, selectedMarker, true, z);
     this.drawUserLocation(ctx, userLocation, z);

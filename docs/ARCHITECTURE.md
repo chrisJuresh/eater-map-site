@@ -40,8 +40,8 @@ src/
                           online Protomaps API; a calm light flavour (soft land,
                           white roads, no POI icons or shields); rail + station
                           layers; layer ordering
-      markers.js          MarkerRenderer: canvas overlay — opaque white-ringed
-                          dots drawn north to south, priced markers on top,
+      markers.js          MarkerRenderer: canvas overlay — white-ringed dots
+                          drawn north to south at a flat 0.8, priced on top,
                           selected above all; sprite
                           cache; activate() = tap → select / lines / spiderfy /
                           zoom; spiderfy fans a stack onto an even ring
@@ -61,17 +61,21 @@ src/
 
 ## Invariants (hand-tuned with the user — do not change casually)
 
-- **Markers**: every marker is opaque with a white ring, drawn north to south so
-  each ring cuts the dot behind it and a pile reads as scales rather than a
-  darker blot; priced markers (the "38 Best London" set) are always above
+- **Markers**: every marker has a white ring, drawn north to south so each ring
+  cuts the dot behind it and a pile reads as scales rather than a darker blot.
+  They are drawn onto one offscreen layer composited at a flat
+  `MARKER_LAYER_OPACITY` (0.8), so the map shows through and overlaps never
+  darken; the selected marker is outside that layer and stays opaque. Priced markers (the "38 Best London" set) are always above
   regular ones; a selected restaurant renders above everything.
   Zoom detail tiers at 12/14; duplicate coordinates fan out into rings.
 - **Rail overlay**: grey base of every track; National Rail (operator brand
   colours, taken slightly toward grey and white) below TfL lines (their own
   colours), each group over a white casing so crossings are cased off; station
-  dots fade in from z10; basemap place labels render ABOVE the lines. Lines are fully OPAQUE — nothing shows
-  through anything, because lines sharing a physical track are drawn side by side
-  instead of on top of each other. `data-pipeline/scripts/rail-stack.mjs` splits
+  dots fade in from z10; basemap place labels render ABOVE the lines. Every rail line
+  layer (lines, casings, base) is at `RAIL_OPACITY` (0.7) of its own opacity, so
+  the map shows through the network — but no line shows through another, because
+  lines sharing a physical track are drawn side by side instead of on top of each
+  other. `data-pipeline/scripts/rail-stack.mjs` splits
   the geometry at build time: a stretch carried by N lines becomes N features,
   each baked with `wf` = 1/N of the full width and `oi` = which band it is,
   counted in band widths out from the track centre, so two lines take half the
@@ -88,9 +92,9 @@ src/
   up and down tracks, which OSM digitises in their own directions of travel, put
   each colour on opposite sides; zoomed out they land in the same pixel and the
   colour drawn second covers the first outright. The grey base keeps its zoom fade
-  (10→0.32, 16→0.5); it is the underlay of every track, not a line. `/tune` still
+  (10→0.32, 16→0.5, times `RAIL_OPACITY`); it is the underlay of every track, not a line. `/tune` still
   puts a slider over rail opacity for eyeballing (`pnpm dev`, open `/tune`); at
-  100% the lines are opaque, so it can only dim. It is DEV ONLY — `prerender =
+  100% it shows what ships (0.7), and it can go up to fully opaque. It is DEV ONLY — `prerender =
   false` keeps it out of the built site and the page is behind
   `import.meta.env.DEV`, so the deployment has no /tune to serve; nothing found
   there is live until the number is written into `style.js`.
