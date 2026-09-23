@@ -721,25 +721,35 @@ function paintLookMarker(ctx, look, { c, radius, tier, color, active, priceRange
   const shadow = tier.shadow;
 
   if (look.style === 'glow') {
-    // A soft halo in the dot's colour, a bright core, and (selected) a ring.
+    // A soft halo in the dot's colour, a core, and (selected) a ring. On a dark
+    // map the core is lit (paler than the halo); on a light one it stays the
+    // solid colour, with a white edge to keep it crisp against its own halo.
+    const glow = look.glow ?? {};
+    const strength = glow.halo ?? 1;
     const reach = radius * 3.4;
     const halo = ctx.createRadialGradient(c, c, 0, c, c, reach);
-    halo.addColorStop(0, rgba(color, 0.9));
-    halo.addColorStop(0.16, rgba(color, 0.55));
-    halo.addColorStop(0.42, rgba(color, 0.14));
+    halo.addColorStop(0, rgba(color, 0.9 * strength));
+    halo.addColorStop(0.16, rgba(color, 0.55 * strength));
+    halo.addColorStop(0.42, rgba(color, 0.14 * strength));
     halo.addColorStop(1, rgba(color, 0));
     ctx.fillStyle = halo;
     circle(ctx, c, reach);
     ctx.fill();
-    circle(ctx, c, radius * 0.62);
-    ctx.fillStyle = mix(color, '#ffffff', 0.55);
+    circle(ctx, c, radius * (glow.coreSize ?? 0.62));
+    ctx.fillStyle = glow.core === 'solid' ? color : mix(color, '#ffffff', 0.55);
     ctx.fill();
+    if (glow.coreRing) {
+      ctx.lineWidth = glow.coreRing;
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.95)';
+      ctx.stroke();
+    }
     if (active) {
       circle(ctx, c, radius + 3);
       ctx.lineWidth = tier.stroke;
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+      ctx.strokeStyle = glow.activeRing ?? 'rgba(255, 255, 255, 0.9)';
       ctx.stroke();
     }
+    if (showPrice && glow.core === 'solid') priceLabel(ctx, c, priceRange, '#ffffff');
     return;
   }
 

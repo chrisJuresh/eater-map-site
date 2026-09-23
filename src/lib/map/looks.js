@@ -527,6 +527,45 @@ const nocturne = {
   }
 };
 
+// Nocturne's rendering (thin glowing lines, restaurants as haloed lights) on
+// Refined's palette: its light basemap, rail colours and dot colours. Additive
+// blending only works on a dark ground — on a light one sums wash out to white —
+// so the halos composite normally and the core stays the solid colour.
+const luminous = {
+  id: 'luminous',
+  name: 'Luminous',
+  blurb: "Nocturne's glow in Refined's colours: haloed lines and lights on a light map",
+  base: 'light',
+  flavor: refined.flavor,
+  rail: {
+    widths: [0.8, 1.5, 2.5, 4],
+    minBand: 1,
+    color: refined.rail.color,
+    glow: { widthFactor: 4, blurFactor: 3.2, opacity: 0.26 },
+    base: refined.rail.base,
+    stations: {
+      ...refined.rail.stations,
+      minzoom: 11,
+      radius: [[11, 1.4], [13, 2.2], [16, 3.6]],
+      strokeWidth: [[11, 0.7], [16, 1.3]],
+      fadeIn: [11, 12]
+    },
+    labels: refined.rail.labels
+  },
+  markers: {
+    style: 'glow',
+    colors: refined.markers.colors,
+    glow: { halo: 0.6, core: 'solid', coreSize: 1, coreRing: 1, activeRing: 'rgba(28, 28, 30, 0.85)' },
+    tiers: {
+      small: { radius: 3, stroke: 0, shadow: null },
+      mid: { radius: 4.5, stroke: 0, shadow: null },
+      full: { radius: 8, stroke: 0, shadow: null },
+      active: { radius: 11, stroke: 2, shadow: null }
+    },
+    southOnTop: true
+  }
+};
+
 const current = {
   id: 'current',
   name: 'Current',
@@ -534,7 +573,7 @@ const current = {
   current: true
 };
 
-export const LOOKS = [current, refined, transit, paper, glass, nocturne];
+export const LOOKS = [current, refined, transit, paper, glass, nocturne, luminous];
 const BY_ID = new Map(LOOKS.map((look) => [look.id, look]));
 
 export function getLook(id) {
