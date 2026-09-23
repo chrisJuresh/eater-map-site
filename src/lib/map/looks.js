@@ -528,21 +528,22 @@ const nocturne = {
 };
 
 // Refined in every respect but the restaurants: instead of ringed dots, each
-// is a red point of light with no edge. The lights are summed (canvas
-// 'lighter'), so overlaps get brighter rather than darker: red where one
-// stands alone, orange to near-white where a street is full of them. Priced
+// is a purple point of light with no edge. The lights are summed (canvas
+// 'lighter'), so overlaps get brighter rather than darker: violet where one
+// stands alone, blue saturating first and then red, so a busy street runs
+// through magenta toward lilac-white. Priced
 // restaurants are the same light, summed into the same pass.
 const luminous = {
   id: 'luminous',
   name: 'Luminous',
-  blurb: 'Refined, with restaurants as red lights that burn brighter together',
+  blurb: 'Refined, with restaurants as purple lights that burn brighter together',
   base: 'light',
   flavor: refined.flavor,
   rail: refined.rail,
   markers: {
     style: 'light',
-    colors: { $: '#ff3b1f', $$: '#ff3b1f', $$$: '#ff3b1f', $$$$: '#ff3b1f', none: '#ff3b1f' },
-    light: { spread: 3, core: '#ffd2b8' },
+    colors: { $: '#8f3cff', $$: '#8f3cff', $$$: '#8f3cff', $$$$: '#8f3cff', none: '#8f3cff' },
+    light: { spread: 3, core: '#e6d2ff' },
     tiers: {
       small: { radius: 2.6, stroke: 0, shadow: null },
       mid: { radius: 3.8, stroke: 0, shadow: null },

@@ -725,8 +725,8 @@ function paintLookMarker(ctx, look, { c, radius, tier, color, active, priceRange
 
   if (look.style === 'light') {
     // No disc and no edge: a point of light that fades out, with a small hot
-    // centre. Drawn additively, so where lights overlap the red saturates and
-    // the other channels climb, and a busy street burns orange toward white.
+    // centre. Drawn additively, so where lights overlap the strongest channel
+    // saturates and the others climb, and a busy street burns toward white.
     const { spread, core } = look.light;
     const reach = radius * spread;
     const halo = ctx.createRadialGradient(c, c, 0, c, c, reach);
