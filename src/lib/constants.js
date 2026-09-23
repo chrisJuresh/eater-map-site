@@ -90,10 +90,9 @@ export const POPUP_EDGE_PAD = 10;
 // ---- Canvas markers ----------------------------------------------------------
 export const MARKER_PADDING = 48;
 export const MARKER_SPRITE_PADDING = 10;
-/** Flat layer opacity for regular markers — overlaps must NOT darken. */
-export const MARKER_LAYER_OPACITY = 0.42;
-/** The 38 priced ("38 Best London") markers stay fully opaque and on top. */
-export const PRICED_MARKER_LAYER_OPACITY = 1;
+/** Flat opacity over the whole marker layer (the selected marker stays opaque).
+ *  Composited as one layer, so a pile of dots is no darker than one. */
+export const MARKER_LAYER_OPACITY = 0.8;
 export const FULL_MARKER_ZOOM = 14;
 export const MID_MARKER_ZOOM = 12;
 
@@ -113,7 +112,7 @@ export const SPIDERFY_MIN_ZOOM = 14;
 export const SPIDER_OVERLAP_PX = 26;
 /** Centre-to-centre spacing of adjacent fanned dots on the ring (24px dot + a tiny gap). */
 export const SPIDER_GAP = 30;
-/** Opacity of non-selected fanned dots — perceptually between the map's 0.42 and 1.0. */
+/** Opacity of non-selected fanned dots, so the opaque selected one stands out. */
 export const SPIDER_MEMBER_OPACITY = 0.72;
 /** Floor on the ring radius so a 2–3 stack doesn't collapse onto the anchor. */
 export const SPIDER_MIN_R = 28;
@@ -137,17 +136,16 @@ export const ROADMAP_ITEMS = [
   'Validate existing data against Google Maps',
   'Use Google Maps price ranges',
   'Add other countries',
-  'Expand to a larger database',
-  'Deduplicate restaurants'
+  'Expand to a larger database'
 ];
 
-/** Marker fill by price tier (matches the original canvas renderer). */
+/** Marker fill by price tier. */
 export function markerColor(priceRange) {
-  if (priceRange === '$') return '#2d8a5f';
-  if (priceRange === '$$') return '#2770a7';
-  if (priceRange === '$$$') return '#7f52a1';
-  if (priceRange === '$$$$') return '#252a31';
-  return '#d43d2f';
+  if (priceRange === '$') return '#2aa36b';
+  if (priceRange === '$$') return '#2b7de9';
+  if (priceRange === '$$$') return '#8c5bd4';
+  if (priceRange === '$$$$') return '#2c2c2e';
+  return '#ef5a43';
 }
 
 export function clamp(value, min, max) {

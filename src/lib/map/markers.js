@@ -1,6 +1,8 @@
 // Canvas marker overlay + spiderfy.
-// - regular markers composited at a FLAT 0.42 opacity (overlaps must not darken)
-// - the priced ("38 Best London") markers composited fully opaque, ON TOP
+// - every marker white-ringed, drawn north to south so each ring cuts the dot
+//   behind it (a pile reads as scales, not a darker blot), and the whole layer
+//   composited at a flat MARKER_LAYER_OPACITY (0.8) so overlaps never darken
+// - the priced ("38 Best London") markers ON TOP of the regular ones
 // - the selected marker drawn above everything at full detail
 // - offscreen sprite cache keyed by price/detail/DPR
 // - tapping a stack fans it out (spiderfy) into spaced, thumb-tappable targets
@@ -11,7 +13,6 @@ import {
   MARKER_PADDING,
   MARKER_SPRITE_PADDING,
   MID_MARKER_ZOOM,
-  PRICED_MARKER_LAYER_OPACITY,
   SPIDER_EDGE_PAD,
   SPIDER_GAP,
   SPIDER_MAX,
@@ -35,7 +36,7 @@ function markerPriority(restaurant) {
 const HIT_EXTRA = 8;
 const TOUCH_HIT_EXTRA = 22;
 // Full-detail marker radius — fanned targets always draw at this size.
-const FULL_RADIUS = 12;
+const FULL_RADIUS = 10;
 
 /** Markers within tolerance of a screen point, nearest-first (deterministic). */
 function candidatesAt(map, restaurants, selectedId, point, extra) {
@@ -60,14 +61,18 @@ function candidatesAt(map, restaurants, selectedId, point, extra) {
   return candidates;
 }
 
+// `shadow` is null for the smallest dots: at that size it only muddies the edge.
 function markerDetail(z, active) {
-  if (active || z >= FULL_MARKER_ZOOM) {
-    return { key: 'full', radius: active ? 17 : 12, strokeWidth: active ? 3 : 2, shadowBlur: active ? 14 : 8, shadowOffsetY: active ? 4 : 3, showPrice: true };
+  if (active) {
+    return { key: 'active', radius: 15, strokeWidth: 3, shadow: { blur: 12, y: 4, alpha: 0.34 }, showPrice: true };
+  }
+  if (z >= FULL_MARKER_ZOOM) {
+    return { key: 'full', radius: 10, strokeWidth: 2, shadow: { blur: 6, y: 2, alpha: 0.22 }, showPrice: true };
   }
   if (z >= MID_MARKER_ZOOM) {
-    return { key: 'mid', radius: 7, strokeWidth: 1.5, shadowBlur: 4, shadowOffsetY: 2, showPrice: false };
+    return { key: 'mid', radius: 6, strokeWidth: 1.5, shadow: { blur: 2, y: 1, alpha: 0.18 }, showPrice: false };
   }
-  return { key: 'small', radius: 4.5, strokeWidth: 1, shadowBlur: 2, shadowOffsetY: 1, showPrice: false };
+  return { key: 'small', radius: 3.6, strokeWidth: 1, shadow: null, showPrice: false };
 }
 
 function metersPerPixel(lat, z) {
@@ -109,7 +114,6 @@ export class MarkerRenderer {
     this.onVisibleCount = onVisibleCount;
     this.frame = 0;
     this.spriteCache = new Map();
-    this.layerCanvas = null;
     this.lastVisible = [];
     // Spiderfy state (null when closed). members[].tx/ty are absolute screen px.
     this.spider = null;
@@ -179,14 +183,9 @@ export class MarkerRenderer {
     }
     this.lastVisible = markers.map((m) => m.restaurant);
     this.onVisibleCount?.(markers.length);
-
-    if (!this.layerCanvas) this.layerCanvas = document.createElement('canvas');
-    const layerCanvas = this.layerCanvas;
-    if (layerCanvas.width !== targetWidth) layerCanvas.width = targetWidth;
-    if (layerCanvas.height !== targetHeight) layerCanvas.height = targetHeight;
-    const layerCtx = layerCanvas.getContext('2d');
-    if (!layerCtx) return;
-    layerCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    // North first, so each dot overlaps the one behind it (up the screen) the
+    // same way: a consistent scale pattern instead of arbitrary stacking.
+    markers.sort((a, b) => a.y - b.y);
 
     const regularMarkers = [];
     const pricedMarkers = [];
@@ -201,18 +200,20 @@ export class MarkerRenderer {
       else regularMarkers.push(marker);
     }
 
-    // Composite each group at a flat opacity so overlapping markers do not darken.
+    // Every dot onto an offscreen layer, then that layer at one flat opacity, so
+    // overlapping dots do not darken each other.
+    if (!this.layerCanvas) this.layerCanvas = document.createElement('canvas');
+    const layerCanvas = this.layerCanvas;
+    if (layerCanvas.width !== targetWidth) layerCanvas.width = targetWidth;
+    if (layerCanvas.height !== targetHeight) layerCanvas.height = targetHeight;
+    const layerCtx = layerCanvas.getContext('2d');
+    if (!layerCtx) return;
+    layerCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
     layerCtx.clearRect(0, 0, width, height);
     for (const marker of regularMarkers) this.drawMarker(layerCtx, marker, false, z);
-    ctx.save();
-    ctx.globalAlpha = MARKER_LAYER_OPACITY;
-    ctx.drawImage(layerCanvas, 0, 0, width, height);
-    ctx.restore();
-
-    layerCtx.clearRect(0, 0, width, height);
     for (const marker of pricedMarkers) this.drawMarker(layerCtx, marker, false, z);
     ctx.save();
-    ctx.globalAlpha = PRICED_MARKER_LAYER_OPACITY;
+    ctx.globalAlpha = MARKER_LAYER_OPACITY;
     ctx.drawImage(layerCanvas, 0, 0, width, height);
     ctx.restore();
 
@@ -230,7 +231,7 @@ export class MarkerRenderer {
     const dpr = Math.max(1, window.devicePixelRatio || 1);
     const normalizedPrice = priceRange || 'none';
     const detail = markerDetail(z, active);
-    const key = `${normalizedPrice}-${active ? 'active' : detail.key}-${dpr}`;
+    const key = `${normalizedPrice}-${detail.key}-${dpr}`;
     const cached = this.spriteCache.get(key);
     if (cached) return cached;
 
@@ -243,20 +244,22 @@ export class MarkerRenderer {
     const center = size / 2;
 
     ctx.scale(dpr, dpr);
-    ctx.shadowColor = active ? 'rgba(27, 31, 28, 0.42)' : 'rgba(27, 31, 28, 0.26)';
-    ctx.shadowBlur = detail.shadowBlur;
-    ctx.shadowOffsetY = detail.shadowOffsetY;
+    if (detail.shadow) {
+      ctx.shadowColor = `rgba(20, 24, 30, ${detail.shadow.alpha})`;
+      ctx.shadowBlur = detail.shadow.blur;
+      ctx.shadowOffsetY = detail.shadow.y;
+    }
     ctx.beginPath();
     ctx.arc(center, center, radius, 0, Math.PI * 2);
     ctx.fillStyle = markerColor(priceRange);
     ctx.fill();
     ctx.shadowColor = 'transparent';
     ctx.lineWidth = detail.strokeWidth;
-    ctx.strokeStyle = active ? 'rgba(255, 255, 255, 0.86)' : '#ffffff';
+    ctx.strokeStyle = '#ffffff';
     ctx.stroke();
 
     if (priceRange && detail.showPrice) {
-      ctx.fillStyle = active ? 'rgba(255, 255, 255, 0.95)' : '#ffffff';
+      ctx.fillStyle = '#ffffff';
       ctx.font = `800 ${priceRange.length >= 4 ? 7 : 8}px Inter, system-ui, sans-serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
@@ -533,8 +536,8 @@ export class MarkerRenderer {
     ctx.fillStyle = 'rgba(27, 31, 28, 0.5)';
     ctx.fill();
 
-    // Non-selected dots at an intermediate opacity (between the map's 0.42 and the
-    // opaque selected marker); the selected member drawn last, opaque, on top.
+    // Non-selected dots slightly faded so the opaque selected member, drawn last
+    // on top, stands out.
     const detailZoom = Math.max(z, FULL_MARKER_ZOOM);
     let selectedPlacement = null;
     ctx.save();
