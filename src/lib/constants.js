@@ -137,8 +137,7 @@ export const ROADMAP_ITEMS = [
   'Validate existing data against Google Maps',
   'Use Google Maps price ranges',
   'Add other countries',
-  'Expand to a larger database',
-  'Deduplicate restaurants'
+  'Expand to a larger database'
 ];
 
 /** Marker fill by price tier (matches the original canvas renderer). */
