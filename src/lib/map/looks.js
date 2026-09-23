@@ -527,42 +527,31 @@ const nocturne = {
   }
 };
 
-// Nocturne's rendering (thin glowing lines, restaurants as haloed lights) on
-// Refined's palette: its light basemap, rail colours and dot colours. Additive
-// blending only works on a dark ground — on a light one sums wash out to white —
-// so the halos composite normally and the core stays the solid colour.
+// Refined in every respect but the restaurants: instead of ringed dots, each
+// is a red point of light with no edge. The lights are summed (canvas
+// 'lighter'), so overlaps get brighter rather than darker: red where one
+// stands alone, orange to near-white where a street is full of them. Priced
+// restaurants are the same light, summed into the same pass.
 const luminous = {
   id: 'luminous',
   name: 'Luminous',
-  blurb: "Nocturne's glow in Refined's colours: haloed lines and lights on a light map",
+  blurb: 'Refined, with restaurants as red lights that burn brighter together',
   base: 'light',
   flavor: refined.flavor,
-  rail: {
-    widths: [0.8, 1.5, 2.5, 4],
-    minBand: 1,
-    color: refined.rail.color,
-    glow: { widthFactor: 4, blurFactor: 3.2, opacity: 0.26 },
-    base: refined.rail.base,
-    stations: {
-      ...refined.rail.stations,
-      minzoom: 11,
-      radius: [[11, 1.4], [13, 2.2], [16, 3.6]],
-      strokeWidth: [[11, 0.7], [16, 1.3]],
-      fadeIn: [11, 12]
-    },
-    labels: refined.rail.labels
-  },
+  rail: refined.rail,
   markers: {
-    style: 'glow',
-    colors: refined.markers.colors,
-    glow: { halo: 0.6, core: 'solid', coreSize: 1, coreRing: 1, activeRing: 'rgba(28, 28, 30, 0.85)' },
+    style: 'light',
+    colors: { $: '#ff3b1f', $$: '#ff3b1f', $$$: '#ff3b1f', $$$$: '#ff3b1f', none: '#ff3b1f' },
+    light: { spread: 3, core: '#ffd2b8' },
     tiers: {
-      small: { radius: 3, stroke: 0, shadow: null },
-      mid: { radius: 4.5, stroke: 0, shadow: null },
-      full: { radius: 8, stroke: 0, shadow: null },
-      active: { radius: 11, stroke: 2, shadow: null }
+      small: { radius: 2.6, stroke: 0, shadow: null },
+      mid: { radius: 3.8, stroke: 0, shadow: null },
+      full: { radius: 5.8, stroke: 0, shadow: null },
+      active: { radius: 8, stroke: 1.5, shadow: null }
     },
-    southOnTop: true
+    additive: true,
+    additivePriced: true,
+    southOnTop: false
   }
 };
 

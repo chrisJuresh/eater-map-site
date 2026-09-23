@@ -248,7 +248,8 @@ export class MarkerRenderer {
    * canvas (each dot's ring cuts the ones beneath, so a pile reads as scales, not
    * a darker blot); a look with `regularAlpha` composites the regular group
    * through the layer canvas at that flat alpha, the way the shipped markers do;
-   * an additive look sums the regular group so dense streets glow.
+   * an additive look sums the regular group so dense streets glow, and with
+   * `additivePriced` sums the priced ones into the same light.
    */
   drawLookLayers(ctx, layerCtx, layerCanvas, { width, height, z, regularMarkers, pricedMarkers }) {
     const look = this.look;
@@ -260,7 +261,9 @@ export class MarkerRenderer {
       ctx.save();
       ctx.globalCompositeOperation = 'lighter';
       for (const marker of regular) this.drawMarker(ctx, marker, false, z);
+      if (look.additivePriced) for (const marker of pricedMarkers) this.drawMarker(ctx, marker, false, z);
       ctx.restore();
+      if (look.additivePriced) return;
     } else if (look.regularAlpha != null && look.regularAlpha < 1) {
       layerCtx.clearRect(0, 0, width, height);
       for (const marker of regular) this.drawMarker(layerCtx, marker, false, z);
@@ -335,7 +338,7 @@ export class MarkerRenderer {
     const radius = tier.radius;
     // A glow reaches well past the dot; everything else only needs room for its
     // shadow.
-    const reach = look.style === 'glow' ? radius * 3.4 : radius;
+    const reach = look.style === 'glow' ? radius * 3.4 : look.style === 'light' ? radius * look.light.spread : radius;
     const size = Math.ceil((reach + MARKER_SPRITE_PADDING) * 2);
     const canvas = document.createElement('canvas');
     canvas.width = Math.ceil(size * dpr);
@@ -720,36 +723,57 @@ function paintLookMarker(ctx, look, { c, radius, tier, color, active, priceRange
   const showPrice = priceRange && (tierKey === 'full' || tierKey === 'active');
   const shadow = tier.shadow;
 
-  if (look.style === 'glow') {
-    // A soft halo in the dot's colour, a core, and (selected) a ring. On a dark
-    // map the core is lit (paler than the halo); on a light one it stays the
-    // solid colour, with a white edge to keep it crisp against its own halo.
-    const glow = look.glow ?? {};
-    const strength = glow.halo ?? 1;
-    const reach = radius * 3.4;
+  if (look.style === 'light') {
+    // No disc and no edge: a point of light that fades out, with a small hot
+    // centre. Drawn additively, so where lights overlap the red saturates and
+    // the other channels climb, and a busy street burns orange toward white.
+    const { spread, core } = look.light;
+    const reach = radius * spread;
     const halo = ctx.createRadialGradient(c, c, 0, c, c, reach);
-    halo.addColorStop(0, rgba(color, 0.9 * strength));
-    halo.addColorStop(0.16, rgba(color, 0.55 * strength));
-    halo.addColorStop(0.42, rgba(color, 0.14 * strength));
+    halo.addColorStop(0, rgba(color, 0.9));
+    halo.addColorStop(0.12, rgba(color, 0.62));
+    halo.addColorStop(0.34, rgba(color, 0.24));
+    halo.addColorStop(0.66, rgba(color, 0.06));
     halo.addColorStop(1, rgba(color, 0));
     ctx.fillStyle = halo;
     circle(ctx, c, reach);
     ctx.fill();
-    circle(ctx, c, radius * (glow.coreSize ?? 0.62));
-    ctx.fillStyle = glow.core === 'solid' ? color : mix(color, '#ffffff', 0.55);
+    const hot = ctx.createRadialGradient(c, c, 0, c, c, radius * 0.6);
+    hot.addColorStop(0, rgba(core, 0.85));
+    hot.addColorStop(1, rgba(core, 0));
+    ctx.fillStyle = hot;
+    circle(ctx, c, radius * 0.6);
     ctx.fill();
-    if (glow.coreRing) {
-      ctx.lineWidth = glow.coreRing;
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.95)';
+    if (active) {
+      // The one ring on the map: which light is selected has to be findable.
+      circle(ctx, c, radius + 2.5);
+      ctx.lineWidth = tier.stroke;
+      ctx.strokeStyle = 'rgba(28, 28, 30, 0.85)';
       ctx.stroke();
     }
+    return;
+  }
+
+  if (look.style === 'glow') {
+    // A soft halo in the dot's colour, a bright core, and (selected) a ring.
+    const reach = radius * 3.4;
+    const halo = ctx.createRadialGradient(c, c, 0, c, c, reach);
+    halo.addColorStop(0, rgba(color, 0.9));
+    halo.addColorStop(0.16, rgba(color, 0.55));
+    halo.addColorStop(0.42, rgba(color, 0.14));
+    halo.addColorStop(1, rgba(color, 0));
+    ctx.fillStyle = halo;
+    circle(ctx, c, reach);
+    ctx.fill();
+    circle(ctx, c, radius * 0.62);
+    ctx.fillStyle = mix(color, '#ffffff', 0.55);
+    ctx.fill();
     if (active) {
       circle(ctx, c, radius + 3);
       ctx.lineWidth = tier.stroke;
-      ctx.strokeStyle = glow.activeRing ?? 'rgba(255, 255, 255, 0.9)';
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
       ctx.stroke();
     }
-    if (showPrice && glow.core === 'solid') priceLabel(ctx, c, priceRange, '#ffffff');
     return;
   }
 
