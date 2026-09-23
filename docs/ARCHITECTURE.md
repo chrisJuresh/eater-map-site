@@ -45,6 +45,12 @@ src/
                           cache; activate() = tap → select / lines / spiderfy /
                           zoom; spiderfy fans a stack onto an even ring
       MapView.svelte      Map lifecycle, events, geolocation, camera API
+      looks.js            Candidate restylings of everything that moves with
+                          the map (basemap flavour, rail, stations, markers).
+                          `current` is the shipped style and takes the original
+                          code paths untouched; the rest are proposals, switched
+                          by the LookPicker (`[`/`]`), which is mounted only
+                          off production (dev, dev.*, *.vercel.app)
     ui/
       TopBar.svelte       Search + offline/install chip
       SearchResults.svelte  Dropdown + "Go to place" geocode row
@@ -53,6 +59,7 @@ src/
       LinesPopup.svelte     Stations within a walk of the popup's root, each
                             with the lines that serve it
       RoadmapMenu.svelte    Planned-features menu (bottom right)
+      LookPicker.svelte     Dev-only switcher over looks.js (above price filter)
       Sidebar.svelte        Desktop: details OR in-view list; mobile: details
                             bottom sheet
       InstallHelp.svelte    Install instructions modal

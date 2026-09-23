@@ -3,6 +3,7 @@
 
 import { SEARCH_LIMIT } from './constants.js';
 import { filterRestaurants } from './data.js';
+import { initialLookId } from './map/looks.js';
 
 export class AppState {
   // Data
@@ -22,6 +23,10 @@ export class AppState {
   isAndroid = false;
   isIos = false;
   isStandalone = $state(false);
+
+  // Map look (looks.js). Always 'current' in production; the dev-only picker
+  // changes it.
+  lookId = $state(initialLookId());
 
   // Geolocation
   userLocation = $state(null);

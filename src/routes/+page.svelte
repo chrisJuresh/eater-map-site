@@ -15,6 +15,8 @@
   import RoadmapMenu from '$lib/ui/RoadmapMenu.svelte';
   import Sidebar from '$lib/ui/Sidebar.svelte';
   import InstallHelp from '$lib/ui/InstallHelp.svelte';
+  import LookPicker from '$lib/ui/LookPicker.svelte';
+  import { looksEnabled } from '$lib/map/looks.js';
 
   const app = new AppState();
   let mapView;
@@ -214,6 +216,9 @@
     <PriceFilter {app} />
     <RoadmapMenu />
     <LinesPopup {app} />
+    {#if looksEnabled()}
+      <LookPicker {app} />
+    {/if}
 
     <div class="attribution">
       <a href="https://protomaps.com" target="_blank" rel="noreferrer">Protomaps</a>

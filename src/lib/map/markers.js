@@ -25,6 +25,7 @@ import {
   hasCoordinates,
   markerColor
 } from '../constants.js';
+import { mix, rgba } from './looks.js';
 
 function markerPriority(restaurant) {
   return restaurant?.priceRange ? 1 : 0;
@@ -100,8 +101,9 @@ export class MarkerRenderer {
    * @param {HTMLElement} opts.host - element whose size defines the viewport
    * @param {() => {restaurants: any[], selectedId: any, userLocation: any}} opts.read
    * @param {(count: number) => void} [opts.onVisibleCount]
+   * @param {object} [opts.look] - an alternative look (looks.js); omitted = shipped markers
    */
-  constructor({ map, canvas, host, read, onVisibleCount }) {
+  constructor({ map, canvas, host, read, onVisibleCount, look = null }) {
     this.map = map;
     this.canvas = canvas;
     this.host = host;
@@ -114,6 +116,18 @@ export class MarkerRenderer {
     // Spiderfy state (null when closed). members[].tx/ty are absolute screen px.
     this.spider = null;
     this.spiderFrame = 0;
+    this.look = null;
+    this.lookId = 'current';
+    if (look) this.setLook(look);
+  }
+
+  /** Swap to another look's markers (null/`current` = the shipped ones). */
+  setLook(look) {
+    this.look = look?.markers ?? null;
+    this.lookId = look?.id ?? 'current';
+    this.spriteCache.clear();
+    if (this.canvas?.style) this.canvas.style.mixBlendMode = this.look?.blend ?? '';
+    this.schedule();
   }
 
   schedule() {
@@ -201,6 +215,14 @@ export class MarkerRenderer {
       else regularMarkers.push(marker);
     }
 
+    if (this.look) {
+      this.drawLookLayers(ctx, layerCtx, layerCanvas, { width, height, z, regularMarkers, pricedMarkers });
+      if (selectedMarker) this.drawMarker(ctx, selectedMarker, true, z);
+      this.drawUserLocation(ctx, userLocation, z);
+      if (this.spider) this.drawSpider(ctx, z, selectedId);
+      return;
+    }
+
     // Composite each group at a flat opacity so overlapping markers do not darken.
     layerCtx.clearRect(0, 0, width, height);
     for (const marker of regularMarkers) this.drawMarker(layerCtx, marker, false, z);
@@ -221,12 +243,44 @@ export class MarkerRenderer {
     if (this.spider) this.drawSpider(ctx, z, selectedId);
   }
 
+  /**
+   * An alternative look's two marker groups. Opaque looks draw straight onto the
+   * canvas (each dot's ring cuts the ones beneath, so a pile reads as scales, not
+   * a darker blot); a look with `regularAlpha` composites the regular group
+   * through the layer canvas at that flat alpha, the way the shipped markers do;
+   * an additive look sums the regular group so dense streets glow.
+   */
+  drawLookLayers(ctx, layerCtx, layerCanvas, { width, height, z, regularMarkers, pricedMarkers }) {
+    const look = this.look;
+    // North first, so each dot overlaps the one behind it (up the screen) the
+    // same way: a consistent scale pattern instead of arbitrary stacking.
+    const order = (list) => (look.southOnTop ? [...list].sort((a, b) => a.y - b.y) : list);
+    const regular = order(regularMarkers);
+    if (look.additive) {
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      for (const marker of regular) this.drawMarker(ctx, marker, false, z);
+      ctx.restore();
+    } else if (look.regularAlpha != null && look.regularAlpha < 1) {
+      layerCtx.clearRect(0, 0, width, height);
+      for (const marker of regular) this.drawMarker(layerCtx, marker, false, z);
+      ctx.save();
+      ctx.globalAlpha = look.regularAlpha;
+      ctx.drawImage(layerCanvas, 0, 0, width, height);
+      ctx.restore();
+    } else {
+      for (const marker of regular) this.drawMarker(ctx, marker, false, z);
+    }
+    for (const marker of order(pricedMarkers)) this.drawMarker(ctx, marker, false, z);
+  }
+
   drawMarker(ctx, marker, active, z) {
     const sprite = this.getSprite(marker.restaurant.priceRange, active, z);
     ctx.drawImage(sprite.canvas, marker.x - sprite.size / 2, marker.y - sprite.size / 2, sprite.size, sprite.size);
   }
 
   getSprite(priceRange, active, z) {
+    if (this.look) return this.getLookSprite(priceRange, active, z);
     const dpr = Math.max(1, window.devicePixelRatio || 1);
     const normalizedPrice = priceRange || 'none';
     const detail = markerDetail(z, active);
@@ -262,6 +316,33 @@ export class MarkerRenderer {
       ctx.textBaseline = 'middle';
       ctx.fillText(priceRange, center, center + 0.5);
     }
+
+    const sprite = { canvas, size };
+    this.spriteCache.set(key, sprite);
+    return sprite;
+  }
+
+  getLookSprite(priceRange, active, z) {
+    const look = this.look;
+    const dpr = Math.max(1, window.devicePixelRatio || 1);
+    const tierKey = active ? 'active' : z >= FULL_MARKER_ZOOM ? 'full' : z >= MID_MARKER_ZOOM ? 'mid' : 'small';
+    const key = `${this.lookId}-${priceRange || 'none'}-${tierKey}-${dpr}`;
+    const cached = this.spriteCache.get(key);
+    if (cached) return cached;
+
+    const tier = look.tiers[tierKey];
+    const color = look.colors[priceRange || 'none'] ?? look.colors.none;
+    const radius = tier.radius;
+    // A glow reaches well past the dot; everything else only needs room for its
+    // shadow.
+    const reach = look.style === 'glow' ? radius * 3.4 : radius;
+    const size = Math.ceil((reach + MARKER_SPRITE_PADDING) * 2);
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.ceil(size * dpr);
+    canvas.height = Math.ceil(size * dpr);
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+    paintLookMarker(ctx, look, { c: size / 2, radius, tier, color, active, priceRange, tierKey });
 
     const sprite = { canvas, size };
     this.spriteCache.set(key, sprite);
@@ -618,4 +699,89 @@ export class MarkerRenderer {
     if (!candidates.length) return { type: 'lines' };
     return { type: 'select', restaurant: candidates[0].restaurant };
   }
+}
+
+// ---- Alternative-look marker painters ----------------------------------------
+
+function circle(ctx, c, r) {
+  ctx.beginPath();
+  ctx.arc(c, c, r, 0, Math.PI * 2);
+}
+
+function priceLabel(ctx, c, priceRange, fill) {
+  ctx.fillStyle = fill;
+  ctx.font = `800 ${priceRange.length >= 4 ? 7 : 8}px Inter, system-ui, sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(priceRange, c, c + 0.5);
+}
+
+function paintLookMarker(ctx, look, { c, radius, tier, color, active, priceRange, tierKey }) {
+  const showPrice = priceRange && (tierKey === 'full' || tierKey === 'active');
+  const shadow = tier.shadow;
+
+  if (look.style === 'glow') {
+    // A soft halo in the dot's colour, a bright core, and (selected) a ring.
+    const reach = radius * 3.4;
+    const halo = ctx.createRadialGradient(c, c, 0, c, c, reach);
+    halo.addColorStop(0, rgba(color, 0.9));
+    halo.addColorStop(0.16, rgba(color, 0.55));
+    halo.addColorStop(0.42, rgba(color, 0.14));
+    halo.addColorStop(1, rgba(color, 0));
+    ctx.fillStyle = halo;
+    circle(ctx, c, reach);
+    ctx.fill();
+    circle(ctx, c, radius * 0.62);
+    ctx.fillStyle = mix(color, '#ffffff', 0.55);
+    ctx.fill();
+    if (active) {
+      circle(ctx, c, radius + 3);
+      ctx.lineWidth = tier.stroke;
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+      ctx.stroke();
+    }
+    return;
+  }
+
+  if (shadow) {
+    ctx.shadowColor = `rgba(20, 24, 30, ${shadow.alpha})`;
+    ctx.shadowBlur = shadow.blur;
+    ctx.shadowOffsetY = shadow.y;
+  }
+  circle(ctx, c, radius);
+  ctx.fillStyle = color;
+  ctx.fill();
+  ctx.shadowColor = 'transparent';
+
+  if (look.style === 'bead' && radius >= 5) {
+    // Glass bead: lit from above, with a lighter top, a slightly darker rim, and
+    // a specular highlight like the chrome's rim.
+    const body = ctx.createRadialGradient(c - radius * 0.3, c - radius * 0.45, radius * 0.1, c, c, radius);
+    body.addColorStop(0, 'rgba(255, 255, 255, 0.42)');
+    body.addColorStop(0.55, 'rgba(255, 255, 255, 0)');
+    body.addColorStop(1, 'rgba(0, 0, 0, 0.16)');
+    circle(ctx, c, radius);
+    ctx.fillStyle = body;
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(c, c - radius * 0.5, radius * 0.52, radius * 0.26, 0, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.55)';
+    ctx.fill();
+  }
+
+  if (tier.stroke) {
+    circle(ctx, c, radius);
+    ctx.lineWidth = tier.stroke;
+    ctx.strokeStyle = look.ring;
+    ctx.stroke();
+  }
+  if (look.hairline) {
+    // A faint dark edge outside the white ring, so a dot on a white-cased line
+    // (or a white road) still has an edge.
+    circle(ctx, c, radius + tier.stroke / 2 + 0.35);
+    ctx.lineWidth = 0.7;
+    ctx.strokeStyle = look.hairline;
+    ctx.stroke();
+  }
+  if (showPrice) priceLabel(ctx, c, priceRange, '#ffffff');
 }
