@@ -37,20 +37,15 @@ src/
                           which stations are within N minutes of a point
     map/
       style.js            Basemap styles: offline pmtiles (gb + detail) and
-                          online Protomaps API; recolouring (black place labels,
-                          vibrant greens); rail + station layers; layer ordering
-      markers.js          MarkerRenderer: canvas overlay — regular markers at a
-                          FLAT 0.42 alpha (overlaps must not darken), priced
-                          markers opaque on top, selected above all; sprite
+                          online Protomaps API; a calm light flavour (soft land,
+                          white roads, no POI icons or shields); rail + station
+                          layers; layer ordering
+      markers.js          MarkerRenderer: canvas overlay — opaque white-ringed
+                          dots drawn north to south, priced markers on top,
+                          selected above all; sprite
                           cache; activate() = tap → select / lines / spiderfy /
                           zoom; spiderfy fans a stack onto an even ring
       MapView.svelte      Map lifecycle, events, geolocation, camera API
-      looks.js            Candidate restylings of everything that moves with
-                          the map (basemap flavour, rail, stations, markers).
-                          `current` is the shipped style and takes the original
-                          code paths untouched; the rest are proposals, switched
-                          by the LookPicker (`[`/`]`), which is mounted only
-                          off production (dev, dev.*, *.vercel.app)
     ui/
       TopBar.svelte       Search + offline/install chip
       SearchResults.svelte  Dropdown + "Go to place" geocode row
@@ -59,7 +54,6 @@ src/
       LinesPopup.svelte     Stations within a walk of the popup's root, each
                             with the lines that serve it
       RoadmapMenu.svelte    Planned-features menu (bottom right)
-      LookPicker.svelte     Dev-only switcher over looks.js (above price filter)
       Sidebar.svelte        Desktop: details OR in-view list; mobile: details
                             bottom sheet
       InstallHelp.svelte    Install instructions modal
@@ -67,13 +61,15 @@ src/
 
 ## Invariants (hand-tuned with the user — do not change casually)
 
-- **Markers**: regular markers composite at a flat `0.42` opacity so overlaps do
-  not darken; priced markers (the "38 Best London" set) are fully opaque and
-  always above regular ones; a selected restaurant renders above everything.
+- **Markers**: every marker is opaque with a white ring, drawn north to south so
+  each ring cuts the dot behind it and a pile reads as scales rather than a
+  darker blot; priced markers (the "38 Best London" set) are always above
+  regular ones; a selected restaurant renders above everything.
   Zoom detail tiers at 12/14; duplicate coordinates fan out into rings.
-- **Rail overlay**: navy base of every track; National Rail (operator brand
-  colours) below TfL lines; station dots always visible; basemap place labels
-  render ABOVE the lines, in near-black. Lines are fully OPAQUE — nothing shows
+- **Rail overlay**: grey base of every track; National Rail (operator brand
+  colours, taken slightly toward grey and white) below TfL lines (their own
+  colours), each group over a white casing so crossings are cased off; station
+  dots fade in from z10; basemap place labels render ABOVE the lines. Lines are fully OPAQUE — nothing shows
   through anything, because lines sharing a physical track are drawn side by side
   instead of on top of each other. `data-pipeline/scripts/rail-stack.mjs` splits
   the geometry at build time: a stretch carried by N lines becomes N features,
@@ -91,8 +87,8 @@ src/
   counter-clockwise if it closed into a ring. Without that last step a corridor's
   up and down tracks, which OSM digitises in their own directions of travel, put
   each colour on opposite sides; zoomed out they land in the same pixel and the
-  colour drawn second covers the first outright. The navy base keeps its zoom fade
-  (10→0.29, 16→0.5); it is the underlay of every track, not a line. `/tune` still
+  colour drawn second covers the first outright. The grey base keeps its zoom fade
+  (10→0.32, 16→0.5); it is the underlay of every track, not a line. `/tune` still
   puts a slider over rail opacity for eyeballing (`pnpm dev`, open `/tune`); at
   100% the lines are opaque, so it can only dim. It is DEV ONLY — `prerender =
   false` keeps it out of the built site and the page is behind

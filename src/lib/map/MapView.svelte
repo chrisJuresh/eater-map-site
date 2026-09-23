@@ -20,7 +20,6 @@
   } from '../constants.js';
   import { buildLocalStyle, buildOnlineStyle, LINE_QUERY_LAYERS, STATION_LAYER } from './style.js';
   import { MarkerRenderer } from './markers.js';
-  import { getLook } from './looks.js';
   import { loadStations, stationsNow, stationsWithin } from '../stations.js';
 
   /**
@@ -41,7 +40,6 @@
   let homeViewApplied = false;
   let mapWasInteractedWith = false;
   let styleMode = ''; // 'online' | 'local'
-  let styleLook = ''; // looks.js id the current style was built for
   let settleFrame = 0;
   let userMove = false; // is the camera moving in the user's hands, or under ours?
   let popupFit = 0; // generation of the popups' placement decision
@@ -63,9 +61,6 @@
 
     const startOnline = app.online && Boolean(ONLINE_TILE_URL);
     styleMode = startOnline ? 'online' : 'local';
-    styleLook = app.lookId;
-    const look = getLook(styleLook);
-    paintVoid(look);
     if (initialView) {
       // A shared/deep-linked view wins over the automatic home/location view.
       homeViewApplied = true;
@@ -73,7 +68,7 @@
     }
     map = new maplibregl.Map({
       container: mapEl,
-      style: startOnline ? buildOnlineStyle(look) : buildLocalStyle(look),
+      style: startOnline ? buildOnlineStyle() : buildLocalStyle(),
       center: initialView
         ? [initialView.lon, initialView.lat]
         : [(LONDON_BOUNDS.minLon + LONDON_BOUNDS.maxLon) / 2, (LONDON_BOUNDS.minLat + LONDON_BOUNDS.maxLat) / 2],
@@ -95,8 +90,7 @@
       read: () => ({ restaurants: app.filtered, selectedId: app.selected?.id, userLocation: app.userLocation }),
       onVisibleCount: (count) => {
         if (app.visibleMarkerCount !== count) app.visibleMarkerCount = count;
-      },
-      look
+      }
     });
 
     map.on('error', (event) => console.error('MapLibre error:', event.error?.message || event.error));
@@ -226,40 +220,23 @@
     if (mapReady) renderer?.syncSpider(app.selected);
   });
 
-  // Swap basemap when connectivity changes (after initial mount), or rebuild it
-  // when the dev look picker changes the look.
+  // Swap basemap when connectivity changes (after initial mount).
   $effect(() => {
     const wantOnline = app.online && Boolean(ONLINE_TILE_URL);
     const wantMode = wantOnline ? 'online' : 'local';
-    const wantLook = app.lookId;
-    if (!map || !styleMode) return;
-    if (wantMode === styleMode && wantLook === styleLook) return;
-    const look = getLook(wantLook);
-    if (wantLook !== styleLook) {
-      styleLook = wantLook;
-      paintVoid(look);
-      renderer?.setLook(look);
+    if (!map || !styleMode || wantMode === styleMode) return;
+    styleMode = wantMode;
+    if (wantOnline) {
+      map.setMaxBounds(null);
+      map.setMinZoom(MIN_ZOOM_ONLINE);
+      map.setStyle(buildOnlineStyle());
+    } else {
+      map.setStyle(buildLocalStyle());
+      map.setMaxBounds(OFFLINE_MAX_BOUNDS);
+      updateOfflineMinZoom();
     }
-    if (wantMode !== styleMode) {
-      styleMode = wantMode;
-      if (wantOnline) {
-        map.setMaxBounds(null);
-        map.setMinZoom(MIN_ZOOM_ONLINE);
-      } else {
-        map.setMaxBounds(OFFLINE_MAX_BOUNDS);
-        updateOfflineMinZoom();
-      }
-    }
-    map.setStyle(wantOnline ? buildOnlineStyle(look) : buildLocalStyle(look));
     renderer?.schedule();
   });
-
-  // A dark look paints the container behind the canvas too, or undownloaded
-  // tiles and the moment before the first tile flash the light default.
-  function paintVoid(look) {
-    const host = mapEl?.parentElement;
-    if (host) host.style.backgroundColor = look.voidColor ?? '';
-  }
 
   // Settle the in-view list once the camera/filters stop changing. Always
   // re-arm: a pending settle queued before a draw frame would otherwise publish

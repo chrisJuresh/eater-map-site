@@ -83,7 +83,7 @@
   }
 
   const lineEffective = $derived(Math.min(1, scale));
-  const baseEffective = $derived(Math.min(1, lerp(zoom, [[10, 0.29], [16, 0.5]]) * scale));
+  const baseEffective = $derived(Math.min(1, lerp(zoom, [[10, 0.32], [16, 0.5]]) * scale));
 </script>
 
 <svelte:head>

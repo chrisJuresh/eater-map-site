@@ -1,17 +1,16 @@
 // Canvas marker overlay + spiderfy.
-// - regular markers composited at a FLAT 0.42 opacity (overlaps must not darken)
-// - the priced ("38 Best London") markers composited fully opaque, ON TOP
+// - every marker opaque and white-ringed, drawn north to south so each ring cuts
+//   the dot behind it (a pile reads as scales, not a darker blot)
+// - the priced ("38 Best London") markers ON TOP of the regular ones
 // - the selected marker drawn above everything at full detail
 // - offscreen sprite cache keyed by price/detail/DPR
 // - tapping a stack fans it out (spiderfy) into spaced, thumb-tappable targets
 
 import {
   FULL_MARKER_ZOOM,
-  MARKER_LAYER_OPACITY,
   MARKER_PADDING,
   MARKER_SPRITE_PADDING,
   MID_MARKER_ZOOM,
-  PRICED_MARKER_LAYER_OPACITY,
   SPIDER_EDGE_PAD,
   SPIDER_GAP,
   SPIDER_MAX,
@@ -25,7 +24,6 @@ import {
   hasCoordinates,
   markerColor
 } from '../constants.js';
-import { mix, rgba } from './looks.js';
 
 function markerPriority(restaurant) {
   return restaurant?.priceRange ? 1 : 0;
@@ -36,7 +34,7 @@ function markerPriority(restaurant) {
 const HIT_EXTRA = 8;
 const TOUCH_HIT_EXTRA = 22;
 // Full-detail marker radius — fanned targets always draw at this size.
-const FULL_RADIUS = 12;
+const FULL_RADIUS = 10;
 
 /** Markers within tolerance of a screen point, nearest-first (deterministic). */
 function candidatesAt(map, restaurants, selectedId, point, extra) {
@@ -61,14 +59,18 @@ function candidatesAt(map, restaurants, selectedId, point, extra) {
   return candidates;
 }
 
+// `shadow` is null for the smallest dots: at that size it only muddies the edge.
 function markerDetail(z, active) {
-  if (active || z >= FULL_MARKER_ZOOM) {
-    return { key: 'full', radius: active ? 17 : 12, strokeWidth: active ? 3 : 2, shadowBlur: active ? 14 : 8, shadowOffsetY: active ? 4 : 3, showPrice: true };
+  if (active) {
+    return { key: 'active', radius: 15, strokeWidth: 3, shadow: { blur: 12, y: 4, alpha: 0.34 }, showPrice: true };
+  }
+  if (z >= FULL_MARKER_ZOOM) {
+    return { key: 'full', radius: 10, strokeWidth: 2, shadow: { blur: 6, y: 2, alpha: 0.22 }, showPrice: true };
   }
   if (z >= MID_MARKER_ZOOM) {
-    return { key: 'mid', radius: 7, strokeWidth: 1.5, shadowBlur: 4, shadowOffsetY: 2, showPrice: false };
+    return { key: 'mid', radius: 6, strokeWidth: 1.5, shadow: { blur: 2, y: 1, alpha: 0.18 }, showPrice: false };
   }
-  return { key: 'small', radius: 4.5, strokeWidth: 1, shadowBlur: 2, shadowOffsetY: 1, showPrice: false };
+  return { key: 'small', radius: 3.6, strokeWidth: 1, shadow: null, showPrice: false };
 }
 
 function metersPerPixel(lat, z) {
@@ -101,9 +103,8 @@ export class MarkerRenderer {
    * @param {HTMLElement} opts.host - element whose size defines the viewport
    * @param {() => {restaurants: any[], selectedId: any, userLocation: any}} opts.read
    * @param {(count: number) => void} [opts.onVisibleCount]
-   * @param {object} [opts.look] - an alternative look (looks.js); omitted = shipped markers
    */
-  constructor({ map, canvas, host, read, onVisibleCount, look = null }) {
+  constructor({ map, canvas, host, read, onVisibleCount }) {
     this.map = map;
     this.canvas = canvas;
     this.host = host;
@@ -111,23 +112,10 @@ export class MarkerRenderer {
     this.onVisibleCount = onVisibleCount;
     this.frame = 0;
     this.spriteCache = new Map();
-    this.layerCanvas = null;
     this.lastVisible = [];
     // Spiderfy state (null when closed). members[].tx/ty are absolute screen px.
     this.spider = null;
     this.spiderFrame = 0;
-    this.look = null;
-    this.lookId = 'current';
-    if (look) this.setLook(look);
-  }
-
-  /** Swap to another look's markers (null/`current` = the shipped ones). */
-  setLook(look) {
-    this.look = look?.markers ?? null;
-    this.lookId = look?.id ?? 'current';
-    this.spriteCache.clear();
-    if (this.canvas?.style) this.canvas.style.mixBlendMode = this.look?.blend ?? '';
-    this.schedule();
   }
 
   schedule() {
@@ -193,14 +181,9 @@ export class MarkerRenderer {
     }
     this.lastVisible = markers.map((m) => m.restaurant);
     this.onVisibleCount?.(markers.length);
-
-    if (!this.layerCanvas) this.layerCanvas = document.createElement('canvas');
-    const layerCanvas = this.layerCanvas;
-    if (layerCanvas.width !== targetWidth) layerCanvas.width = targetWidth;
-    if (layerCanvas.height !== targetHeight) layerCanvas.height = targetHeight;
-    const layerCtx = layerCanvas.getContext('2d');
-    if (!layerCtx) return;
-    layerCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    // North first, so each dot overlaps the one behind it (up the screen) the
+    // same way: a consistent scale pattern instead of arbitrary stacking.
+    markers.sort((a, b) => a.y - b.y);
 
     const regularMarkers = [];
     const pricedMarkers = [];
@@ -215,66 +198,12 @@ export class MarkerRenderer {
       else regularMarkers.push(marker);
     }
 
-    if (this.look) {
-      this.drawLookLayers(ctx, layerCtx, layerCanvas, { width, height, z, regularMarkers, pricedMarkers });
-      if (selectedMarker) this.drawMarker(ctx, selectedMarker, true, z);
-      this.drawUserLocation(ctx, userLocation, z);
-      if (this.spider) this.drawSpider(ctx, z, selectedId);
-      return;
-    }
-
-    // Composite each group at a flat opacity so overlapping markers do not darken.
-    layerCtx.clearRect(0, 0, width, height);
-    for (const marker of regularMarkers) this.drawMarker(layerCtx, marker, false, z);
-    ctx.save();
-    ctx.globalAlpha = MARKER_LAYER_OPACITY;
-    ctx.drawImage(layerCanvas, 0, 0, width, height);
-    ctx.restore();
-
-    layerCtx.clearRect(0, 0, width, height);
-    for (const marker of pricedMarkers) this.drawMarker(layerCtx, marker, false, z);
-    ctx.save();
-    ctx.globalAlpha = PRICED_MARKER_LAYER_OPACITY;
-    ctx.drawImage(layerCanvas, 0, 0, width, height);
-    ctx.restore();
+    for (const marker of regularMarkers) this.drawMarker(ctx, marker, false, z);
+    for (const marker of pricedMarkers) this.drawMarker(ctx, marker, false, z);
 
     if (selectedMarker) this.drawMarker(ctx, selectedMarker, true, z);
     this.drawUserLocation(ctx, userLocation, z);
     if (this.spider) this.drawSpider(ctx, z, selectedId);
-  }
-
-  /**
-   * An alternative look's two marker groups. Opaque looks draw straight onto the
-   * canvas (each dot's ring cuts the ones beneath, so a pile reads as scales, not
-   * a darker blot); a look with `regularAlpha` composites the regular group
-   * through the layer canvas at that flat alpha, the way the shipped markers do;
-   * an additive look sums the regular group so dense streets glow, and with
-   * `additivePriced` sums the priced ones into the same light.
-   */
-  drawLookLayers(ctx, layerCtx, layerCanvas, { width, height, z, regularMarkers, pricedMarkers }) {
-    const look = this.look;
-    // North first, so each dot overlaps the one behind it (up the screen) the
-    // same way: a consistent scale pattern instead of arbitrary stacking.
-    const order = (list) => (look.southOnTop ? [...list].sort((a, b) => a.y - b.y) : list);
-    const regular = order(regularMarkers);
-    if (look.additive) {
-      ctx.save();
-      ctx.globalCompositeOperation = 'lighter';
-      for (const marker of regular) this.drawMarker(ctx, marker, false, z);
-      if (look.additivePriced) for (const marker of pricedMarkers) this.drawMarker(ctx, marker, false, z);
-      ctx.restore();
-      if (look.additivePriced) return;
-    } else if (look.regularAlpha != null && look.regularAlpha < 1) {
-      layerCtx.clearRect(0, 0, width, height);
-      for (const marker of regular) this.drawMarker(layerCtx, marker, false, z);
-      ctx.save();
-      ctx.globalAlpha = look.regularAlpha;
-      ctx.drawImage(layerCanvas, 0, 0, width, height);
-      ctx.restore();
-    } else {
-      for (const marker of regular) this.drawMarker(ctx, marker, false, z);
-    }
-    for (const marker of order(pricedMarkers)) this.drawMarker(ctx, marker, false, z);
   }
 
   drawMarker(ctx, marker, active, z) {
@@ -283,11 +212,10 @@ export class MarkerRenderer {
   }
 
   getSprite(priceRange, active, z) {
-    if (this.look) return this.getLookSprite(priceRange, active, z);
     const dpr = Math.max(1, window.devicePixelRatio || 1);
     const normalizedPrice = priceRange || 'none';
     const detail = markerDetail(z, active);
-    const key = `${normalizedPrice}-${active ? 'active' : detail.key}-${dpr}`;
+    const key = `${normalizedPrice}-${detail.key}-${dpr}`;
     const cached = this.spriteCache.get(key);
     if (cached) return cached;
 
@@ -300,52 +228,27 @@ export class MarkerRenderer {
     const center = size / 2;
 
     ctx.scale(dpr, dpr);
-    ctx.shadowColor = active ? 'rgba(27, 31, 28, 0.42)' : 'rgba(27, 31, 28, 0.26)';
-    ctx.shadowBlur = detail.shadowBlur;
-    ctx.shadowOffsetY = detail.shadowOffsetY;
+    if (detail.shadow) {
+      ctx.shadowColor = `rgba(20, 24, 30, ${detail.shadow.alpha})`;
+      ctx.shadowBlur = detail.shadow.blur;
+      ctx.shadowOffsetY = detail.shadow.y;
+    }
     ctx.beginPath();
     ctx.arc(center, center, radius, 0, Math.PI * 2);
     ctx.fillStyle = markerColor(priceRange);
     ctx.fill();
     ctx.shadowColor = 'transparent';
     ctx.lineWidth = detail.strokeWidth;
-    ctx.strokeStyle = active ? 'rgba(255, 255, 255, 0.86)' : '#ffffff';
+    ctx.strokeStyle = '#ffffff';
     ctx.stroke();
 
     if (priceRange && detail.showPrice) {
-      ctx.fillStyle = active ? 'rgba(255, 255, 255, 0.95)' : '#ffffff';
+      ctx.fillStyle = '#ffffff';
       ctx.font = `800 ${priceRange.length >= 4 ? 7 : 8}px Inter, system-ui, sans-serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(priceRange, center, center + 0.5);
     }
-
-    const sprite = { canvas, size };
-    this.spriteCache.set(key, sprite);
-    return sprite;
-  }
-
-  getLookSprite(priceRange, active, z) {
-    const look = this.look;
-    const dpr = Math.max(1, window.devicePixelRatio || 1);
-    const tierKey = active ? 'active' : z >= FULL_MARKER_ZOOM ? 'full' : z >= MID_MARKER_ZOOM ? 'mid' : 'small';
-    const key = `${this.lookId}-${priceRange || 'none'}-${tierKey}-${dpr}`;
-    const cached = this.spriteCache.get(key);
-    if (cached) return cached;
-
-    const tier = look.tiers[tierKey];
-    const color = look.colors[priceRange || 'none'] ?? look.colors.none;
-    const radius = tier.radius;
-    // A glow reaches well past the dot; everything else only needs room for its
-    // shadow.
-    const reach = look.style === 'glow' ? radius * 3.4 : look.style === 'light' ? radius * look.light.spread : radius;
-    const size = Math.ceil((reach + MARKER_SPRITE_PADDING) * 2);
-    const canvas = document.createElement('canvas');
-    canvas.width = Math.ceil(size * dpr);
-    canvas.height = Math.ceil(size * dpr);
-    const ctx = canvas.getContext('2d');
-    ctx.scale(dpr, dpr);
-    paintLookMarker(ctx, look, { c: size / 2, radius, tier, color, active, priceRange, tierKey });
 
     const sprite = { canvas, size };
     this.spriteCache.set(key, sprite);
@@ -617,8 +520,8 @@ export class MarkerRenderer {
     ctx.fillStyle = 'rgba(27, 31, 28, 0.5)';
     ctx.fill();
 
-    // Non-selected dots at an intermediate opacity (between the map's 0.42 and the
-    // opaque selected marker); the selected member drawn last, opaque, on top.
+    // Non-selected dots slightly faded so the opaque selected member, drawn last
+    // on top, stands out.
     const detailZoom = Math.max(z, FULL_MARKER_ZOOM);
     let selectedPlacement = null;
     ctx.save();
@@ -702,120 +605,4 @@ export class MarkerRenderer {
     if (!candidates.length) return { type: 'lines' };
     return { type: 'select', restaurant: candidates[0].restaurant };
   }
-}
-
-// ---- Alternative-look marker painters ----------------------------------------
-
-function circle(ctx, c, r) {
-  ctx.beginPath();
-  ctx.arc(c, c, r, 0, Math.PI * 2);
-}
-
-function priceLabel(ctx, c, priceRange, fill) {
-  ctx.fillStyle = fill;
-  ctx.font = `800 ${priceRange.length >= 4 ? 7 : 8}px Inter, system-ui, sans-serif`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(priceRange, c, c + 0.5);
-}
-
-function paintLookMarker(ctx, look, { c, radius, tier, color, active, priceRange, tierKey }) {
-  const showPrice = priceRange && (tierKey === 'full' || tierKey === 'active');
-  const shadow = tier.shadow;
-
-  if (look.style === 'light') {
-    // No disc and no edge: a point of light that fades out, with a small hot
-    // centre. Drawn additively, so where lights overlap the strongest channel
-    // saturates and the others climb, and a busy street burns toward white.
-    const { spread, core } = look.light;
-    const reach = radius * spread;
-    const halo = ctx.createRadialGradient(c, c, 0, c, c, reach);
-    halo.addColorStop(0, rgba(color, 0.9));
-    halo.addColorStop(0.12, rgba(color, 0.62));
-    halo.addColorStop(0.34, rgba(color, 0.24));
-    halo.addColorStop(0.66, rgba(color, 0.06));
-    halo.addColorStop(1, rgba(color, 0));
-    ctx.fillStyle = halo;
-    circle(ctx, c, reach);
-    ctx.fill();
-    const hot = ctx.createRadialGradient(c, c, 0, c, c, radius * 0.6);
-    hot.addColorStop(0, rgba(core, 0.85));
-    hot.addColorStop(1, rgba(core, 0));
-    ctx.fillStyle = hot;
-    circle(ctx, c, radius * 0.6);
-    ctx.fill();
-    if (active) {
-      // The one ring on the map: which light is selected has to be findable.
-      circle(ctx, c, radius + 2.5);
-      ctx.lineWidth = tier.stroke;
-      ctx.strokeStyle = 'rgba(28, 28, 30, 0.85)';
-      ctx.stroke();
-    }
-    return;
-  }
-
-  if (look.style === 'glow') {
-    // A soft halo in the dot's colour, a bright core, and (selected) a ring.
-    const reach = radius * 3.4;
-    const halo = ctx.createRadialGradient(c, c, 0, c, c, reach);
-    halo.addColorStop(0, rgba(color, 0.9));
-    halo.addColorStop(0.16, rgba(color, 0.55));
-    halo.addColorStop(0.42, rgba(color, 0.14));
-    halo.addColorStop(1, rgba(color, 0));
-    ctx.fillStyle = halo;
-    circle(ctx, c, reach);
-    ctx.fill();
-    circle(ctx, c, radius * 0.62);
-    ctx.fillStyle = mix(color, '#ffffff', 0.55);
-    ctx.fill();
-    if (active) {
-      circle(ctx, c, radius + 3);
-      ctx.lineWidth = tier.stroke;
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
-      ctx.stroke();
-    }
-    return;
-  }
-
-  if (shadow) {
-    ctx.shadowColor = `rgba(20, 24, 30, ${shadow.alpha})`;
-    ctx.shadowBlur = shadow.blur;
-    ctx.shadowOffsetY = shadow.y;
-  }
-  circle(ctx, c, radius);
-  ctx.fillStyle = color;
-  ctx.fill();
-  ctx.shadowColor = 'transparent';
-
-  if (look.style === 'bead' && radius >= 5) {
-    // Glass bead: lit from above, with a lighter top, a slightly darker rim, and
-    // a specular highlight like the chrome's rim.
-    const body = ctx.createRadialGradient(c - radius * 0.3, c - radius * 0.45, radius * 0.1, c, c, radius);
-    body.addColorStop(0, 'rgba(255, 255, 255, 0.42)');
-    body.addColorStop(0.55, 'rgba(255, 255, 255, 0)');
-    body.addColorStop(1, 'rgba(0, 0, 0, 0.16)');
-    circle(ctx, c, radius);
-    ctx.fillStyle = body;
-    ctx.fill();
-    ctx.beginPath();
-    ctx.ellipse(c, c - radius * 0.5, radius * 0.52, radius * 0.26, 0, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.55)';
-    ctx.fill();
-  }
-
-  if (tier.stroke) {
-    circle(ctx, c, radius);
-    ctx.lineWidth = tier.stroke;
-    ctx.strokeStyle = look.ring;
-    ctx.stroke();
-  }
-  if (look.hairline) {
-    // A faint dark edge outside the white ring, so a dot on a white-cased line
-    // (or a white road) still has an edge.
-    circle(ctx, c, radius + tier.stroke / 2 + 0.35);
-    ctx.lineWidth = 0.7;
-    ctx.strokeStyle = look.hairline;
-    ctx.stroke();
-  }
-  if (showPrice) priceLabel(ctx, c, priceRange, '#ffffff');
 }

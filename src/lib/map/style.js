@@ -1,6 +1,6 @@
 // MapLibre style construction: local (offline pmtiles) and online (Protomaps API)
-// basemaps, the recolouring pass (black place labels, vibrant greens), and the
-// always-visible colour-coded rail overlay. All values are hand-tuned — see
+// basemaps in a calm light flavour (soft land, white roads, no POI icons), and
+// the colour-coded, white-cased rail overlay. All values are hand-tuned — see
 // docs/ARCHITECTURE.md before changing anything here.
 
 import { layers, namedFlavor } from '@protomaps/basemaps';
@@ -10,6 +10,9 @@ function assetUrl(path) {
   const origin = typeof location !== 'undefined' ? location.origin : '';
   return `${origin}${path}`;
 }
+
+// The land colour, which label halos match so text sits in the map.
+const LAND = '#f5f3ef';
 
 const ATTRIBUTION =
   '<a href="https://protomaps.com" target="_blank" rel="noreferrer">Protomaps</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a>';
@@ -40,21 +43,15 @@ const BAND_FLOOR = ['case', ['has', 'wf'], MIN_BAND, 0];
 // The zoom interpolate must be the OUTERMOST expression (MapLibre forbids nesting
 // a zoom curve inside another), so the band maths is repeated in every stop.
 const railBand = (px) => ['max', ['*', px, BAND_WIDTH], BAND_FLOOR];
-const railCurve = (stop) => [
-  'interpolate',
-  ['linear'],
-  ['zoom'],
-  6,
-  stop(1),
-  10,
-  stop(2),
-  13,
-  stop(3.2),
-  16,
-  stop(5)
-];
+const RAIL_ZOOMS = [6, 10, 13, 16];
+const RAIL_WIDTHS = [0.9, 1.8, 3, 4.8];
+// White casing, px added on EACH side of a band at the same zooms, so a TfL line
+// crossing a National Rail one is cased off from it.
+const CASING_PX = [0.35, 0.8, 1.1, 1.5];
+const railCurve = (stop) => ['interpolate', ['linear'], ['zoom'], ...RAIL_ZOOMS.flatMap((z, i) => [z, stop(RAIL_WIDTHS[i], i)])];
 const LINE_WIDTH = railCurve((px) => railBand(px));
 const LINE_OFFSET = railCurve((px) => ['*', railBand(px), BAND_INDEX]);
+const CASING_WIDTH = railCurve((px, i) => ['+', railBand(px), 2 * CASING_PX[i]]);
 // `scale` is 1 everywhere in the app — the dev-only /tune page is the only caller
 // that moves it, so the curves are built rather than stated as constants.
 const lineOpacity = (scale = 1) => Math.min(1, scale);
@@ -63,7 +60,7 @@ const baseOpacity = (scale = 1) => [
   ['linear'],
   ['zoom'],
   10,
-  Math.min(1, 0.29 * scale),
+  Math.min(1, 0.32 * scale),
   16,
   Math.min(1, 0.5 * scale)
 ];
@@ -75,48 +72,49 @@ export const LINE_QUERY_LAYERS = ['rail-tfl', 'rail-nr', 'rail-base'];
 /** Station dots — queried for the station that heads the lines popup. */
 export const STATION_LAYER = 'rail-stations';
 
+// National Rail operator colours, each taken a little toward grey and white so
+// the TfL network (its own colours, untouched) reads first. Anything not listed
+// (a line added to the data later) keeps its own colour.
+const NR_COLORS = [
+  '#FF5AA4', '#003DA5', '#0A493E', '#00A1DE', '#D70E35', '#FF8300', '#004354', '#189CD5',
+  '#24398C', '#8CC63E', '#D70428', '#6E2C6B', '#1D1D1B', '#B7007C', '#2D2D6E'
+];
+const toRgb = (hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
+const toHex = (rgb) => `#${rgb.map((v) => Math.round(Math.min(255, Math.max(0, v))).toString(16).padStart(2, '0')).join('')}`;
+function softenNr(hex) {
+  const rgb = toRgb(hex);
+  const grey = 0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2];
+  return toHex(rgb.map((v) => v + (grey - v) * 0.15).map((v) => v + (255 - v) * 0.12));
+}
+const OWN_COLOUR = ['coalesce', ['get', 'color'], '#666666'];
+const NR_COLOUR = ['match', ['get', 'color'], ...NR_COLORS.flatMap((hex) => [hex, softenNr(hex)]), OWN_COLOUR];
+
+const NR_FILTER = ['all', ['==', ['get', 'base'], false], ['==', ['get', 'tfl'], false]];
+const TFL_FILTER = ['all', ['==', ['get', 'base'], false], ['==', ['get', 'tfl'], true]];
+const railLine = (id, filter, paint) => ({
+  id,
+  type: 'line',
+  source: 'tube',
+  filter,
+  layout: { 'line-join': 'round', 'line-cap': 'round' },
+  paint
+});
+const casing = (id, filter) =>
+  railLine(id, filter, { 'line-color': '#ffffff', 'line-width': CASING_WIDTH, 'line-offset': LINE_OFFSET, 'line-opacity': LINE_OPACITY });
+
 const RAIL_LAYERS = [
-  {
-    // Every passenger track (navy) — complete coverage.
-    id: 'rail-base',
-    type: 'line',
-    source: 'tube',
-    filter: ['==', ['get', 'base'], true],
-    layout: { 'line-join': 'round', 'line-cap': 'round' },
-    paint: {
-      'line-color': '#41476b',
-      'line-width': ['interpolate', ['linear'], ['zoom'], 8, 0.4, 12, 1, 14, 1.6, 16, 2.4],
-      'line-opacity': BASE_OPACITY
-    }
-  },
-  {
-    // National Rail (below TfL so Overground/Tube/Elizabeth stay on top).
-    id: 'rail-nr',
-    type: 'line',
-    source: 'tube',
-    filter: ['all', ['==', ['get', 'base'], false], ['==', ['get', 'tfl'], false]],
-    layout: { 'line-join': 'round', 'line-cap': 'round' },
-    paint: {
-      'line-color': ['coalesce', ['get', 'color'], '#666666'],
-      'line-width': LINE_WIDTH,
-      'line-offset': LINE_OFFSET,
-      'line-opacity': LINE_OPACITY
-    }
-  },
-  {
-    // Tube / DLR / Overground / Elizabeth / Tram / Cable car — drawn on top.
-    id: 'rail-tfl',
-    type: 'line',
-    source: 'tube',
-    filter: ['all', ['==', ['get', 'base'], false], ['==', ['get', 'tfl'], true]],
-    layout: { 'line-join': 'round', 'line-cap': 'round' },
-    paint: {
-      'line-color': ['coalesce', ['get', 'color'], '#666666'],
-      'line-width': LINE_WIDTH,
-      'line-offset': LINE_OFFSET,
-      'line-opacity': LINE_OPACITY
-    }
-  }
+  // Every passenger track (grey) — complete coverage.
+  railLine('rail-base', ['==', ['get', 'base'], true], {
+    'line-color': '#8a8f9c',
+    'line-width': ['interpolate', ['linear'], ['zoom'], 8, 0.4, 12, 1, 14, 1.6, 16, 2.4],
+    'line-opacity': BASE_OPACITY
+  }),
+  // National Rail (below TfL so Overground/Tube/Elizabeth stay on top), then
+  // Tube / DLR / Overground / Elizabeth / Tram / Cable car, each over its casing.
+  casing('rail-nr-casing', NR_FILTER),
+  railLine('rail-nr', NR_FILTER, { 'line-color': NR_COLOUR, 'line-width': LINE_WIDTH, 'line-offset': LINE_OFFSET, 'line-opacity': LINE_OPACITY }),
+  casing('rail-tfl-casing', TFL_FILTER),
+  railLine('rail-tfl', TFL_FILTER, { 'line-color': OWN_COLOUR, 'line-width': LINE_WIDTH, 'line-offset': LINE_OFFSET, 'line-opacity': LINE_OPACITY })
 ];
 
 /**
@@ -125,30 +123,39 @@ const RAIL_LAYERS = [
  * along with that page. Re-apply after a `setStyle` — the swap rebuilds the paint.
  */
 export function setRailOpacityScale(map, scale) {
-  const builders = { 'rail-base': baseOpacity, 'rail-nr': lineOpacity, 'rail-tfl': lineOpacity };
+  const builders = {
+    'rail-base': baseOpacity,
+    'rail-nr-casing': lineOpacity,
+    'rail-nr': lineOpacity,
+    'rail-tfl-casing': lineOpacity,
+    'rail-tfl': lineOpacity
+  };
   for (const [id, build] of Object.entries(builders)) {
     if (map?.getLayer(id)) map.setPaintProperty(id, 'line-opacity', build(scale));
   }
 }
 
-// Station dots (bundled) — always visible.
+// Station dots (bundled), fading in from z10 so the zoomed-out network is lines.
 const STATION_DOT_LAYER = {
   id: STATION_LAYER,
   type: 'circle',
   source: 'tube',
+  minzoom: 10,
   filter: ['==', ['get', 'station'], true],
   paint: {
-    'circle-radius': ['interpolate', ['linear'], ['zoom'], 5, 1.4, 9, 2, 12, 2.6, 14, 3.6, 16, 4.6],
+    'circle-radius': ['interpolate', ['linear'], ['zoom'], 10, 1.6, 12, 2.4, 14, 3.4, 16, 4.4],
     'circle-color': '#ffffff',
-    'circle-stroke-color': '#17201c',
-    'circle-stroke-width': ['interpolate', ['linear'], ['zoom'], 5, 0.8, 12, 1.3, 16, 1.8]
+    'circle-stroke-color': '#1c1c1e',
+    'circle-stroke-width': ['interpolate', ['linear'], ['zoom'], 10, 0.8, 12, 1.1, 16, 1.6],
+    'circle-opacity': ['interpolate', ['linear'], ['zoom'], 10, 0, 11, 1],
+    'circle-stroke-opacity': ['interpolate', ['linear'], ['zoom'], 10, 0, 11, 1]
   }
 };
 const STATION_LABEL_LAYER = {
   id: 'rail-station-labels',
   type: 'symbol',
   source: 'tube',
-  minzoom: 13,
+  minzoom: 13.5,
   filter: ['==', ['get', 'station'], true],
   layout: {
     'text-field': ['get', 'name'],
@@ -158,182 +165,101 @@ const STATION_LABEL_LAYER = {
     'text-anchor': 'top',
     'text-optional': true
   },
-  paint: { 'text-color': '#17201c', 'text-halo-color': '#ffffff', 'text-halo-width': 1.6 }
+  paint: { 'text-color': '#3a3a3c', 'text-halo-color': LAND, 'text-halo-width': 1.6 }
 };
 
-// More vibrant greens for parks/woods/grass than the muted Protomaps defaults.
-const VIBRANT_GREEN = [
-  'case',
-  ['in', ['get', 'kind'], ['literal', ['national_park', 'park', 'cemetery', 'protected_area', 'nature_reserve', 'forest', 'golf_course']]],
-  '#8bcf87',
-  ['==', ['get', 'kind'], 'wood'],
-  '#77c47b',
-  ['in', ['get', 'kind'], ['literal', ['scrub', 'grassland', 'grass']]],
-  '#a3d9a0',
-  ['==', ['get', 'kind'], 'glacier'],
-  '#e7e7e7',
-  ['==', ['get', 'kind'], 'sand'],
-  '#e2e0d7',
-  ['in', ['get', 'kind'], ['literal', ['military', 'naval_base', 'airfield']]],
-  '#c6dcdc',
-  '#e2dfda'
-];
-const PLACE_LABEL_IDS = new Set(['places_subplace', 'places_region', 'places_locality', 'places_country']);
+// ---- Basemap flavour -----------------------------------------------------------
+// Protomaps flavours are flat colour tables; this overrides `light`. Casing and
+// road keys are grouped so the table states intent ("all casings this colour")
+// rather than forty hexes.
 
-// Make area/place names black and green spaces more vibrant.
-function recolourBasemap(layer) {
-  const baseId = layer.id.replace(/^detail_/, '');
-  if (PLACE_LABEL_IDS.has(baseId)) {
-    return { ...layer, paint: { ...layer.paint, 'text-color': '#111111' } };
-  }
-  if (baseId === 'landuse_park') {
-    return { ...layer, paint: { ...layer.paint, 'fill-color': VIBRANT_GREEN } };
-  }
-  if (baseId === 'landuse_urban_green') {
-    return { ...layer, paint: { ...layer.paint, 'fill-color': '#8bcf87' } };
-  }
-  return layer;
+const CASING_KEYS = [
+  'minor_service_casing', 'minor_casing', 'link_casing', 'major_casing_late', 'highway_casing_late',
+  'major_casing_early', 'highway_casing_early', 'bridges_other_casing', 'bridges_minor_casing',
+  'bridges_link_casing', 'bridges_major_casing', 'bridges_highway_casing'
+];
+const TUNNEL_KEYS = ['tunnel_other', 'tunnel_minor', 'tunnel_link', 'tunnel_major', 'tunnel_highway'];
+const ROAD_KEYS = [
+  'other', 'minor_service', 'minor_a', 'minor_b', 'bridges_other', 'bridges_minor',
+  'link', 'major', 'bridges_link', 'bridges_major', 'highway', 'bridges_highway', 'pier'
+];
+const spread = (keys, value) => Object.fromEntries(keys.map((k) => [k, value]));
+
+function buildFlavor() {
+  const base = namedFlavor('light');
+  return {
+    ...base,
+    background: LAND,
+    earth: LAND,
+    park_a: '#dcecd2',
+    park_b: '#c5e2b6',
+    wood_a: '#d6e9cc',
+    wood_b: '#bfddae',
+    scrub_a: '#deecd4',
+    scrub_b: '#cae4bc',
+    hospital: '#f3e8e7',
+    industrial: '#edebe7',
+    school: '#f2ede4',
+    pedestrian: '#f1eee8',
+    beach: '#f4edd8',
+    sand: '#f2ebda',
+    aerodrome: '#ebeaee',
+    runway: '#dedde2',
+    zoo: '#dcecd2',
+    military: '#ecebe6',
+    glacier: '#ffffff',
+    water: '#aad4f0',
+    buildings: '#e9e5df',
+    railway: '#d2cdc5',
+    boundaries: '#b8b3ab',
+    ...spread(CASING_KEYS, '#e3ded6'),
+    ...spread(TUNNEL_KEYS, '#efece7'),
+    ...spread(TUNNEL_KEYS.map((k) => `${k}_casing`), '#e6e2db'),
+    ...spread(ROAD_KEYS, '#ffffff'),
+    roads_label_minor: '#8e8e93',
+    roads_label_minor_halo: '#ffffff',
+    roads_label_major: '#7c7c80',
+    roads_label_major_halo: '#ffffff',
+    ocean_label: '#5a8bb8',
+    subplace_label: '#6d6d72',
+    subplace_label_halo: LAND,
+    city_label: '#2c2c2e',
+    city_label_halo: LAND,
+    state_label: '#a1a1a6',
+    state_label_halo: LAND,
+    country_label: '#8e8e93',
+    address_label: '#8e8e93',
+    address_label_halo: '#ffffff',
+    landcover: {
+      ...base.landcover,
+      grassland: '#dcecd0',
+      farmland: '#e3eed7',
+      forest: '#cde5c1',
+      scrub: '#e5ecd4',
+      urban_area: '#ece9e4',
+      barren: '#f3eee2',
+      glacier: '#ffffff'
+    }
+  };
 }
+
+// POI icons and road shields read as a second set of markers competing with the
+// restaurants, so they go.
+const DROPPED_LAYERS = /(^|_)(pois|roads_shields)$/;
 
 // Stack bottom→top: basemap fills/lines -> rail lines -> station dots ->
 // basemap labels (place names, so they stay readable over the lines) ->
 // station labels.
-function composeTransit(baseLayers, look) {
-  if (!look?.rail) {
-    const styled = baseLayers.map(recolourBasemap);
-    const symbols = styled.filter((l) => l.type === 'symbol');
-    const nonSymbols = styled.filter((l) => l.type !== 'symbol');
-    return [...nonSymbols, ...RAIL_LAYERS, STATION_DOT_LAYER, ...symbols, STATION_LABEL_LAYER];
-  }
-  // An alternative look (looks.js) colours the basemap through its flavour, so
-  // there is no recolouring pass — only POI icons and road shields go, which
-  // read as a second set of markers competing with the restaurants.
-  const kept = baseLayers.filter((l) => !LOOK_DROPPED_LAYERS.test(l.id));
+function composeTransit(baseLayers) {
+  const kept = baseLayers.filter((l) => !DROPPED_LAYERS.test(l.id));
   const symbols = kept.filter((l) => l.type === 'symbol');
   const nonSymbols = kept.filter((l) => l.type !== 'symbol');
-  const rail = buildLookRail(look.rail);
-  return [...nonSymbols, ...rail.lines, rail.stations, ...symbols, rail.labels];
-}
-
-// ---- Alternative looks -------------------------------------------------------
-// The same data and band maths as the shipped rail, with the look choosing the
-// width curve, colours, casing, glow and station styling. Layer ids stay the
-// ones the lines popup queries (LINE_QUERY_LAYERS, STATION_LAYER).
-
-const LOOK_DROPPED_LAYERS = /(^|_)(pois|roads_shields)$/;
-const LOOK_ZOOMS = [6, 10, 13, 16];
-const zoomStops = (stops) => ['interpolate', ['linear'], ['zoom'], ...stops.flat()];
-const lookCurve = (widths, stop) => zoomStops(LOOK_ZOOMS.map((z, i) => [z, stop(widths[i], i)]));
-
-function buildLookRail(r) {
-  const floor = ['case', ['has', 'wf'], r.minBand ?? MIN_BAND, 0];
-  const band = (px) => ['max', ['*', px, BAND_WIDTH], floor];
-  const width = lookCurve(r.widths, (px) => band(px));
-  const offset = lookCurve(r.widths, (px) => ['*', band(px), BAND_INDEX]);
-  const groups = [
-    ['nr', ['all', ['==', ['get', 'base'], false], ['==', ['get', 'tfl'], false]]],
-    ['tfl', ['all', ['==', ['get', 'base'], false], ['==', ['get', 'tfl'], true]]]
-  ];
-  const line = (id, filter, paint) => ({
-    id,
-    type: 'line',
-    source: 'tube',
-    filter,
-    layout: { 'line-join': 'round', 'line-cap': 'round' },
-    paint
-  });
-
-  const lines = [
-    line('rail-base', ['==', ['get', 'base'], true], {
-      'line-color': r.base.color,
-      'line-width': zoomStops([8, 12, 14, 16].map((z, i) => [z, r.base.width[i]])),
-      'line-opacity': zoomStops([[10, r.base.opacity[0]], [16, r.base.opacity[1]]])
-    })
-  ];
-  // NR group entirely below the TfL group, each as glow → casing → line →
-  // highlight, so a TfL line crossing a National Rail one is cased off from it.
-  for (const [group, filter] of groups) {
-    if (r.glow) {
-      lines.push(
-        line(`rail-${group}-glow`, filter, {
-          'line-color': r.color,
-          'line-width': lookCurve(r.widths, (px) => ['*', band(px), r.glow.widthFactor]),
-          'line-blur': lookCurve(r.widths, (px) => ['*', band(px), r.glow.blurFactor]),
-          'line-offset': offset,
-          'line-opacity': r.glow.opacity
-        })
-      );
-    }
-    if (r.casing) {
-      lines.push(
-        line(`rail-${group}-casing`, filter, {
-          'line-color': r.casing.color,
-          'line-width': lookCurve(r.widths, (px, i) => ['+', band(px), 2 * r.casing.px[i]]),
-          'line-offset': offset
-        })
-      );
-    }
-    lines.push(line(`rail-${group}`, filter, { 'line-color': r.color, 'line-width': width, 'line-offset': offset }));
-    if (r.highlight) {
-      lines.push(
-        line(`rail-${group}-highlight`, filter, {
-          'line-color': '#ffffff',
-          'line-width': lookCurve(r.widths, (px) => ['*', band(px), r.highlight.widthFactor]),
-          'line-offset': offset,
-          'line-opacity': zoomStops(r.highlight.opacity)
-        })
-      );
-    }
-  }
-
-  const s = r.stations;
-  const stations = {
-    id: STATION_LAYER,
-    type: 'circle',
-    source: 'tube',
-    minzoom: s.minzoom,
-    filter: ['==', ['get', 'station'], true],
-    paint: {
-      'circle-radius': zoomStops(s.radius),
-      'circle-color': s.fill,
-      'circle-stroke-color': s.stroke,
-      'circle-stroke-width': zoomStops(s.strokeWidth),
-      'circle-opacity': zoomStops([[s.fadeIn[0], 0], [s.fadeIn[1], 1]]),
-      'circle-stroke-opacity': zoomStops([[s.fadeIn[0], 0], [s.fadeIn[1], 1]])
-    }
-  };
-
-  const l = r.labels;
-  const labels = {
-    id: 'rail-station-labels',
-    type: 'symbol',
-    source: 'tube',
-    minzoom: l.minzoom,
-    filter: ['==', ['get', 'station'], true],
-    layout: {
-      'text-field': ['get', 'name'],
-      'text-font': l.font,
-      'text-size': l.size,
-      'text-offset': [0, 0.9],
-      'text-anchor': 'top',
-      'text-optional': true
-    },
-    paint: { 'text-color': l.color, 'text-halo-color': l.halo, 'text-halo-width': l.haloWidth ?? 1.6 }
-  };
-
-  return { lines, stations, labels };
-}
-
-function lookFlavor(look) {
-  const base = namedFlavor(look?.base ?? 'light');
-  if (!look?.flavor) return base;
-  const { landcover, ...rest } = look.flavor;
-  return { ...base, ...rest, landcover: { ...base.landcover, ...landcover } };
+  return [...nonSymbols, ...RAIL_LAYERS, STATION_DOT_LAYER, ...symbols, STATION_LABEL_LAYER];
 }
 
 /** Offline: bundled GB tiles (coarse country + detailed restaurant areas). */
-export function buildLocalStyle(look) {
-  const flavor = lookFlavor(look);
+export function buildLocalStyle() {
+  const flavor = buildFlavor();
   // Coarse whole-country tiles below the handoff zoom; detailed restaurant-area
   // tiles at/above it. Namespacing keeps the two layer sets' ids unique.
   const gbLayers = layers('gb', flavor, { lang: 'en' }).map((layer) => ({
@@ -364,16 +290,13 @@ export function buildLocalStyle(look) {
     },
     // Drop the opaque background layer so undownloaded voids stay transparent
     // and reveal the "offline" watermark on the map container behind the canvas.
-    layers: composeTransit(
-      [...gbLayers, ...detailLayers].filter((l) => !/(^|_)background$/.test(l.id)),
-      look
-    )
+    layers: composeTransit([...gbLayers, ...detailLayers].filter((l) => !/(^|_)background$/.test(l.id)))
   };
 }
 
 /** Online: full global Protomaps (all cities, all labels, max zoom) via the API. */
-export function buildOnlineStyle(look) {
-  const flavor = lookFlavor(look);
+export function buildOnlineStyle() {
+  const flavor = buildFlavor();
   return {
     version: 8,
     glyphs: assetUrl('/basemap/fonts/{fontstack}/{range}.pbf'),
@@ -387,6 +310,6 @@ export function buildOnlineStyle(look) {
       },
       tube: TUBE_SOURCE
     },
-    layers: composeTransit(layers('world', flavor, { lang: 'en' }), look)
+    layers: composeTransit(layers('world', flavor, { lang: 'en' }))
   };
 }
