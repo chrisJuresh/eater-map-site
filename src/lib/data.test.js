@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { annotateRestaurants, distanceMeters, filterRestaurants, formatDistance, markerOffset } from './data.js';
+import {
+  annotateRestaurants,
+  distanceMeters,
+  filterRestaurants,
+  formatDistance,
+  markerOffset,
+  rankSearchResults
+} from './data.js';
 
 const raw = [
   { id: 'a', name: 'Alpha', address: '1 St', lat: '51.5', lon: '-0.1', priceRange: '$$', openFor: 'Dinner' },
@@ -61,6 +68,31 @@ describe('filterRestaurants', () => {
   it('combines price and text', () => {
     expect(filterRestaurants(annotated, 'alpha', '$$').map((r) => r.id)).toEqual(['a']);
     expect(filterRestaurants(annotated, 'gamma', '$$').length).toBe(0);
+  });
+});
+
+describe('rankSearchResults', () => {
+  const annotated = annotateRestaurants([
+    { id: 'desc', name: 'Wok Inn', lat: 51.5, lon: -0.1, description: 'Great Chinese dumplings' },
+    {
+      id: 'guide',
+      name: 'Golden Bowl',
+      lat: 51.51,
+      lon: -0.1,
+      sources: [{ pageTitle: 'Best Brunch' }, { pageTitle: 'Where to Eat Chinese Food in London' }]
+    },
+    { id: 'name', name: 'Chinese Laundry', lat: 51.52, lon: -0.1, pageTitle: 'Best Brunch' }
+  ]);
+
+  it('ranks name hits, then guide-title hits, then other text', () => {
+    const hits = filterRestaurants(annotated, 'chinese', 'all');
+    expect(hits.map((r) => r.id)).toEqual(['desc', 'guide', 'name']);
+    expect(rankSearchResults(hits, 'chinese').map((r) => r.id)).toEqual(['name', 'guide', 'desc']);
+  });
+
+  it('keeps data order within a tier', () => {
+    const hits = filterRestaurants(annotated, 'brunch', 'all');
+    expect(rankSearchResults(hits, 'brunch').map((r) => r.id)).toEqual(['guide', 'name']);
   });
 });
 

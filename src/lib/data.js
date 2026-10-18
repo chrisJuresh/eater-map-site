@@ -37,7 +37,10 @@ export function annotateRestaurants(items) {
       searchText: [item.name, item.address, item.priceRange, item.openFor, item.bestFor, ...descriptionTexts, ...sourceTitles]
         .filter(Boolean)
         .join(' ')
-        .toLowerCase()
+        .toLowerCase(),
+      // Ranking only: which part of searchText a query hit.
+      nameText: String(item.name || '').toLowerCase(),
+      guideText: sourceTitles.filter(Boolean).join(' ').toLowerCase()
     };
   });
 }
@@ -49,6 +52,19 @@ export function filterRestaurants(restaurants, searchText, priceFilter) {
     if (!searchText) return true;
     return restaurant.searchText.includes(searchText);
   });
+}
+
+/**
+ * Order matches for the capped search dropdown: name hits, then restaurants
+ * from a guide whose title matches ("chinese" → every restaurant in a Chinese
+ * guide), then hits elsewhere in the text. Stable within each tier.
+ */
+export function rankSearchResults(restaurants, searchText) {
+  const tier = (r) => (r.nameText.includes(searchText) ? 0 : r.guideText.includes(searchText) ? 1 : 2);
+  return restaurants
+    .map((restaurant) => ({ restaurant, tier: tier(restaurant) }))
+    .sort((a, b) => a.tier - b.tier)
+    .map(({ restaurant }) => restaurant);
 }
 
 /** Great-circle distance in metres (for the in-view list's distance sort). */
